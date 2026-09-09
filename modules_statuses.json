@@ -1,0 +1,6 @@
+{
+    "Catalog": true,
+    "Transaction": true,
+    "Subscription": true,
+    "Admin": true
+}
