@@ -3,9 +3,17 @@
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+/*
+|--------------------------------------------------------------------------
+| PRIM — Route Utama
+|--------------------------------------------------------------------------
+|
+| Route publik (katalog) didaftarkan oleh modul Catalog. Berkas ini hanya
+| menangani landing page, dashboard, dan pengaturan akun.
+|
+*/
+
+Route::view('/', 'welcome')->name('home');
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])

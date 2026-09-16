@@ -1,8 +1,17 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Modules\Subscription\Http\Controllers\SubscriptionController;
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::resource('subscriptions', SubscriptionController::class)->names('subscription');
+/*
+|--------------------------------------------------------------------------
+| Subscription Routes (AUTH)
+|--------------------------------------------------------------------------
+|
+| Daftar langganan aktif, riwayat masa aktif, perpanjangan, dan pembatalan
+| perpanjangan otomatis.
+|
+*/
+
+Route::middleware(['auth', 'verified'])->name('subscription.')->group(function () {
+    Route::get('langganan', fn () => 'Langganan — segera')->name('index');
 });
