@@ -42,13 +42,13 @@ test('pengguna biasa ditolak dari panel admin', function () {
 
 test('administrator dapat membuka seluruh halaman panel admin', function () {
     $admin = User::factory()->admin()->create();
+    $service = Service::factory()->create();
 
     $routes = [
         'admin.dashboard',
         'admin.providers.index',
         'admin.categories.index',
         'admin.services.index',
-        'admin.plans.index',
         'admin.users.index',
         'admin.transactions.index',
     ];
@@ -56,6 +56,10 @@ test('administrator dapat membuka seluruh halaman panel admin', function () {
     foreach ($routes as $name) {
         $this->actingAs($admin)->get(route($name))->assertOk();
     }
+
+    $this->actingAs($admin)
+        ->get(route('admin.plans.index', $service->slug))
+        ->assertOk();
 });
 
 test('factory pengguna menetapkan peran dengan benar', function () {

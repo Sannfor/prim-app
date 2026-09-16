@@ -37,12 +37,6 @@
                         Langganan
                     </flux:navbar.item>
                 @endauth
-
-                @if ($isAdmin)
-                    <flux:navbar.item icon="wrench-screwdriver" :href="route('admin.dashboard')" :current="request()->routeIs('admin.*')" wire:navigate>
-                        Panel Admin
-                    </flux:navbar.item>
-                @endif
             </flux:navbar>
 
             <flux:spacer />
@@ -100,8 +94,35 @@
             @endauth
         </flux:header>
 
-        {{-- Menu navigasi untuk layar kecil --}}
-        <flux:sidebar stashable sticky class="border-r border-zinc-200 bg-white lg:hidden dark:border-zinc-700 dark:bg-zinc-800">
+        {{-- Bar navigasi khusus panel pengelola --}}
+        @if ($isAdmin)
+            <div class="border-b border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-800">
+                <div class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+                    <flux:navbar class="overflow-x-auto py-1">
+                        <flux:navbar.item icon="chart-bar-square" :href="route('admin.dashboard')" :current="request()->routeIs('admin.dashboard')" wire:navigate>
+                            Ringkasan
+                        </flux:navbar.item>
+                        <flux:navbar.item icon="squares-2x2" :href="route('admin.services.index')" :current="request()->routeIs('admin.services.*', 'admin.plans.*')" wire:navigate>
+                            Layanan
+                        </flux:navbar.item>
+                        <flux:navbar.item icon="tag" :href="route('admin.categories.index')" :current="request()->routeIs('admin.categories.*')" wire:navigate>
+                            Kategori
+                        </flux:navbar.item>
+                        <flux:navbar.item icon="building-office" :href="route('admin.providers.index')" :current="request()->routeIs('admin.providers.*')" wire:navigate>
+                            Penyedia
+                        </flux:navbar.item>
+                        <flux:navbar.item icon="users" :href="route('admin.users.index')" :current="request()->routeIs('admin.users.*')" wire:navigate>
+                            Pengguna
+                        </flux:navbar.item>
+                        <flux:navbar.item icon="receipt-percent" :href="route('admin.transactions.index')" :current="request()->routeIs('admin.transactions.*')" wire:navigate>
+                            Transaksi
+                        </flux:navbar.item>
+                    </flux:navbar>
+                </div>
+            </div>
+        @endif
+
+        {{-- Menu navigasi untuk layar kecil --}}        <flux:sidebar stashable sticky class="border-r border-zinc-200 bg-white lg:hidden dark:border-zinc-700 dark:bg-zinc-800">
             <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
 
             <a href="{{ route('home') }}" class="ml-1 flex items-center gap-2" wire:navigate>
@@ -133,9 +154,24 @@
                 @endauth
 
                 @if ($isAdmin)
-                    <flux:navlist.group heading="Pengelola">
-                        <flux:navlist.item icon="wrench-screwdriver" :href="route('admin.dashboard')" :current="request()->routeIs('admin.*')" wire:navigate>
-                            Panel Admin
+                    <flux:navlist.group heading="Pengelola" class="grid">
+                        <flux:navlist.item icon="chart-bar-square" :href="route('admin.dashboard')" :current="request()->routeIs('admin.dashboard')" wire:navigate>
+                            Ringkasan
+                        </flux:navlist.item>
+                        <flux:navlist.item icon="squares-2x2" :href="route('admin.services.index')" :current="request()->routeIs('admin.services.*', 'admin.plans.*')" wire:navigate>
+                            Layanan
+                        </flux:navlist.item>
+                        <flux:navlist.item icon="tag" :href="route('admin.categories.index')" :current="request()->routeIs('admin.categories.*')" wire:navigate>
+                            Kategori
+                        </flux:navlist.item>
+                        <flux:navlist.item icon="building-office" :href="route('admin.providers.index')" :current="request()->routeIs('admin.providers.*')" wire:navigate>
+                            Penyedia
+                        </flux:navlist.item>
+                        <flux:navlist.item icon="users" :href="route('admin.users.index')" :current="request()->routeIs('admin.users.*')" wire:navigate>
+                            Pengguna
+                        </flux:navlist.item>
+                        <flux:navlist.item icon="receipt-percent" :href="route('admin.transactions.index')" :current="request()->routeIs('admin.transactions.*')" wire:navigate>
+                            Transaksi
                         </flux:navlist.item>
                     </flux:navlist.group>
                 @endif

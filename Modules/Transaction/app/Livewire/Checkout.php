@@ -29,13 +29,28 @@ class Checkout extends Component
 
     /**
      * Muat paket dari segmen URL dan sediakan metode pembayaran bawaan.
+     *
+     * Parameter diterima sebagai string (id paket) lalu dicari eksplisit agar
+     * tidak bergantung pada perilaku implicit binding Livewire.
      */
-    public function mount(Plan $plan, TransactionService $transactions): void
+    public function mount(string $plan, TransactionService $transactions): void
     {
-        abort_unless($plan->is_active, 404);
+        $plan = $this->resolvePlan($plan);
 
         $this->planId = $plan->id;
         $this->paymentMethod = array_key_first($transactions->gateway()->methods()) ?? '';
+    }
+
+    /**
+     * Cari paket aktif berdasarkan id.
+     */
+    private function resolvePlan(string $planId): Plan
+    {
+        $plan = Plan::query()->whereKey($planId)->firstOrFail();
+
+        abort_unless($plan->is_active, 404);
+
+        return $plan;
     }
 
     /**
@@ -43,9 +58,7 @@ class Checkout extends Component
      */
     public function checkout(TransactionService $transactions)
     {
-        $plan = Plan::query()->whereKey($this->planId)->firstOrFail();
-
-        abort_unless($plan->is_active, 404);
+        $plan = $this->resolvePlan((string) $this->planId);
 
         $this->validate([
             'paymentMethod' => ['required', 'string', 'in:'.implode(',', array_keys($transactions->gateway()->methods()))],
