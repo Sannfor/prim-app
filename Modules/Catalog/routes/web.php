@@ -11,12 +11,13 @@ use Illuminate\Support\Facades\Route;
 | desain: pengunjung boleh mencari, memfilter, dan membandingkan layanan.
 | Login baru diwajibkan saat masuk proses pembelian (modul Transaction).
 |
+| Komponen dirujuk memakai nama bernamespace (catalog::...) yang didaftarkan
+| pada App\Providers\ModuleLivewireServiceProvider.
+|
 */
 
 Route::name('catalog.')->group(function () {
-    Route::view('/', 'welcome')->name('home');
-
-    Route::get('katalog', fn () => 'Katalog — segera')->name('index');
-    Route::get('katalog/{service:slug}', fn (string $service) => "Detail: {$service}")->name('show');
-    Route::get('bandingkan', fn () => 'Komparasi — segera')->name('compare');
+    Route::livewire('katalog', 'catalog::service-list')->name('index');
+    Route::livewire('katalog/{service}', 'catalog::service-detail')->name('show');
+    Route::livewire('bandingkan', 'catalog::comparison')->name('compare');
 });

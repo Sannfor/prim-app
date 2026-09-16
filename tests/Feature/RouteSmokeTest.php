@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\Role;
+use App\Models\Service;
 use App\Models\User;
 
 /*
@@ -19,9 +20,11 @@ test('landing page dapat diakses tanpa login', function () {
 });
 
 test('halaman katalog dapat diakses tanpa login', function () {
+    $service = Service::factory()->create(['name' => 'Layanan Uji Route', 'slug' => 'layanan-uji-route']);
+
     $this->get(route('catalog.index'))->assertOk();
     $this->get(route('catalog.compare'))->assertOk();
-    $this->get(route('catalog.show', 'contoh-layanan'))->assertOk();
+    $this->get(route('catalog.show', $service->slug))->assertOk();
 });
 
 test('halaman transaksi dan langganan memerlukan login', function () {

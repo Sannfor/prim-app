@@ -32,7 +32,11 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/",
-            "Modules\\": "Modules/"
+            "Modules\\": "Modules/",
+            "Modules\\Admin\\": "Modules/Admin/app/",
+            "Modules\\Catalog\\": "Modules/Catalog/app/",
+            "Modules\\Subscription\\": "Modules/Subscription/app/",
+            "Modules\\Transaction\\": "Modules/Transaction/app/"
         },
         "classmap": [
             "Modules/Admin/database/seeders",

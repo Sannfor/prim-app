@@ -112,7 +112,7 @@ class Service extends Model
     }
 
     /**
-     * Layanan aktif beserta provider dan paket aktifnya.
+     * Layanan aktif beserta provider, paket aktif, dan ulasannya.
      *
      * @param  Builder<Service>  $query
      */
@@ -121,6 +121,7 @@ class Service extends Model
         $query->with([
             'provider',
             'category',
+            'reviews',
             'plans' => fn ($q) => $q->where('is_active', true)->orderBy('price'),
         ]);
     }

@@ -152,5 +152,6 @@
         </footer>
 
         @fluxScripts
+        <flux:toast.group />
     </body>
 </html>
