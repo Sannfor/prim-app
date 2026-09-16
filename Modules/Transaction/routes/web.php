@@ -10,10 +10,13 @@ use Illuminate\Support\Facades\Route;
 | Checkout, pembayaran (simulasi internal), dan riwayat transaksi.
 | Seluruh route di sini membutuhkan pengguna yang sudah login dan terverifikasi.
 |
+| Komponen dirujuk memakai nama bernamespace (transaction::...) yang
+| didaftarkan pada App\Providers\ModuleLivewireServiceProvider.
+|
 */
 
 Route::middleware(['auth', 'verified'])->name('transaction.')->group(function () {
-    Route::get('checkout/{plan}', fn (string $plan) => "Checkout plan: {$plan}")->name('checkout');
-    Route::get('transaksi', fn () => 'Riwayat transaksi — segera')->name('index');
-    Route::get('transaksi/{order}', fn (string $order) => "Detail transaksi: {$order}")->name('show');
+    Route::livewire('checkout/{plan}', 'transaction::checkout')->name('checkout');
+    Route::livewire('transaksi', 'transaction::transaction-history')->name('index');
+    Route::livewire('transaksi/{order}', 'transaction::transaction-detail')->name('show');
 });
