@@ -21,7 +21,9 @@ class SubscriptionFactory extends Factory
      */
     public function definition(): array
     {
-        $startedAt = now()->subDays(fake()->numberBetween(1, 60));
+        // Dimulai maksimal 25 hari lalu agar masa aktif 30 hari selalu
+        // masih berjalan ketika factory ini dipakai tanpa state khusus.
+        $startedAt = now()->subDays(fake()->numberBetween(1, 25));
 
         return [
             'user_id' => User::factory(),
