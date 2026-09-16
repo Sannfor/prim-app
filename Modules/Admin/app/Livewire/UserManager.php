@@ -25,6 +25,7 @@ class UserManager extends Component
     use WithPagination;
 
     public string $search = '';
+
     public string $roleFilter = '';
 
     public function updated(string $property): void

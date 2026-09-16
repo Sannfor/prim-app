@@ -25,12 +25,19 @@ class ServiceManager extends Component
     use ManagesResource, StoresUploadedImages, WithFileUploads;
 
     public ?int $providerId = null;
+
     public ?int $categoryId = null;
+
     public string $name = '';
+
     public string $tagline = '';
+
     public string $description = '';
+
     public string $website = '';
+
     public bool $isActive = true;
+
     public $logo = null;
 
     protected function defaultFormData(): array

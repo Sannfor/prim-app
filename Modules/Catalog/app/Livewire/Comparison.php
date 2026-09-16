@@ -6,6 +6,7 @@ use App\Models\Plan;
 use App\Models\Service;
 use Flux\Flux;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Number;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -90,9 +91,9 @@ class Comparison extends Component
      * Tabel perbandingan per layanan.
      *
      * @return array{
-     *     services: \Illuminate\Support\Collection<int, Service>,
+     *     services: Collection<int, Service>,
      *     rows: list<array{label: string, values: list<string>, highlight: ?int}>,
-     *     available: \Illuminate\Support\Collection<int, Service>
+     *     available: Collection<int, Service>
      * }
      */
     private function buildComparison(): array

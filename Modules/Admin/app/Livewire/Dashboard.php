@@ -12,6 +12,7 @@ use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -180,9 +181,9 @@ class Dashboard extends Component
     /**
      * Layanan dengan pendapatan tertinggi dari transaksi lunas.
      *
-     * @return \Illuminate\Support\Collection<int, object>
+     * @return Collection<int, object>
      */
-    private function topServices(): \Illuminate\Support\Collection
+    private function topServices(): Collection
     {
         return Transaction::query()
             ->where('transactions.status', TransactionStatus::Paid->value)

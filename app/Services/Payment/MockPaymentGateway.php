@@ -16,7 +16,9 @@ use Illuminate\Support\Str;
 class MockPaymentGateway implements PaymentGateway
 {
     public const METHOD_TRANSFER = 'transfer';
+
     public const METHOD_QRIS = 'qris';
+
     public const METHOD_EWALLET = 'ewallet';
 
     public function name(): string

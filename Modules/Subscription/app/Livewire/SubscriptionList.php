@@ -6,6 +6,7 @@ use App\Enums\SubscriptionStatus;
 use App\Models\Subscription;
 use Flux\Flux;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Collection;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
@@ -81,7 +82,7 @@ class SubscriptionList extends Component
     /**
      * Daftar langganan sesuai filter yang dipilih.
      */
-    private function subscriptions(): \Illuminate\Support\Collection
+    private function subscriptions(): Collection
     {
         $query = Subscription::query()
             ->where('user_id', auth()->id())

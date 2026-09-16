@@ -6,6 +6,8 @@ use App\Models\Category;
 use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Unique;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -32,7 +34,9 @@ class CategoryManager extends Component
     ];
 
     public string $name = '';
+
     public string $icon = '';
+
     public string $description = '';
 
     protected function defaultFormData(): array
@@ -52,9 +56,9 @@ class CategoryManager extends Component
     /**
      * Aturan nama unik, mengabaikan record yang sedang disunting.
      */
-    private function uniqueNameRule(): \Illuminate\Validation\Rules\Unique
+    private function uniqueNameRule(): Unique
     {
-        $rule = \Illuminate\Validation\Rule::unique('categories', 'name');
+        $rule = Rule::unique('categories', 'name');
 
         return $this->editingId === null ? $rule : $rule->ignore($this->editingId);
     }

@@ -2,7 +2,6 @@
 
 namespace Modules\Transaction\Livewire;
 
-use App\Enums\TransactionStatus;
 use App\Models\Transaction;
 use App\Services\TransactionService;
 use Flux\Flux;

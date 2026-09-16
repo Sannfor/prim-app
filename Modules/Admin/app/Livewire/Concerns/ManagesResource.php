@@ -194,7 +194,7 @@ trait ManagesResource
      * Kait sebelum record dihapus; dipakai untuk membersihkan berkas terkait
      * atau menolak penghapusan dengan mengembalikan false.
      */
-    protected function beforeDelete(Model $record): bool|null
+    protected function beforeDelete(Model $record): ?bool
     {
         return true;
     }

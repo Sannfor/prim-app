@@ -23,8 +23,11 @@ class ProviderManager extends Component
     use ManagesResource, StoresUploadedImages, WithFileUploads;
 
     public string $name = '';
+
     public string $website = '';
+
     public string $description = '';
+
     public $logo = null;
 
     protected function defaultFormData(): array

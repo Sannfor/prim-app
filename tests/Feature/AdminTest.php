@@ -10,6 +10,7 @@ use App\Models\Subscription;
 use App\Models\Transaction;
 use App\Models\User;
 use Database\Seeders\CatalogSeeder;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Livewire\Livewire;
 use Modules\Admin\Livewire\CategoryManager;
 use Modules\Admin\Livewire\Dashboard;
@@ -356,7 +357,7 @@ test('paket milik layanan lain tidak dapat disunting dari halaman ini', function
     expect(fn () => Livewire::actingAs($this->admin)
         ->test(PlanManager::class, ['service' => $service->slug])
         ->call('edit', $foreignPlan->id))
-        ->toThrow(Illuminate\Database\Eloquent\ModelNotFoundException::class);
+        ->toThrow(ModelNotFoundException::class);
 });
 
 test('paket yang sudah ditransaksikan tidak dapat dihapus', function () {

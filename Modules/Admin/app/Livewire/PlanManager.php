@@ -8,7 +8,6 @@ use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
 use Livewire\Attributes\Layout;
-use Livewire\Attributes\Title;
 use Livewire\Component;
 use Modules\Admin\Livewire\Concerns\ManagesResource;
 
@@ -29,11 +28,17 @@ class PlanManager extends Component
     public int $serviceId;
 
     public string $name = '';
+
     public int $price = 0;
+
     public int $durationDays = 30;
+
     public int $maxDevices = 1;
+
     public string $description = '';
+
     public string $featuresText = '';
+
     public bool $isActive = true;
 
     /**

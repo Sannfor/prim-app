@@ -2,14 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Enums\Role;
 use App\Models\Category;
 use App\Models\Plan;
 use App\Models\Provider;
 use App\Models\Service;
-use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 
 /**
  * Mengisi katalog PRIM dengan data contoh yang realistis.
