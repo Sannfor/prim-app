@@ -43,7 +43,9 @@
 
         <div class="mt-8 flex h-52 items-end gap-4">
             @foreach ($monthly as $month)
-                <div class="group flex flex-1 flex-col items-center gap-2">
+                {{-- h-full wajib: tanpa itu tinggi persentase dihitung terhadap
+                     induk setinggi otomatis sehingga batang tidak terlihat. --}}
+                <div class="group flex h-full flex-1 flex-col items-center justify-end gap-2">
                     <span class="text-[11px] text-muted opacity-0 transition group-hover:opacity-100">
                         Rp{{ Number::format($month['value'], locale: 'id') }}
                     </span>

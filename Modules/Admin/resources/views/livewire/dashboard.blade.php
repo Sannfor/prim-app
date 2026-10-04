@@ -61,7 +61,9 @@
 
             <div class="mt-8 flex h-40 items-end gap-1.5">
                 @foreach ($dailyTransactions as $day)
-                    <div wire:key="day-{{ $day['date']->toDateString() }}" class="group flex flex-1 flex-col items-center gap-1">
+                    {{-- h-full wajib: tanpa itu tinggi persentase dihitung terhadap
+                         induk setinggi otomatis sehingga batang tidak terlihat. --}}
+                    <div wire:key="day-{{ $day['date']->toDateString() }}" class="group flex h-full flex-1 flex-col items-center justify-end gap-1">
                         <span class="text-[10px] font-medium text-muted opacity-0 transition group-hover:opacity-100">
                             {{ $day['count'] }}
                         </span>
