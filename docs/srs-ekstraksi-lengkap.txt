@@ -1,0 +1,689 @@
+
+# Analisa Kebutuhan dan Desain
+
+# untuk
+
+# PRIM: Platform digital aggregator layanan langganaan/fitur premium
+Version 1.0
+Dibuat oleh :
+2411016320004 Hidayatunnisa
+2411016110012 Ahmadi Hasan
+2411016220010 Najwa Karima Hana Putri
+2411016120001 Misliani
+2311016210015 Muhammad Najib Akbar
+
+Ilmu Komputer
+Fakultas Matematika dan Ilmu Pengetahuan Alam
+Universitas Lambung Mangkurat
+2026
+Daftar Isi
+
+Daftar Gambar
+
+Daftar Tabel
+
+Catatan Revisi
+
+<!-- TABEL 1 -->
+| Nama | Tanggal | Alasan | Versi |
+|---|---|---|---|
+|  |  |  |  |
+|  |  |  |  |
+|  |  |  |  |
+
+# Pendahuluan
+
+## Tujuan
+Dokumen Software Requirements Specification (SRS) ini bertujuan untuk mendefinisikan dan menguraikan secara menyeluruh kebutuhan fungsional maupun non-fungsional dari Aplikasi PRIM (Aggregator Fitur Premium). Dokumen ini dirancang untuk memberikan pemahaman yang sama mengenai spesifikasi sistem kepada seluruh pemangku kepentingan (stakeholders) yang terlibat, serta menjadi acuan resmi (baseline) bagi tim pengembang software dalam merancang, mengimplementasikan, dan menguji aplikasi agar sesuai dengan kriteria yang ditetapkan.
+
+## Daftar Istilah
+Berikut ini adalah istilah-istilah yang digunakan pada dokumen ini :
+
+<!-- TABEL 2 -->
+| Istilah | Keterangan |
+|---|---|
+| PRIM | Platform digital aggregator layanan langganaan/fitur premium. |
+| Aggregator | Sistem atau platform yang mengumpulkan, mengintegrasikan, dan menyajikan data/layanan dari berbagai sumber berbeda ke dalam satu wadah terstruktur. |
+| SRS | Software Requirements Specification, dokumen spesifkasi kebutuhan perangkat lunak. |
+| Server | Komputer pusat atau penyedia layanan komputasi yang memproses permintaan data dari aplikasi pengguna. |
+| User/Pengguna | Pihak internal maupun eksternal yang menggunakan aplikasi PRIM untuk mengakses layanan, melihat katalog, dan melakukan pemesanan. |
+| Website | Sekumpulan halaman web yang saling terhubung dan dapat diakses melalui internet menggunakan sebuah alamat unik (URL). |
+| Entity Relationship Diagram | Diagram yang digunakan untuk merancang dan memvisualisasikan struktur basis data sistem, yang menghubungkan antar entitas data. |
+| Activity Diagram | Diagram yang memodelkan alur kerja dari sebuah proses sistem secara visual dari awal hingga akhir. |
+| Use Case | Sebuah teknik pemodelan yang digunakan untuk menggambarkan interaksi fungsional antara pengguna (aktor) dengan sistem untuk mencapai suatu tujuan spesifik. |
+
+## Sasaran Pembaca
+Berikut ini adalah pihak yang dapat menggunakan dokumen ini :
+Tim Pengembang (Software Developers & Designer), dokumen ini dapat digunakan oleh pengembang sebagai panduan teknis utama dalam membanggun arsitektur sistem, rancangan basis data, antarmuka (UI/UX), dan penulisan kode program.
+Tim Penguji (Software Quality Assurance / Testers), dokumen ini dapat digunakan oleh tim QA sebagai acuan dalam menyusun skenario penguji (test cases) untuk memastikan sistem berfungsi sesuai spesifikasi.
+Manajer Proyek (Project Manager), dokumen ini dapat digunakan oleh project manager sebagai dasar monitoring jalannya pengembangan, estimasi sumber daya, dan validasi deliverables.
+Pengelola Platform (Product Owner), dokumen ini dapat digunakan oleh pihak pengelola sebagai acuan dalam memahami cakupan fitur, model bisnis, dan mekanisme kemitraan dengan provider layanan yang akan diterapkan pada platform PRIM.
+Dosen Pengampu / Evaluator, dokumen ini dapat digunakan oleh evaluator sebagai bahan penilaian terhadap pemenuhan standar rekayasa perangkat lunak dalam perancangan aplikasi.
+
+## Ruang Lingkup Produk
+Aplikasi PRIM adalah platform digital aggregator layanan langganan premium yang dikembangkan untuk memudahkan pengguna dalam mencari, membandingkan, dan membeli berbagai layanan digital secara praktis dan efisien dalam satu wadah.
+Tujuan & Manfaat: Aplikasi ini mengatasi masalah fragmentasi informasi dengan menghilangkan kebutuhan pengguna untuk berpindah-pindah antar platform saat membandingkan fitur, harga, dan paket langganan digital. Informasi disajikan secara lengkap, transparan, dan terstruktur sehingga mempercepat serta mempermudah proses pengambilan keputusan.
+Manfaat Organisasi/Lembaga: Bagi pengembang atau pihak pengelola platform, PRIM membuka peluang sebagai hub distribusi digital yang memfasilitasi kemitraan dengan berbagai penyedia layanan (providers), meningkatkan efisiensi pemasaran layanan digital, serta menyediakan repository data analitik pasar terkait tren kebutuhan langganan digital.
+Cakupan Utama: Aplikasi ini mencakup fitur pencarian katalog, filter kategori, komparasi fitur dan harga side-by-side, manajemen transaksi/pembelian, serta riwayat langganan pengguna. Penjelasan rinci mengenai fitur-fitur fungsional sistem akan dibahas pada bagian Kebutuhan Spesifik pada bab selanjutnya.
+
+## Referensi
+Berikut adalah referensi yang digunakan pada dokumen ini :
+Nugroho, A. (2010). Rekayasa perangkat lunak berorientasi objek dengan metode USDP.
+Ichwani, A., Zani, T., Waseso, B., Trisnawan, A. B., Wahyu, S., Setyadi, R., ... & Prabowo, A. (2026). Software Requirements Specification (SRS): Konsep, Analisis, dan Implementasi.
+Hartono, S., Tanaamah, A. R. (2018). Penerapan Software Requirement Specifications pada Sistem Website Sinode GKJ di Salatiga.
+
+# Deskripsi Umum Sistem
+
+## Perspektif Sistem
+
+Gambar 2-1. Tinjauan Sistem PRIM (Platform Aggregator Fitur Premium)
+Gambar 2-1 menggambarkan tinjauan umum sistem PRIM (Platform Aggregator Fitur Premium) beserta seluruh pihak yang berinteraksi dengannya. Sistem PRIM berpusat sebagai platform digital yang menerima dan memproses data dari tiga aktor utama, yaitu User, Admin, dan Payment Gateway.
+User (pengguna akhir) berinteraksi dengan sistem dengan mengirimkan data pemesanan paket, data profil dan akun, konfirmasi checkout, serta survei kepuasan. Sebagai balikan, sistem memberikan informasi katalog paket premium, status order, bukti pembayaran, dan notifikasi aktivasi layanan.
+Admin (pengelola platform) mengirimkan data pengelolaan paket, pengaturan status pengguna, aktivasi layanan, dan data pelanggan baru ke dalam sistem. Sistem mengembalikan laporan pendapatan dan data transaksi sebagai bahan pengelolaan platform.
+Payment Gateway (Midtrans, Xendit, Stripe) menerima data transaksi order, permintaan pembayaran, dan token pembayaran dari sistem. Selanjutnya Payment Gateway mengirimkan kembali konfirmasi pembayaran status sukses atau gagal untuk diproses oleh sistem.
+
+## Fungsi Produk
+Fungsi yang dari PRIM ini antara lain adalah :
+Menyediakan katalog layanan digital premium yang berisi informasi mengenai berbagai layanan, fitur, paket, dan harga dalam satu platform sehingga pengguna tidak perlu mencari informasi dari banyak sumber.
+Membantu pengguna membandingkan layanan digital berdasarkan fitur, harga, paket langganan, dan informasi lainnya sehingga pengguna dapat menentukan layanan yang sesuai dengan kebutuhan.
+Mempermudah proses pembelian layanan premium melalui sistem transaksi yang terintegrasi dan terorganisir dalam satu platform.
+Menyediakan fitur pencarian dan filter kategori untuk membantu pengguna menemukan layanan premium dengan lebih cepat sesuai dengan jenis atau kategori yang diinginkan.
+Menyimpan dan menampilkan riwayat transaksi serta langganan sehingga pengguna dapat melihat kembali layanan yang pernah dibeli atau digunakan.
+Membantu pengelola dalam mengelola data layanan dan transaksi secara lebih terstruktur sehingga proses pengelolaan platform dapat dilakukan dengan lebih efektif dan efisien.
+
+## Penggolongan Karakteristik Pengguna
+Dalam sistem informasi ini, pengguna yang terlibat dalam penggunaan Aplikasi PRIM (Aggregator Fitur Premium) adalah sebagai berikut:
+User/Pelanggan, merupakan pengguna yang menggunakan aplikasi untuk mencari, melihat, membandingkan, dan membeli layanan digital premium. User juga dapat melihat informasi paket, harga, fitur layanan, serta riwayat transaksi dan langganan.
+Admin, merupakan pengguna yang bertanggung jawab dalam mengelola data pada sistem. Admin dapat mengelola data layanan premium, kategori, informasi paket, harga, data pengguna, serta memantau transaksi yang dilakukan melalui aplikasi.
+Provider/Penyedia Layanan, merupakan pihak yang menyediakan layanan atau fitur premium yang ditampilkan pada aplikasi PRIM. Provider dapat memberikan informasi terkait layanan, paket, fitur, dan harga yang akan ditampilkan kepada pengguna melalui platform.
+Sistem Pembayaran, merupakan bagian yang mendukung proses transaksi pembelian layanan premium. Sistem ini digunakan untuk memproses pembayaran dan memberikan informasi mengenai status transaksi kepada aplikasi.
+
+## Batasan Sistem
+Batasan sistem merupakan ketentuan dan keterbatasan yang ditetapkan dalam pengembangan serta penggunaan Aplikasi PRIM (Aggregator Fitur Premium). Batasan ini digunakan agar pengembangan sistem tetap sesuai dengan tujuan dan ruang lingkup yang telah ditentukan.
+Batasan sistem pada Aplikasi PRIM antara lain:
+Berbasis Web, Aplikasi PRIM dikembangkan sebagai sistem informasi berbasis web yang dapat diakses melalui web browser tanpa harus melakukan instalasi aplikasi secara khusus pada perangkat pengguna.
+Membutuhkan Koneksi Internet, aplikasi membutuhkan koneksi internet untuk mengakses server, menampilkan data layanan, melakukan proses transaksi, dan menyimpan perubahan data.
+Menggunakan Database, data pengguna, layanan premium, kategori, paket, harga, transaksi, dan riwayat langganan disimpan dalam database yang dikelola oleh sistem.
+Akses Berdasarkan Hak Pengguna, setiap pengguna memiliki hak akses sesuai dengan perannya. User dapat menggunakan fitur yang berkaitan dengan pencarian, perbandingan, pembelian, dan riwayat langganan, sedangkan admin memiliki akses untuk mengelola data sistem.
+Ketergantungan pada Provider, informasi mengenai layanan, paket, fitur, dan harga bergantung pada data yang diberikan atau tersedia dari penyedia layanan. PRIM tidak bertanggung jawab terhadap perubahan fitur, harga, maupun kebijakan dari provider.
+Pembayaran Bergantung pada Sistem Pembayaran, proses pembayaran bergantung pada metode atau layanan pembayaran yang terintegrasi dengan sistem. Status transaksi dapat dipengaruhi oleh keberhasilan atau kegagalan proses pembayaran.
+Kompatibilitas Browser, aplikasi ditujukan untuk digunakan pada web browser modern seperti Google Chrome, Mozilla Firefox, dan Microsoft Edge. Penggunaan browser yang sudah tidak diperbarui dapat menyebabkan beberapa fitur tidak berjalan secara optimal.
+Keamanan Data, sistem harus membatasi akses terhadap data berdasarkan hak pengguna dan menjaga informasi pengguna serta transaksi agar tidak dapat diakses oleh pihak yang tidak memiliki izin.
+Cakupan Sistem Terbatas, PRIM berfokus pada pencarian, perbandingan, dan pembelian layanan digital premium serta pengelolaan data terkait. Sistem tidak mencakup pengembangan atau pengelolaan layanan premium milik provider secara langsung.
+
+## Kebutuhan Spesifik Sistem
+Berikut ini adalah kebutuhan fungsional dari Sistem Informasi PRIM , yaitu :
+
+Tabel 2-1. Kebutuhan Fungsional
+
+<!-- TABEL 3 -->
+| No. | Kebutuhan Fungsional (FITUR) | Keterangan |
+|---|---|---|
+| F-01 | Registrasi dan Login Pengguna | Sistem menyediakan fitur registrasi dan login agar pengguna dapat membuat akun dan mengakses fitur sesuai dengan hak aksesnya. |
+| F-02 | Pengelolaan Profil Pengguna | Sistem memungkinkan pengguna untuk melihat dan mengubah informasi profil akun yang dimiliki. |
+| F-03 | Menampilkan Katalog Layanan Premium | Sistem dapat menampilkan daftar layanan digital premium yang tersedia beserta informasi layanan, fitur, paket, dan harga. |
+| F-04 | Pencarian Layanan | Sistem menyediakan fitur pencarian untuk membantu pengguna menemukan layanan digital premium berdasarkan kata kunci tertentu. |
+| F -05 | Filter dan Kategori Layanan | Sistem menyediakan fitur filter dan kategori untuk mempermudah pengguna mencari layanan berdasarkan jenis atau kategori layanan yang diinginkan. |
+| F -06 | Perbandingan Layanan | Sistem memungkinkan pengguna membandingkan beberapa layanan berdasarkan fitur, paket, harga, dan informasi lainnya. |
+| F -07 | Melihat Detail Layanan | Sistem dapat menampilkan informasi detail suatu layanan, meliputi deskripsi, fitur, pilihan paket, harga, dan informasi terkait lainnya. |
+| F -08 | Pembelian Layanan Premium | Sistem memungkinkan pengguna memilih layanan dan paket yang diinginkan serta melakukan proses pembelian melalui sistem. |
+| F -09 | Proses Pembayaran | Sistem terintegrasi dengan metode atau layanan pembayaran untuk memproses pembayaran pembelian layanan premium. |
+| F -10 | Menampilkan Status Transaksi | Sistem dapat menampilkan status transaksi pengguna, seperti menunggu pembayaran, berhasil, atau gagal. |
+| F -11 | Riwayat Transaksi | Sistem menyimpan dan menampilkan riwayat transaksi yang pernah dilakukan oleh pengguna. |
+| F -12 | Riwayat Langganan | Sistem dapat menampilkan informasi layanan yang sedang atau pernah dilanggan oleh pengguna. |
+| F -13 | Pengelolaan Data Layanan oleh Admin | Admin dapat menambah, mengubah, melihat, dan menghapus data layanan digital premium yang tersedia pada sistem. |
+| F -14 | Pengelolaan Kategori dan Paket | Admin dapat mengelola kategori layanan, paket langganan, fitur, dan harga yang ditampilkan pada sistem |
+| F -15 | Pengelolaan Data Pengguna | Admin dapat melihat dan mengelola data pengguna sesuai dengan hak akses yang dimiliki. |
+| F -16 | Pengelolaan dan Pemantauan Transaksi | Admin dapat melihat dan memantau transaksi yang dilakukan oleh pengguna melalui sistem. |
+| F -17 | Pengelolaan Informasi Layanan oleh Provider | Provider dapat memberikan atau memperbarui informasi layanan, paket, fitur, dan harga yang disediakan untuk ditampilkan pada PRIM. |
+| F -18 | Hak Akses Berdasarkan Peran | Sistem memberikan hak akses yang berbeda kepada User, Admin, dan Provider sesuai dengan peran masing-masing. |
+
+Berikut ini adalah kebutuhan non fungsional dari Sistem Informasi PRIM, yaitu :
+
+Tabel 2-2. Kebutuhan Non Fungsional
+
+<!-- TABEL 4 -->
+| No. | Kebutuhan Non Fungsional | Keterangan |
+|---|---|---|
+| NF-01 | Availability/Ketersediaan | Sistem dapat diakses selama 24 jam sehari dan 7 hari seminggu dengan target ketersediaan sistem yang tinggi. |
+| NF-02 | Performance / Kinerja | Waktu loading halaman maksimal 10 detik pada kondisi jaringan dan server normal. |
+| NF-03 | Performance Transaksi | Waktu proses transaksi pembayaran maksimal 20 detik, tidak termasuk waktu yang disebabkan oleh gangguan atau keterlambatan dari pihak payment gateway. |
+| NF-04 | Concurrent Transaction | Sistem mampu menangani minimal 100 transaksi secara simultan tanpa menyebabkan kegagalan fungsi utama sistem. |
+| NF-05 | Skalabilitas | Sistem dirancang agar dapat digunakan oleh minimal 1.000+ pengguna aktif per bulan serta memungkinkan peningkatan jumlah pengguna di masa mendatang. |
+| NF-06 | Keamanan | Sistem menggunakan protokol keamanan SSL/TLS (HTTPS) untuk melindungi komunikasi antara pengguna dan server. |
+| NF-07 | Payment Security | Sistem menggunakan atau terintegrasi dengan payment gateway resmi dan terpercaya untuk mendukung keamanan proses pembayaran. |
+| NF-08 | Autentikasi | Sistem menyediakan autentikasi pengguna menggunakan akun yang terdaftar dan dapat menerapkan email verification untuk memastikan validitas akun. |
+| NF-09 | Additional Authentication | Sistem dapat menyediakan OTP sebagai metode keamanan tambahan pada proses autentikasi atau transaksi tertentu. |
+| NF-10 | Authorization / Otorisasi | Sistem membatasi akses terhadap fitur dan data berdasarkan hak akses pengguna, seperti User, Admin, dan Provider. |
+| NF-11 | Data Integrity / Integritas Data | Sistem harus menjaga agar data pengguna, layanan, paket, harga, dan transaksi tetap akurat, konsisten, dan tidak mudah mengalami perubahan tanpa izin. |
+| NF-12 | Usability / Kemudahan Penggunaan | Antarmuka sistem harus mudah dipahami dan digunakan oleh pengguna serta memiliki navigasi yang jelas. |
+| NF-13 | Kompatibilitas | Sistem dapat digunakan pada web browser modern seperti Google Chrome, Mozilla Firefox, dan Microsoft Edge. |
+| NF-14 | Responsive Design | Tampilan sistem dapat menyesuaikan ukuran layar komputer, laptop, tablet, maupun smartphone. |
+| NF-15 | Reliability / Keandalan | Sistem dapat menjalankan fungsi utama seperti pencarian, perbandingan, pembelian, dan pencatatan transaksi secara konsisten. |
+| NF-16 | Maintainability / Pemeliharaan | Sistem memiliki dokumentasi dan struktur yang memungkinkan proses pemeliharaan, perbaikan, dan pengembangan sistem dilakukan dengan lebih mudah. |
+| NF-17 | Operational Documentation | Tersedia dokumentasi sistem dan SOP operasional yang dapat digunakan oleh Admin dalam menjalankan dan mengelola sistem. |
+| NF-18 | Backup Data | Data penting sistem dapat dilakukan pencadangan secara berkala untuk mengurangi risiko kehilangan data. |
+
+## Kebutuhan Interface
+Kebutuhan interface atau antarmuka merupakan kebutuhan perangkat keras dan perangkat lunak yang digunakan oleh pengguna untuk mengakses dan menjalankan Aplikasi PRIM (Aggregator Fitur Premium). Sistem dirancang berbasis web sehingga dapat diakses melalui perangkat yang memiliki koneksi internet dan web browser.Kebutuhan interface yang diperlukan antara lain:
+Perangkat Komputer/Laptop, digunakan oleh pengguna untuk mengakses dan menjalankan aplikasi PRIM. Perangkat dapat berupa PC atau laptop dengan spesifikasi yang mampu menjalankan web browser dengan baik
+Keyboard dan Mouse/Touchpad, digunakan sebagai perangkat input untuk melakukan navigasi, mengisi data, memilih menu, melakukan pencarian, serta menjalankan berbagai fungsi yang tersedia pada aplikasi.
+Monitor/Layar, digunakan untuk menampilkan halaman aplikasi, informasi layanan premium, daftar paket, harga, hasil pencarian, informasi transaksi, dan fitur lainnya.
+Perangkat Smartphone, dapat digunakan sebagai alternatif untuk mengakses aplikasi PRIM melalui web browser selama perangkat memiliki koneksi internet dan browser yang mendukung.
+Web Browser, digunakan untuk mengakses aplikasi PRIM. Browser yang dapat digunakan antara lain Google Chrome, Mozilla Firefox, Microsoft Edge, atau browser modern lainnya.
+Koneksi Internet, diperlukan agar pengguna dapat mengakses aplikasi, mengambil data layanan, melakukan transaksi, serta berkomunikasi dengan server sistem.
+Server, digunakan untuk menyimpan dan memproses data aplikasi, seperti data pengguna, data layanan premium, data paket, serta data transaksi. Server harus dapat terhubung dengan internet agar aplikasi dapat diakses oleh pengguna.
+Database, digunakan untuk menyimpan data yang dibutuhkan oleh sistem secara terstruktur, seperti data pengguna, layanan premium, kategori, paket langganan, transaksi, dan riwayat langganan.
+
+# Model Sistem
+
+## Use Case
+
+### Use Case Diagram : <Modul Catalog>
+
+<!-- TABEL 5 -->
+|  |
+|---|
+
+Gambar 3-1. Use Case Diagram <Modul Catalog>
+Tabel 3-1. Use case description : Menelusuri katalog
+
+<!-- TABEL 6 -->
+| Name | : | Menelusuri katalog |
+|---|---|---|
+| Description | : | Fitur untuk menampilkan seluruh layanan langganan yang tersedia pada katalog publik PRIM tanpa memerlukan login. Langkah-langkahnya: (1) Pengunjung membuka halaman beranda atau menu "Katalog". (2) Sistem memuat daftar layanan aktif beserta logo, nama penyedia, kategori, tagline, harga paket termurah, dan rata-rata rating. (3) Pengunjung menggulir daftar layanan dan berpindah halaman melalui kontrol paginasi. (4) Pengunjung menekan salah satu kartu layanan untuk membuka halaman detailnya. |
+| Actor | : | Pengunjung |
+| Pre-condition | : | Kondisi sebelum :– Data layanan aktif beserta paket, penyedia, dan kategorinya telah tersimpan di dalam basis data.– Pengunjung berada pada halaman katalog publik sehingga tidak perlu melakukan login. |
+| Post-condition | : | Kondisi setelah :– Daftar layanan aktif tampil pada halaman katalog lengkap dengan penyedia, kategori, harga paket termurah, dan rata-rata rating.– Halaman katalog menampilkan kontrol paginasi beserta jumlah total layanan yang ditemukan. |
+| Alternate flow | : | – Bila Pengunjung sudah login sebagai Pelanggan, sistem tetap menampilkan katalog yang sama dan menambahkan menu langganan pada bilah navigasi.– Bila suatu layanan belum memiliki ulasan, sistem menampilkan keterangan "Belum ada ulasan" alih-alih nilai rating. |
+| Exception flow | : | – Bila daftar layanan gagal dimuat dari basis data, sistem menampilkan pesan kesalahan dan halaman katalog dirender tanpa daftar layanan.– Bila belum ada layanan aktif yang tersedia, sistem menampilkan pesan bahwa katalog masih kosong. |
+
+Tabel 3-2. Use case description : Mencari layanan
+
+<!-- TABEL 7 -->
+| Name | : | Mencari layanan |
+|---|---|---|
+| Description | : | Fitur untuk mencari layanan pada katalog berdasarkan kata kunci yang diketikkan Pengunjung. Langkah-langkahnya: (1) Pengunjung mengetikkan kata kunci pada kolom pencarian "Cari layanan...". (2) Pengunjung menekan tombol "Cari" atau tombol Enter. (3) Sistem mencocokkan kata kunci dengan kolom nama, tagline, dan deskripsi layanan. (4) Sistem menampilkan layanan yang cocok beserta jumlah temuannya dan membagi hasil per halaman. |
+| Actor | : | Pengunjung |
+| Pre-condition | : | Kondisi sebelum :– Data layanan dengan kolom nama, tagline, dan deskripsi telah tersedia di dalam basis data.– Pengunjung berada pada halaman katalog publik. |
+| Post-condition | : | Kondisi setelah :– Daftar layanan yang cocok dengan kata kunci tampil pada halaman hasil pencarian katalog.– Kata kunci yang dipakai tetap terlihat pada kolom pencarian sehingga Pengunjung dapat menyuntingnya kembali. |
+| Alternate flow | : | – Bila kolom pencarian dikosongkan lalu pencarian dijalankan, sistem menampilkan kembali seluruh layanan aktif.– Pencarian dapat digabungkan dengan filter kategori, penyedia, dan harga maksimum pada halaman yang sama. |
+| Exception flow | : | – Bila kata kunci tidak menemukan layanan apa pun, sistem menampilkan pesan bahwa layanan tidak ditemukan beserta saran untuk mencoba kata kunci lain.– Bila permintaan pencarian gagal diproses server, sistem menampilkan pesan kesalahan dan mempertahankan kata kunci terakhir pada kolom pencarian. |
+
+Tabel 3-3. Use case description : Memfilter layanan
+
+<!-- TABEL 8 -->
+| Name | : | Memfilter layanan |
+|---|---|---|
+| Description | : | Fitur untuk menyaring daftar layanan katalog berdasarkan kategori, penyedia, harga maksimum, dan urutan pengurutan. Langkah-langkahnya: (1) Pengunjung membuka panel filter pada halaman katalog. (2) Pengunjung memilih kategori dan/atau penyedia dari daftar pilihan yang tersedia. (3) Pengunjung mengisi batas harga maksimum paket. (4) Pengunjung memilih opsi pengurutan, yaitu terbaru, harga terendah, harga tertinggi, atau nama. (5) Pengunjung menekan tombol "Terapkan Filter" sehingga sistem menampilkan layanan yang memenuhi seluruh kriteria. |
+| Actor | : | Pengunjung |
+| Pre-condition | : | Kondisi sebelum :– Data kategori, penyedia, dan paket beserta harga dalam rupiah telah tersimpan di dalam basis data.– Pengunjung berada pada halaman katalog publik. |
+| Post-condition | : | Kondisi setelah :– Daftar layanan yang memenuhi kriteria filter tampil pada halaman katalog dan hasilnya dibagi per halaman.– Kriteria filter yang aktif ditampilkan pada ringkasan filter beserta tombol untuk mengosongkannya. |
+| Alternate flow | : | – Bila Pengunjung menekan tombol "Reset", sistem menghapus seluruh kriteria filter dan menampilkan kembali semua layanan aktif.– Bila hanya batas harga yang diisi, sistem menyaring layanan yang memiliki paling sedikit satu paket dengan harga di bawah batas tersebut. |
+| Exception flow | : | – Bila kombinasi kriteria tidak menghasilkan layanan, sistem menampilkan pesan bahwa tidak ada layanan yang sesuai dan menyarankan memperlonggar filter.– Bila batas harga diisi dengan nilai bukan angka atau bernilai negatif, sistem menampilkan pesan validasi dan filter tidak dijalankan. |
+
+Tabel 3-4. Use case description : Melihat detail layanan
+
+<!-- TABEL 9 -->
+| Name | : | Melihat detail layanan |
+|---|---|---|
+| Description | : | Fitur untuk menampilkan informasi lengkap satu layanan beserta daftar paket langganannya. Langkah-langkahnya: (1) Pengunjung menekan kartu layanan pada halaman katalog. (2) Sistem membuka halaman detail layanan yang memuat logo, nama penyedia, kategori, tagline, deskripsi, dan tautan situs resmi. (3) Sistem menampilkan seluruh paket aktif beserta harga, durasi, jumlah perangkat maksimum, dan daftar fiturnya. (4) Sistem menampilkan rata-rata rating serta ulasan dari Pelanggan. (5) Pengunjung dapat menekan tombol "Tambah ke Perbandingan" atau "Beli Paket". |
+| Actor | : | Pengunjung |
+| Pre-condition | : | Kondisi sebelum :– Data layanan, paket, penyedia, kategori, dan ulasan telah tersimpan di dalam basis data.– Pengunjung berada pada halaman katalog publik. |
+| Post-condition | : | Kondisi setelah :– Halaman detail layanan tampil lengkap dengan daftar paket aktif, rata-rata rating, dan ulasan Pelanggan.– Sistem menyediakan tombol untuk menambahkan layanan ke daftar perbandingan atau melanjutkan ke checkout. |
+| Alternate flow | : | – Bila Pengunjung belum login lalu menekan tombol "Beli Paket", sistem mengarahkannya ke halaman login terlebih dahulu.– Bila layanan tidak memiliki logo, sistem menampilkan inisial nama layanan sebagai pengganti logo. |
+| Exception flow | : | – Bila layanan yang diminta tidak ditemukan atau berstatus tidak aktif, sistem menampilkan halaman pesan bahwa layanan tidak tersedia.– Bila layanan tidak memiliki paket aktif, sistem menampilkan keterangan bahwa paket belum tersedia dan menonaktifkan tombol pembelian. |
+
+Tabel 3-5. Use case description : Membandingkan layanan
+
+<!-- TABEL 10 -->
+| Name | : | Membandingkan layanan |
+|---|---|---|
+| Description | : | Fitur untuk membandingkan 2 sampai 4 layanan secara berdampingan pada satu tabel perbandingan. Langkah-langkahnya: (1) Pengunjung menambahkan paling sedikit dua layanan ke daftar perbandingan dari katalog atau halaman detail. (2) Pengunjung membuka halaman "Perbandingan". (3) Sistem menyusun tabel berisi harga, jumlah paket, perangkat maksimum, durasi, penyedia, kategori, rating, dan fitur tiap layanan. (4) Sistem menyorot sel dengan nilai terbaik menggunakan warna khusus. (5) Pengunjung menekan tombol hapus pada kolom layanan tertentu bila ingin menggantinya. |
+| Actor | : | Pengunjung |
+| Pre-condition | : | Kondisi sebelum :– Data layanan, paket, penyedia, kategori, dan rating telah tersedia di dalam basis data.– Pengunjung telah memilih paling sedikit dua layanan pada daftar perbandingan. |
+| Post-condition | : | Kondisi setelah :– Tabel perbandingan layanan tampil berdampingan dengan sel nilai terbaik yang disorot warna.– Daftar perbandingan tetap tersimpan pada sesi Pengunjung sehingga dapat dilanjutkan kembali. |
+| Alternate flow | : | – Bila layanan yang dibandingkan memiliki beberapa paket, sistem memakai paket dengan harga terendah sebagai acuan baris harga.– Bila salah satu layanan tidak memiliki fitur tertentu, sel fitur tersebut ditandai tanda hubung. |
+| Exception flow | : | – Bila Pengunjung mencoba menambahkan layanan kelima, sistem menolak penambahan tersebut dan menampilkan pesan maksimal 4 layanan.– Bila daftar perbandingan berisi kurang dari dua layanan, sistem menampilkan pesan agar Pengunjung menambahkan minimal dua layanan. |
+
+Tabel 3-6. Use case description : Mengelola daftar perbandingan
+
+<!-- TABEL 11 -->
+| Name | : | Mengelola daftar perbandingan |
+|---|---|---|
+| Description | : | Fitur untuk menambah, menghapus, dan mengosongkan layanan pada daftar perbandingan. Langkah-langkahnya: (1) Pengunjung menekan tombol "Tambah ke Perbandingan" pada kartu katalog atau halaman detail layanan. (2) Sistem menyimpan identitas layanan ke dalam daftar perbandingan pada sesi Pengunjung. (3) Sistem menampilkan lencana jumlah layanan pada ikon perbandingan. (4) Pengunjung dapat menekan tombol hapus pada satu layanan tertentu. (5) Pengunjung dapat menekan tombol "Kosongkan" untuk menghapus seluruh daftar. |
+| Actor | : | Pengunjung |
+| Pre-condition | : | Kondisi sebelum :– Pengunjung berada pada halaman katalog atau halaman detail layanan.– Sesi Pengunjung aktif sehingga daftar perbandingan dapat disimpan. |
+| Post-condition | : | Kondisi setelah :– Daftar perbandingan pada sesi diperbarui sesuai layanan yang ditambah atau dihapus.– Lencana jumlah layanan pada ikon perbandingan menampilkan jumlah terkini. |
+| Alternate flow | : | – Bila layanan yang sama ditambahkan dua kali, sistem mengenali duplikasi dan tidak menggandakan entri pada daftar.– Bila Pengunjung menekan tombol "Kosongkan", seluruh layanan dihapus dan lencana jumlah kembali ke nol. |
+| Exception flow | : | – Bila jumlah pilihan sudah mencapai 4, sistem menolak penambahan dan menampilkan pesan maksimal 4 layanan.– Bila sesi Pengunjung berakhir, daftar perbandingan hilang dan sistem menampilkan pesan agar Pengunjung memilih ulang layanan. |
+
+Tabel 3-7. Use case description : Menulis ulasan dan rating
+
+<!-- TABEL 12 -->
+| Name | : | Menulis ulasan dan rating |
+|---|---|---|
+| Description | : | Fitur untuk memberikan rating dan komentar ulasan pada layanan yang pernah dibeli Pelanggan. Langkah-langkahnya: (1) Pelanggan membuka halaman detail layanan yang pernah dilangganinya. (2) Pelanggan memilih nilai rating 1 sampai 5 bintang pada formulir ulasan. (3) Pelanggan mengetikkan komentar ulasan pada kolom yang tersedia. (4) Pelanggan menekan tombol "Kirim Ulasan". (5) Sistem menyimpan ulasan dan menghitung ulang rata-rata rating layanan tersebut. |
+| Actor | : | Pelanggan |
+| Pre-condition | : | Kondisi sebelum :– Pengguna telah login dengan role user sehingga berstatus Pelanggan.– Pelanggan memiliki transaksi berstatus paid atas layanan yang akan diulas. |
+| Post-condition | : | Kondisi setelah :– Data ulasan tersimpan ke dalam basis data dengan rating 1 sampai 5 dan komentar dari Pelanggan.– Rata-rata rating layanan diperbarui dan tampil pada katalog serta halaman detail layanan. |
+| Alternate flow | : | – Bila Pelanggan mengirim ulang ulasan untuk layanan yang sama, sistem memperbarui ulasan lamanya alih-alih membuat ulasan baru.– Pelanggan boleh mengirim rating saja tanpa menuliskan komentar. |
+| Exception flow | : | – Bila rating belum dipilih, sistem menampilkan pesan validasi bahwa rating wajib diisi dan ulasan tidak disimpan.– Bila Pelanggan belum memiliki transaksi berhasil pada layanan tersebut, sistem menolak akses dan menampilkan pesan bahwa hanya pembeli yang dapat mengulas. |
+
+### Use Case Diagram : <Modul Transaction>
+
+Gambar 3-2. Use Case Diagram <Modul Transaction>
+Tabel 3-8. Use case description : Melakukan checkout paket
+
+<!-- TABEL 13 -->
+| Name | : | Melakukan checkout paket |
+|---|---|---|
+| Description | : | Fitur untuk membuat pesanan atas paket langganan yang dipilih Pelanggan. Langkah-langkahnya: (1) Pelanggan menekan tombol "Beli Paket" pada halaman detail layanan. (2) Sistem menampilkan halaman checkout berisi ringkasan layanan, paket, durasi, jumlah perangkat maksimum, dan nominal harga. (3) Pelanggan memeriksa rincian tersebut lalu menekan tombol "Buat Pesanan". (4) Sistem membuat transaksi berstatus pending dengan kode pesanan unik berpola PRIM-YYYYMMDD-XXXXXX dan menetapkan expires_at 24 jam sejak pesanan dibuat. (5) Sistem mengarahkan Pelanggan ke halaman detail transaksi. |
+| Actor | : | Pelanggan |
+| Pre-condition | : | Kondisi sebelum :– Pengguna telah login dengan role user sehingga berstatus Pelanggan.– Paket yang dipilih berstatus aktif dan terhubung ke layanan serta penyedia yang valid. |
+| Post-condition | : | Kondisi setelah :– Transaksi baru tersimpan ke dalam basis data dengan status pending dan kode pesanan yang unik.– Kolom expires_at terisi 24 jam sejak pesanan dibuat dan tampil sebagai batas waktu pembayaran pada halaman detail transaksi. |
+| Alternate flow | : | – Bila Pelanggan sudah memiliki langganan aktif pada layanan yang sama, sistem menandai bahwa pembelian baru akan memperpanjang masa langganan mulai dari ends_at sebelumnya.– Sebelum menekan tombol "Buat Pesanan", Pelanggan dapat kembali ke katalog dan membatalkan proses checkout. |
+| Exception flow | : | – Bila paket tidak ditemukan atau sudah tidak aktif, sistem menampilkan pesan kesalahan dan pesanan tidak dibuat.– Bila data paket berubah saat pesanan sedang diproses, sistem membatalkan pembuatan pesanan dan meminta Pelanggan memuat ulang halaman. |
+
+Tabel 3-9. Use case description : Memilih metode pembayaran
+
+<!-- TABEL 14 -->
+| Name | : | Memilih metode pembayaran |
+|---|---|---|
+| Description | : | Fitur untuk memilih metode pembayaran simulasi pada halaman detail transaksi sebelum pembayaran dilakukan. Langkah-langkahnya: (1) Pelanggan membuka halaman detail transaksi yang masih berstatus pending. (2) Sistem menampilkan daftar metode pembayaran yang tersedia beserta kode pesanan, nominal, dan sisa waktu pembayaran. (3) Pelanggan memilih salah satu metode, misalnya "Transfer Bank (Simulasi)" atau "Virtual Account (Simulasi)". (4) Pelanggan menekan tombol "Simpan Metode Pembayaran". (5) Sistem menyimpan metode pilihan tersebut pada kolom payment_method transaksi. |
+| Actor | : | Pelanggan |
+| Pre-condition | : | Kondisi sebelum :– Pengguna telah login sebagai Pelanggan dan merupakan pemilik transaksi tersebut.– Transaksi berstatus pending sehingga masih dapat dibayar. |
+| Post-condition | : | Kondisi setelah :– Kolom payment_method pada transaksi terisi metode pembayaran yang dipilih Pelanggan.– Metode pembayaran yang dipilih tampil pada ringkasan halaman detail transaksi. |
+| Alternate flow | : | – Pelanggan dapat mengganti metode pembayaran selama transaksi masih berstatus pending.– Bila simulasi pembayaran dijalankan tanpa memilih metode, sistem memakai metode bawaan dan tetap mencatat nilainya. |
+| Exception flow | : | – Bila transaksi sudah berstatus paid, expired, atau cancelled, sistem menolak perubahan metode dan menampilkan pesan bahwa transaksi tidak dapat diubah lagi.– Bila Pelanggan mencoba mengubah transaksi milik pengguna lain, sistem menolak akses dengan pesan bahwa data transaksi tidak ditemukan. |
+
+Tabel 3-10. Use case description : Membayar pesanan
+
+<!-- TABEL 15 -->
+| Name | : | Membayar pesanan |
+|---|---|---|
+| Description | : | Fitur untuk menyimulasikan pembayaran pesanan melalui gateway pembayaran internal. Langkah-langkahnya: (1) Pelanggan membuka halaman detail transaksi berstatus pending dan menekan tombol "Simulasikan Pembayaran Berhasil". (2) Sistem meneruskan permintaan tersebut ke gateway pembayaran simulasi internal. (3) Gateway mengembalikan hasil transaksi berupa berhasil atau ditolak. (4) Bila hasilnya berhasil, sistem mengubah status transaksi menjadi paid dan mengisi kolom paid_at. (5) Sistem membuat langganan secara otomatis dan menampilkan halaman sukses beserta ringkasan langganan. |
+| Actor | : | Pelanggan, Gateway Pembayaran |
+| Pre-condition | : | Kondisi sebelum :– Pengguna telah login sebagai Pelanggan dan transaksi berstatus pending serta belum melewati expires_at.– Paket dan layanan pada transaksi masih berstatus aktif di dalam basis data. |
+| Post-condition | : | Kondisi setelah :– Transaksi berubah menjadi paid, kolom paid_at terisi, dan langganan baru tercatat pada tabel subscriptions.– Masa langganan aktif terhitung dari tanggal pembayaran, kecuali bila sudah ada langganan aktif pada layanan yang sama sehingga masa baru dimulai dari ends_at sebelumnya. |
+| Alternate flow | : | – Pelanggan dapat menekan tombol "Simulasikan Pembayaran Ditolak" sehingga transaksi ditandai failed tanpa membuat langganan.– Bila langganan sebelumnya masih aktif pada layanan yang sama, sistem menambahkan duration_days mulai dari ends_at lama sehingga masa aktif tersambung tanpa jeda. |
+| Exception flow | : | – Bila expires_at telah terlewati, sistem menolak pembayaran, mengubah status menjadi expired, dan menampilkan pesan bahwa batas waktu pembayaran telah habis.– Bila gateway simulasi mengembalikan kegagalan teknis, status transaksi tetap pending dan sistem menampilkan pesan agar Pelanggan mencoba kembali. |
+
+Tabel 3-11. Use case description : Melihat riwayat transaksi
+
+<!-- TABEL 16 -->
+| Name | : | Melihat riwayat transaksi |
+|---|---|---|
+| Description | : | Fitur untuk menampilkan seluruh transaksi milik Pelanggan yang sedang login. Langkah-langkahnya: (1) Pelanggan membuka menu "Riwayat Transaksi" pada dasbor. (2) Sistem memuat daftar transaksi milik Pelanggan tersebut beserta kode pesanan, nama layanan, paket, nominal, tanggal, metode pembayaran, dan status. (3) Sistem menampilkan lencana warna yang berbeda untuk status pending, paid, failed, expired, dan cancelled. (4) Pelanggan memilih satu baris untuk membuka detail transaksi atau berpindah halaman melalui paginasi. |
+| Actor | : | Pelanggan |
+| Pre-condition | : | Kondisi sebelum :– Pengguna telah login sebagai Pelanggan.– Terdapat data transaksi milik Pelanggan tersebut di dalam basis data. |
+| Post-condition | : | Kondisi setelah :– Daftar transaksi milik Pelanggan tampil terurut dari yang terbaru beserta status terkini masing-masing.– Setiap baris transaksi menyediakan tautan menuju halaman detail transaksi. |
+| Alternate flow | : | – Pelanggan dapat menyaring daftar riwayat berdasarkan status transaksi melalui filter yang tersedia.– Bila jumlah transaksi banyak, daftar dibagi per halaman dengan tautan paginasi. |
+| Exception flow | : | – Bila Pelanggan belum memiliki transaksi, sistem menampilkan pesan bahwa belum ada riwayat transaksi beserta ajakan menelusuri katalog.– Bila permintaan daftar transaksi gagal diproses server, sistem menampilkan pesan kesalahan dan halaman dimuat ulang. |
+
+Tabel 3-12. Use case description : Melihat detail transaksi
+
+<!-- TABEL 17 -->
+| Name | : | Melihat detail transaksi |
+|---|---|---|
+| Description | : | Fitur untuk menampilkan rincian satu transaksi beserta langkah pembayaran yang tersedia. Langkah-langkahnya: (1) Pelanggan menekan kode pesanan pada halaman riwayat transaksi. (2) Sistem memuat rincian transaksi berupa kode pesanan, layanan, paket, durasi, jumlah perangkat, nominal, metode pembayaran, paid_at, expires_at, dan catatan. (3) Sistem menampilkan status transaksi beserta sisa waktu pembayaran bila transaksinya masih pending. (4) Sistem menyediakan tombol simulasi pembayaran berhasil atau ditolak selama transaksi masih pending. (5) Pelanggan membaca ringkasan langganan bila transaksi telah berstatus paid. |
+| Actor | : | Pelanggan |
+| Pre-condition | : | Kondisi sebelum :– Pengguna telah login sebagai Pelanggan dan merupakan pemilik transaksi.– Data transaksi beserta paket dan layanan terkait tersedia di dalam basis data. |
+| Post-condition | : | Kondisi setelah :– Halaman detail transaksi tampil lengkap dengan status terkini dan keterangan waktu pembayaran.– Tombol aksi pembayaran hanya aktif untuk transaksi berstatus pending yang belum melewati batas waktu. |
+| Alternate flow | : | – Bila transaksi berstatus paid, sistem menampilkan tautan menuju langganan yang terbentuk dari transaksi tersebut.– Bila transaksi berstatus expired atau cancelled, sistem menampilkan keterangan mengenai berakhirnya transaksi tersebut. |
+| Exception flow | : | – Bila kode pesanan tidak ditemukan atau bukan milik Pelanggan yang sedang login, sistem menampilkan halaman pesan bahwa transaksi tidak ditemukan.– Bila data paket terkait telah dihapus sehingga tidak dapat ditampilkan, sistem tetap menampilkan nominal dan kode pesanan yang tersimpan pada transaksi. |
+
+Tabel 3-13. Use case description : Memverifikasi transaksi
+
+<!-- TABEL 18 -->
+| Name | : | Memverifikasi transaksi |
+|---|---|---|
+| Description | : | Fitur untuk memeriksa keabsahan transaksi sebelum statusnya diubah oleh Administrator. Langkah-langkahnya: (1) Administrator membuka menu transaksi pada panel admin. (2) Administrator memilih transaksi berstatus pending dan menekan tombol "Lihat Detail". (3) Sistem menampilkan kode pesanan, identitas Pelanggan, paket, nominal, metode pembayaran, waktu pembuatan, serta batas waktunya. (4) Administrator mencocokkan data tersebut dengan bukti atau catatan pembayaran yang ada. (5) Administrator menandai hasil verifikasi melalui tombol "Tandai Berhasil" atau "Tandai Gagal". |
+| Actor | : | Administrator |
+| Pre-condition | : | Kondisi sebelum :– Administrator telah login dengan role admin dan email yang terverifikasi.– Transaksi yang diperiksa tersedia di dalam basis data beserta data paket dan penggunanya. |
+| Post-condition | : | Kondisi setelah :– Hasil verifikasi tercatat pada transaksi sehingga statusnya mencerminkan keputusan Administrator.– Catatan verifikasi Administrator tersimpan pada kolom notes transaksi. |
+| Alternate flow | : | – Administrator dapat memverifikasi beberapa transaksi secara berurutan langsung dari daftar tanpa kembali ke menu utama.– Administrator dapat menyaring daftar berdasarkan status pending untuk memprioritaskan pemeriksaan. |
+| Exception flow | : | – Bila data transaksi tidak lengkap sehingga tidak dapat diverifikasi, Administrator dapat menambahkan catatan dan menunda keputusannya.– Bila transaksi sudah pernah ditandai berhasil atau gagal, sistem menampilkan pesan bahwa status transaksi telah final dan tidak dapat diverifikasi ulang. |
+
+Tabel 3-14. Use case description : Menandai transaksi berhasil / gagal
+
+<!-- TABEL 19 -->
+| Name | : | Menandai transaksi berhasil / gagal |
+|---|---|---|
+| Description | : | Fitur untuk menetapkan status akhir transaksi menjadi paid atau failed secara manual oleh Administrator. Langkah-langkahnya: (1) Administrator membuka detail transaksi berstatus pending. (2) Administrator menekan tombol "Tandai Berhasil" atau "Tandai Gagal". (3) Sistem menampilkan permintaan konfirmasi atas tindakan tersebut. (4) Setelah dikonfirmasi, sistem mengubah status transaksi menjadi paid atau failed. (5) Bila ditandai berhasil, sistem mengisi paid_at dan membuat langganan baru secara otomatis bagi Pelanggan. |
+| Actor | : | Administrator |
+| Pre-condition | : | Kondisi sebelum :– Administrator telah login dengan role admin dan email yang terverifikasi.– Transaksi berstatus pending dan belum melewati batas waktu pembayarannya. |
+| Post-condition | : | Kondisi setelah :– Status transaksi berubah menjadi paid atau failed disertai catatan hasil verifikasi Administrator pada kolom notes.– Bila status diubah menjadi paid, kolom paid_at terisi dan langganan Pelanggan terbentuk otomatis dengan status active. |
+| Alternate flow | : | – Bila Pelanggan telah memiliki langganan aktif pada layanan yang sama, penandaan berhasil akan memperpanjang masa aktif mulai dari ends_at sebelumnya.– Administrator dapat membatalkan proses penandaan pada dialog konfirmasi tanpa mengubah status transaksi. |
+| Exception flow | : | – Bila transaksi sudah berstatus paid, failed, expired, atau cancelled, sistem menolak perubahan dan menampilkan pesan bahwa status transaksi bersifat final.– Bila penyimpanan langganan gagal dilakukan, sistem mengembalikan status transaksi dan menampilkan pesan kesalahan agar Administrator mencoba lagi. |
+
+Tabel 3-15. Use case description : Memperbarui status transaksi
+
+<!-- TABEL 20 -->
+| Name | : | Memperbarui status transaksi |
+|---|---|---|
+| Description | : | Fitur untuk memperbarui status transaksi dan langganan yang telah melewati batas waktunya secara terjadwal. Langkah-langkahnya: (1) Penjadwal Sistem menjalankan perintah konsol pemeliharaan secara berkala. (2) Sistem mengambil seluruh transaksi berstatus pending yang nilai expires_at-nya telah terlewati. (3) Sistem mengubah status transaksi tersebut menjadi expired. (4) Sistem mengambil langganan berstatus active yang nilai ends_at-nya telah terlewati. (5) Sistem mengubah status langganan tersebut menjadi expired. |
+| Actor | : | Penjadwal Sistem |
+| Pre-condition | : | Kondisi sebelum :– Penjadwal Sistem terpasang pada server dan perintah pemeliharaan telah terjadwal secara berkala.– Terdapat transaksi pending atau langganan aktif yang menyimpan nilai expires_at atau ends_at di dalam basis data. |
+| Post-condition | : | Kondisi setelah :– Seluruh transaksi pending yang melewati batas waktu berubah menjadi expired.– Seluruh langganan aktif yang melewati ends_at berubah menjadi expired dan tidak lagi dihitung sebagai langganan aktif pada metrik dasbor. |
+| Alternate flow | : | – Bila tidak ditemukan transaksi atau langganan yang melewati batas waktu, perintah selesai tanpa mengubah data apa pun.– Perintah pemeliharaan dapat dijalankan secara manual oleh Administrator melalui terminal server untuk keperluan pengujian. |
+| Exception flow | : | – Bila proses penjadwalan gagal dijalankan, sistem mencatat kesalahan pada log aplikasi agar dapat diperiksa Administrator.– Bila pembaruan sebagian data gagal disimpan, sistem mencatat data yang gagal pada log dan melanjutkan pemrosesan data berikutnya. |
+
+Tabel 3-16. Use case description : Menandai transaksi kedaluwarsa
+
+<!-- TABEL 21 -->
+| Name | : | Menandai transaksi kedaluwarsa |
+|---|---|---|
+| Description | : | Fitur untuk menandai transaksi pending sebagai kedaluwarsa setelah batas waktu pembayaran 24 jam terlewati. Langkah-langkahnya: (1) Waktu Pembayaran mencapai titik expires_at yang tersimpan pada transaksi. (2) Penjadwal Sistem mendeteksi transaksi pending yang telah melewati waktu tersebut. (3) Sistem mengubah status transaksi menjadi expired. (4) Sistem menghentikan penyediaan tombol simulasi pembayaran pada halaman detail transaksi. (5) Sistem menampilkan keterangan bahwa batas waktu pembayaran telah habis kepada Pelanggan pada riwayat transaksi. |
+| Actor | : | Waktu Pembayaran, Penjadwal Sistem |
+| Pre-condition | : | Kondisi sebelum :– Transaksi telah dibuat dengan status pending dan nilai expires_at terisi 24 jam sejak pesanan dibuat.– Penjadwal Sistem berjalan sehingga pemeriksaan batas waktu dapat dilakukan. |
+| Post-condition | : | Kondisi setelah :– Status transaksi berubah menjadi expired dan ditampilkan dengan lencana khusus pada riwayat transaksi.– Tombol pembayaran pada halaman detail transaksi dinonaktifkan sehingga transaksi tersebut tidak dapat dibayar lagi. |
+| Alternate flow | : | – Bila Pelanggan menyelesaikan pembayaran sebelum expires_at, transaksi berstatus paid dan tidak akan diproses oleh penandaan kedaluwarsa.– Pelanggan dapat membuat pesanan baru atas paket yang sama setelah transaksi lamanya kedaluwarsa. |
+| Exception flow | : | – Bila transaksi kedaluwarsa dibayar tepat saat pemeriksaan berjalan, sistem memprioritaskan status paid yang sudah tersimpan dan tidak menimpanya dengan status expired.– Bila perubahan status gagal disimpan, sistem mencatat kesalahan pada log dan transaksi tetap pending untuk diproses pada pemeriksaan berikutnya. |
+
+### Use Case Diagram : <Modul Subscription>
+
+Gambar 3-3. Use Case Diagram <Modul Subscription>
+Tabel 3-17. Use case description : Melihat daftar langganan
+
+<!-- TABEL 22 -->
+| Name | : | Melihat daftar langganan |
+|---|---|---|
+| Description | : | Fitur untuk menampilkan seluruh langganan milik Pelanggan beserta status dan masa aktifnya. Langkah-langkahnya: (1) Pelanggan membuka menu "Langganan Saya" pada dasbor. (2) Sistem memuat daftar langganan milik Pelanggan beserta nama layanan, paket, tanggal mulai, tanggal berakhir, status, dan indikator perpanjangan otomatis. (3) Sistem menghitung sisa hari menuju ends_at pada setiap langganan. (4) Pelanggan dapat menekan tombol "Perpanjang" pada langganan tertentu untuk melanjutkan proses perpanjangan. |
+| Actor | : | Pelanggan |
+| Pre-condition | : | Kondisi sebelum :– Pengguna telah login sebagai Pelanggan.– Terdapat data langganan milik Pelanggan tersebut di dalam basis data. |
+| Post-condition | : | Kondisi setelah :– Daftar langganan Pelanggan tampil beserta status active, expired, atau cancelled dan tanggal berakhirnya.– Setiap langganan menyediakan tombol aksi perpanjang serta pengaturan perpanjangan otomatis. |
+| Alternate flow | : | – Langganan berstatus active yang mendekati ends_at ditandai khusus agar mudah dikenali Pelanggan.– Bila Pelanggan belum pernah berlangganan, sistem menampilkan pesan bahwa belum ada langganan beserta ajakan menelusuri katalog. |
+| Exception flow | : | – Bila permintaan daftar langganan gagal diproses server, sistem menampilkan pesan kesalahan dan meminta Pelanggan memuat ulang halaman.– Bila data paket atau transaksi asal sebuah langganan sudah tidak dapat dibaca, sistem tetap menampilkan baris langganan tersebut dengan keterangan data paket tidak tersedia. |
+
+Tabel 3-18. Use case description : Memfilter langganan
+
+<!-- TABEL 23 -->
+| Name | : | Memfilter langganan |
+|---|---|---|
+| Description | : | Fitur untuk menyaring daftar langganan Pelanggan berdasarkan status masa aktifnya. Langkah-langkahnya: (1) Pelanggan membuka halaman "Langganan Saya". (2) Pelanggan memilih salah satu opsi filter, yaitu "Sedang Aktif", "Akan Berakhir", "Sudah Berakhir", atau "Semua". (3) Sistem menyaring data langganan sesuai opsi yang dipilih. (4) Sistem menampilkan daftar langganan yang sesuai beserta jumlahnya pada tiap opsi filter. |
+| Actor | : | Pelanggan |
+| Pre-condition | : | Kondisi sebelum :– Pengguna telah login sebagai Pelanggan dan memiliki data langganan.– Opsi filter Sedang Aktif, Akan Berakhir, Sudah Berakhir, dan Semua tersedia pada halaman langganan. |
+| Post-condition | : | Kondisi setelah :– Daftar langganan tampil sesuai opsi filter yang dipilih Pelanggan.– Opsi filter yang sedang aktif ditandai pada antarmuka halaman langganan. |
+| Alternate flow | : | – Opsi "Akan Berakhir" menampilkan langganan berstatus active yang ends_at-nya berada dalam tujuh hari ke depan.– Opsi "Semua" menampilkan seluruh langganan tanpa memandang statusnya. |
+| Exception flow | : | – Bila tidak ada langganan yang sesuai dengan opsi filter, sistem menampilkan pesan bahwa tidak ada langganan pada kategori tersebut.– Bila nilai opsi filter yang dikirim tidak dikenali sistem, tampilan dikembalikan ke opsi "Semua". |
+
+Tabel 3-19. Use case description : Memperpanjang langganan
+
+<!-- TABEL 24 -->
+| Name | : | Memperpanjang langganan |
+|---|---|---|
+| Description | : | Fitur untuk memperpanjang masa langganan dengan membuat transaksi perpanjangan. Langkah-langkahnya: (1) Pelanggan menekan tombol "Perpanjang" pada salah satu langganan di halaman "Langganan Saya". (2) Sistem menampilkan ringkasan paket yang akan diperpanjang beserta nominal, durasi, dan tanggal berakhir saat ini. (3) Pelanggan menekan tombol "Buat Pesanan Perpanjangan". (4) Sistem membuat transaksi baru berstatus pending dengan kode pesanan unik dan batas waktu pembayaran 24 jam. (5) Setelah pembayaran berhasil, sistem menambahkan durasi paket mulai dari ends_at langganan sebelumnya. |
+| Actor | : | Pelanggan |
+| Pre-condition | : | Kondisi sebelum :– Pengguna telah login sebagai Pelanggan dan memiliki langganan yang akan diperpanjang.– Paket yang menjadi dasar langganan tersebut masih berstatus aktif di dalam basis data. |
+| Post-condition | : | Kondisi setelah :– Transaksi perpanjangan tersimpan dengan status pending dan terhubung ke langganan yang diperpanjang.– Bila pembayaran berhasil, ends_at langganan bertambah sesuai duration_days paket dan statusnya kembali active. |
+| Alternate flow | : | – Perpanjangan juga dapat dilakukan ketika langganan sudah berstatus expired sehingga masa aktif baru dimulai dari tanggal pembayaran.– Pelanggan dapat memilih paket perpanjangan lain selama paket tersebut masih berasal dari layanan yang sama. |
+| Exception flow | : | – Bila paket asal langganan telah dinonaktifkan atau dihapus, sistem menolak perpanjangan dan menampilkan pesan bahwa paket tidak lagi tersedia.– Bila transaksi perpanjangan kedaluwarsa, sistem menandainya expired dan masa langganan lama tetap mengikuti ends_at sebelumnya. |
+
+Tabel 3-20. Use case description : Mengatur perpanjangan otomatis
+
+<!-- TABEL 25 -->
+| Name | : | Mengatur perpanjangan otomatis |
+|---|---|---|
+| Description | : | Fitur untuk mengaktifkan perpanjangan otomatis pada langganan Pelanggan. Langkah-langkahnya: (1) Pelanggan membuka halaman "Langganan Saya". (2) Pelanggan memilih langganan yang diinginkan dan menekan tombol "Aktifkan Perpanjangan Otomatis". (3) Sistem menampilkan konfirmasi bahwa langganan akan diperpanjang menjelang berakhir. (4) Pelanggan menyetujui konfirmasi tersebut. (5) Sistem mengubah nilai auto_renew menjadi true dan menampilkan penanda aktif pada langganan tersebut. |
+| Actor | : | Pelanggan |
+| Pre-condition | : | Kondisi sebelum :– Pengguna telah login sebagai Pelanggan dan memiliki langganan berstatus active.– Langganan tersebut belum memiliki perpanjangan otomatis yang aktif. |
+| Post-condition | : | Kondisi setelah :– Kolom auto_renew pada langganan berubah menjadi true dan indikator perpanjangan otomatis tampil aktif.– Sistem mencatat bahwa langganan akan diperpanjang menjelang ends_at selama tidak dibatalkan Pelanggan. |
+| Alternate flow | : | – Pelanggan dapat mengaktifkan perpanjangan otomatis pada beberapa langganan secara terpisah.– Bila perpanjangan otomatis sudah aktif, sistem hanya menampilkan tombol untuk membatalkannya. |
+| Exception flow | : | – Bila langganan sudah berstatus expired atau cancelled, sistem menolak pengaktifan dan menampilkan pesan bahwa perpanjangan otomatis hanya berlaku untuk langganan aktif.– Bila pembaruan gagal disimpan, sistem menampilkan pesan kesalahan dan nilai auto_renew tidak berubah. |
+
+Tabel 3-21. Use case description : Membatalkan perpanjangan otomatis
+
+<!-- TABEL 26 -->
+| Name | : | Membatalkan perpanjangan otomatis |
+|---|---|---|
+| Description | : | Fitur untuk mematikan perpanjangan otomatis tanpa menghentikan masa langganan yang sedang berjalan. Langkah-langkahnya: (1) Pelanggan membuka halaman "Langganan Saya". (2) Pelanggan menekan tombol "Batalkan Perpanjangan Otomatis" pada langganan yang mengaktifkannya. (3) Sistem menampilkan konfirmasi yang menjelaskan bahwa masa aktif tetap berjalan sampai ends_at. (4) Pelanggan menyetujui konfirmasi tersebut. (5) Sistem mengubah nilai auto_renew menjadi false dan mengisi kolom cancelled_at. |
+| Actor | : | Pelanggan |
+| Pre-condition | : | Kondisi sebelum :– Pengguna telah login sebagai Pelanggan dan merupakan pemilik langganan tersebut.– Langganan berstatus active dengan nilai auto_renew bernilai true. |
+| Post-condition | : | Kondisi setelah :– Kolom auto_renew berubah menjadi false dan cancelled_at terisi waktu pembatalan.– Masa langganan tetap dihormati sampai ends_at dan tidak lagi diperpanjang setelah tanggal tersebut. |
+| Alternate flow | : | – Pelanggan dapat mengaktifkan kembali perpanjangan otomatis selama masa aktif belum berakhir.– Riwayat pembatalan tetap tersimpan pada nilai cancelled_at meskipun perpanjangan otomatis dinyalakan kembali. |
+| Exception flow | : | – Bila langganan telah berstatus expired atau cancelled, sistem menampilkan pesan bahwa perpanjangan otomatis sudah tidak aktif.– Bila pembaruan gagal disimpan, sistem menampilkan pesan kesalahan dan nilai auto_renew tetap bernilai true. |
+
+Tabel 3-22. Use case description : Memonitor seluruh langganan
+
+<!-- TABEL 27 -->
+| Name | : | Memonitor seluruh langganan |
+|---|---|---|
+| Description | : | Fitur untuk memantau seluruh langganan pengguna dari panel admin. Langkah-langkahnya: (1) Administrator membuka menu "Langganan" pada panel admin. (2) Sistem menampilkan daftar langganan seluruh pengguna beserta nama Pelanggan, layanan, paket, tanggal mulai, tanggal berakhir, status, dan status perpanjangan otomatisnya. (3) Administrator mencari langganan berdasarkan nama pengguna atau nama layanan. (4) Administrator menyaring daftar berdasarkan status active, expired, atau cancelled. (5) Administrator menekan satu baris untuk melihat rincian langganan beserta transaksi asalnya. |
+| Actor | : | Administrator |
+| Pre-condition | : | Kondisi sebelum :– Administrator telah login dengan role admin dan email yang terverifikasi.– Terdapat data langganan pengguna beserta transaksi asalnya di dalam basis data. |
+| Post-condition | : | Kondisi setelah :– Daftar seluruh langganan tampil pada panel admin beserta status dan masa aktifnya.– Administrator memperoleh gambaran jumlah langganan aktif yang menjadi bagian dari metrik dasbor. |
+| Alternate flow | : | – Administrator dapat mengurutkan daftar berdasarkan tanggal berakhir untuk mengetahui langganan yang akan segera habis.– Administrator dapat membuka tautan transaksi asal untuk memeriksa kesesuaian data langganan. |
+| Exception flow | : | – Bila tidak ada langganan yang cocok dengan pencarian, sistem menampilkan pesan bahwa data langganan tidak ditemukan.– Bila data langganan tidak dapat dimuat karena gangguan basis data, sistem menampilkan pesan kesalahan pada panel admin. |
+
+### Use Case Diagram : <Modul Admin>
+
+Gambar 3-4. Use Case Diagram <Modul Admin>
+Tabel 3-23. Use case description : Melihat dashboard metrik
+
+<!-- TABEL 28 -->
+| Name | : | Melihat dashboard metrik |
+|---|---|---|
+| Description | : | Fitur untuk menampilkan ringkasan metrik PRIM pada dashboard panel admin. Langkah-langkahnya: (1) Administrator membuka halaman utama panel admin. (2) Sistem menampilkan jumlah layanan, paket, penyedia, pengguna, langganan aktif, transaksi pending, dan pendapatan bulan berjalan dalam rupiah. (3) Sistem menampilkan grafik tren 14 hari terakhir serta komposisi status transaksi. (4) Sistem menampilkan daftar layanan terpopuler dan transaksi terbaru. (5) Administrator menekan salah satu kartu metrik untuk melihat daftar rinciannya. |
+| Actor | : | Administrator |
+| Pre-condition | : | Kondisi sebelum :– Administrator telah login dengan role admin dan email yang terverifikasi.– Data layanan, paket, penyedia, pengguna, transaksi, dan langganan tersedia di dalam basis data. |
+| Post-condition | : | Kondisi setelah :– Dashboard menampilkan seluruh metrik utama beserta grafik tren 14 hari dan komposisi status transaksi.– Daftar layanan terpopuler dan transaksi terbaru tampil sebagai bahan pemantauan Administrator. |
+| Alternate flow | : | – Pendapatan bulan berjalan dihitung dari transaksi berstatus paid yang paid_at-nya berada pada bulan berjalan.– Bila Administrator mengubah rentang tanggal grafik, sistem memuat ulang data tren sesuai rentang pilihannya. |
+| Exception flow | : | – Bila belum ada transaksi berstatus paid, kartu pendapatan menampilkan nilai nol tanpa menyebabkan kesalahan pada halaman.– Bila permintaan data metrik gagal diproses, sistem menampilkan pesan kesalahan dan dashboard dirender dengan nilai kosong. |
+
+Tabel 3-24. Use case description : Masuk sebagai pengelola
+
+<!-- TABEL 29 -->
+| Name | : | Masuk sebagai pengelola |
+|---|---|---|
+| Description | : | Fitur untuk mengautentikasi Administrator sebelum mengakses panel admin. Langkah-langkahnya: (1) Administrator membuka alamat /admin pada peramban. (2) Sistem menampilkan formulir login berisi kolom email dan kata sandi. (3) Administrator mengisi kedua kolom tersebut dan menekan tombol "Masuk". (4) Sistem memeriksa kecocokan kredensial, status verifikasi email, dan nilai role pengguna. (5) Bila seluruh syarat terpenuhi, sistem mengarahkan Administrator ke dashboard panel admin. |
+| Actor | : | Administrator |
+| Pre-condition | : | Kondisi sebelum :– Akun pengguna dengan role admin telah terdaftar dan emailnya telah terverifikasi.– Halaman login panel admin dapat diakses melalui alamat /admin. |
+| Post-condition | : | Kondisi setelah :– Sesi Administrator aktif sehingga seluruh menu panel admin dapat diakses.– Sistem menampilkan dashboard metrik sebagai halaman pertama setelah login berhasil. |
+| Alternate flow | : | – Administrator dapat memilih opsi "Ingat saya" sehingga sesi login bertahan lebih lama pada peramban yang dipakai.– Administrator dapat menekan tautan lupa kata sandi untuk meminta tautan pengaturan ulang melalui email. |
+| Exception flow | : | – Bila email atau kata sandi salah, sistem menampilkan pesan kesalahan dan Administrator tetap berada pada halaman login.– Bila akun yang mencoba masuk bukan berrole admin atau emailnya belum terverifikasi, sistem menolak akses dan menampilkan pesan bahwa akun tidak berhak mengakses panel admin. |
+
+Tabel 3-25. Use case description : Mengelola data penyedia
+
+<!-- TABEL 30 -->
+| Name | : | Mengelola data penyedia |
+|---|---|---|
+| Description | : | Fitur untuk menambah, mengubah, dan menghapus data penyedia layanan. Langkah-langkahnya: (1) Administrator membuka menu "Penyedia" pada panel admin. (2) Administrator menekan tombol "Tambah Penyedia". (3) Administrator mengisi kolom nama, slug, situs web, dan deskripsi penyedia. (4) Administrator mengunggah logo penyedia melalui tombol "Pilih Berkas". (5) Administrator menekan tombol "Simpan" sehingga data penyedia tersimpan dan tampil pada tabel penyedia. |
+| Actor | : | Administrator |
+| Pre-condition | : | Kondisi sebelum :– Administrator telah login dengan role admin dan email yang terverifikasi.– Data penyedia beserta relasinya dengan layanan tersedia di dalam basis data. |
+| Post-condition | : | Kondisi setelah :– Data penyedia tersimpan ke dalam basis data dan langsung tampil pada tabel penyedia di panel admin.– Penyedia baru dapat dipilih sebagai relasi pada saat Administrator mengelola data layanan. |
+| Alternate flow | : | – Bila Administrator tidak mengunggah logo, penyedia tetap tersimpan dengan inisial nama sebagai pengganti logo.– Administrator dapat mengubah atau menghapus data penyedia melalui tombol aksi pada baris tabel penyedia. |
+| Exception flow | : | – Bila kolom nama penyedia belum diisi, sistem menampilkan pesan validasi bahwa kolom nama wajib diisi dan data tidak disimpan.– Bila penyedia yang akan dihapus masih memiliki layanan terkait, sistem menolak penghapusan dan menampilkan pesan bahwa data masih direferensikan. |
+
+Tabel 3-26. Use case description : Mengelola data kategori
+
+<!-- TABEL 31 -->
+| Name | : | Mengelola data kategori |
+|---|---|---|
+| Description | : | Fitur untuk menambah, mengubah, dan menghapus data kategori layanan. Langkah-langkahnya: (1) Administrator membuka menu "Kategori" pada panel admin. (2) Administrator menekan tombol "Tambah Kategori". (3) Administrator mengisi kolom nama, slug, ikon, dan deskripsi kategori. (4) Administrator menekan tombol "Simpan". (5) Sistem menyimpan data kategori ke dalam basis data dan menampilkannya pada tabel kategori. |
+| Actor | : | Administrator |
+| Pre-condition | : | Kondisi sebelum :– Administrator telah login dengan role admin dan email yang terverifikasi.– Data kategori beserta relasinya dengan layanan tersedia di dalam basis data. |
+| Post-condition | : | Kondisi setelah :– Data kategori tersimpan ke dalam basis data dan tampil pada tabel kategori di panel admin.– Kategori baru langsung tersedia sebagai pilihan filter pada katalog publik. |
+| Alternate flow | : | – Administrator dapat mengisi ikon kategori berupa kelas ikon yang akan ditampilkan pada katalog.– Administrator dapat menyunting nama atau deskripsi kategori melalui tombol "Ubah" pada baris tabel. |
+| Exception flow | : | – Bila kolom nama kategori dikosongkan, sistem menampilkan pesan validasi dan data tidak disimpan.– Bila kategori yang akan dihapus masih dipakai oleh satu atau lebih layanan, sistem menolak penghapusan dan menampilkan pesan bahwa kategori masih digunakan. |
+
+Tabel 3-27. Use case description : Mengelola data layanan
+
+<!-- TABEL 32 -->
+| Name | : | Mengelola data layanan |
+|---|---|---|
+| Description | : | Fitur untuk menambah, mengubah, dan menghapus data layanan langganan. Langkah-langkahnya: (1) Administrator membuka menu "Layanan" pada panel admin. (2) Administrator menekan tombol "Tambah Layanan". (3) Administrator mengisi kolom nama, slug, tagline, deskripsi, dan situs web layanan. (4) Administrator memilih penyedia dan kategori serta mengunggah logo layanan. (5) Administrator menentukan status aktif layanan lalu menekan tombol "Simpan" sehingga data layanan tersimpan dan tampil pada tabel layanan. |
+| Actor | : | Administrator |
+| Pre-condition | : | Kondisi sebelum :– Administrator telah login dengan role admin dan email yang terverifikasi.– Data penyedia dan kategori yang akan dijadikan relasi telah tersimpan di dalam basis data. |
+| Post-condition | : | Kondisi setelah :– Data layanan tersimpan ke dalam basis data dan langsung tampil pada katalog publik bila berstatus aktif.– Layanan baru dapat ditambahkan paketnya melalui menu pengelolaan paket. |
+| Alternate flow | : | – Bila Administrator tidak mengunggah logo, layanan tetap tersimpan dengan inisial nama sebagai pengganti logo.– Layanan dapat disimpan dengan status tidak aktif terlebih dahulu agar belum tampil pada katalog publik. |
+| Exception flow | : | – Bila penyedia atau kategori belum dipilih, sistem menampilkan pesan validasi bahwa kedua kolom tersebut wajib diisi dan data tidak disimpan.– Bila layanan yang akan dihapus masih memiliki paket atau langganan terkait, sistem menolak penghapusan dan menampilkan pesan bahwa data masih direferensikan. |
+
+Tabel 3-28. Use case description : Mengelola data paket
+
+<!-- TABEL 33 -->
+| Name | : | Mengelola data paket |
+|---|---|---|
+| Description | : | Fitur untuk menambah, mengubah, dan menghapus paket langganan pada suatu layanan. Langkah-langkahnya: (1) Administrator membuka menu "Paket" pada panel admin. (2) Administrator menekan tombol "Tambah Paket". (3) Administrator memilih layanan lalu mengisi nama paket, harga dalam rupiah, duration_days, max_devices, dan deskripsi paket. (4) Administrator mengisi daftar fitur paket dan menentukan status aktifnya. (5) Administrator menekan tombol "Simpan" sehingga paket tampil pada halaman detail layanan di katalog. |
+| Actor | : | Administrator |
+| Pre-condition | : | Kondisi sebelum :– Administrator telah login dengan role admin dan email yang terverifikasi.– Data layanan yang akan diberi paket telah tersimpan di dalam basis data. |
+| Post-condition | : | Kondisi setelah :– Data paket tersimpan ke dalam basis data beserta harga, durasi, jumlah perangkat maksimum, dan daftar fiturnya.– Paket aktif langsung tampil pada halaman detail layanan dan diperhitungkan pada fitur perbandingan layanan. |
+| Alternate flow | : | – Daftar fitur paket dapat diisi beberapa baris sekaligus dan disimpan sebagai data JSON pada kolom features.– Paket dapat dinonaktifkan tanpa dihapus sehingga tidak tampil pada katalog tetapi riwayat transaksinya tetap utuh. |
+| Exception flow | : | – Bila harga paket diisi bukan angka atau bernilai nol, sistem menampilkan pesan validasi dan data paket tidak disimpan.– Bila paket yang akan dihapus sudah dipakai pada transaksi atau langganan, sistem menolak penghapusan dan menyarankan menonaktifkan paket tersebut. |
+
+Tabel 3-29. Use case description : Mengelola data pengguna
+
+<!-- TABEL 34 -->
+| Name | : | Mengelola data pengguna |
+|---|---|---|
+| Description | : | Fitur untuk mencari pengguna dan mengubah perannya pada panel admin. Langkah-langkahnya: (1) Administrator membuka menu "Pengguna" pada panel admin. (2) Administrator mengetikkan nama atau email pada kolom pencarian lalu menjalankan pencarian. (3) Sistem menampilkan daftar pengguna yang cocok beserta nilai role masing-masing. (4) Administrator memilih peran baru, yaitu user, admin, atau provider, melalui pilihan pada baris pengguna. (5) Administrator menekan tombol "Simpan" sehingga peran pengguna diperbarui. |
+| Actor | : | Administrator |
+| Pre-condition | : | Kondisi sebelum :– Administrator telah login dengan role admin dan email yang terverifikasi.– Data pengguna beserta kolom role tersedia di dalam basis data. |
+| Post-condition | : | Kondisi setelah :– Nilai role pengguna yang diubah tersimpan ke dalam basis data dan tampil pada tabel pengguna.– Hak akses pengguna tersebut menyesuaikan peran barunya pada kunjungan berikutnya. |
+| Alternate flow | : | – Administrator dapat mengubah peran beberapa pengguna secara berurutan dari halaman yang sama.– Peran provider diberikan kepada pengguna yang mewakili penyedia layanan sehingga dapat dibedakan dari Pelanggan biasa. |
+| Exception flow | : | – Bila Administrator mencoba menurunkan peran akunnya sendiri, sistem menolak tindakan tersebut dan menampilkan pesan validasi bahwa peran akun sendiri tidak dapat diubah.– Bila pencarian tidak menemukan pengguna yang cocok, sistem menampilkan pesan bahwa pengguna tidak ditemukan. |
+
+Tabel 3-30. Use case description : Memverifikasi transaksi
+
+<!-- TABEL 35 -->
+| Name | : | Memverifikasi transaksi |
+|---|---|---|
+| Description | : | Fitur untuk memeriksa transaksi pending melalui menu verifikasi transaksi pada panel admin. Langkah-langkahnya: (1) Administrator membuka menu "Verifikasi Transaksi". (2) Sistem menampilkan daftar transaksi yang menunggu verifikasi beserta kode pesanan, nama Pelanggan, layanan, paket, nominal, metode pembayaran, dan sisa waktunya. (3) Administrator memilih satu transaksi dan memeriksa rinciannya. (4) Administrator mencocokkan nominal serta bukti pembayaran dengan data pesanan. (5) Administrator memutuskan hasil verifikasi melalui tombol "Tandai Berhasil" atau "Tandai Gagal". |
+| Actor | : | Administrator |
+| Pre-condition | : | Kondisi sebelum :– Administrator telah login dengan role admin dan email yang terverifikasi.– Terdapat transaksi berstatus pending yang belum melewati batas waktu pembayarannya. |
+| Post-condition | : | Kondisi setelah :– Transaksi yang diverifikasi memiliki status paid atau failed beserta catatan verifikasinya.– Daftar transaksi yang menunggu verifikasi berkurang sesuai keputusan Administrator. |
+| Alternate flow | : | – Administrator dapat menyaring daftar verifikasi berdasarkan status atau metode pembayaran tertentu.– Administrator dapat menambahkan catatan pada kolom notes untuk menjelaskan hasil verifikasi. |
+| Exception flow | : | – Bila transaksi yang dipilih ternyata sudah diproses pihak lain secara bersamaan, sistem menampilkan pesan bahwa status transaksi telah berubah dan memuat ulang datanya.– Bila transaksi telah melewati batas waktu, sistem menyarankan agar transaksi tersebut dibiarkan berstatus expired dan tidak diverifikasi. |
+
+Tabel 3-31. Use case description : Mengunggah logo berkas
+
+<!-- TABEL 36 -->
+| Name | : | Mengunggah logo berkas |
+|---|---|---|
+| Description | : | Fitur untuk mengunggah berkas logo pada data penyedia, layanan, atau kategori melalui panel admin. Langkah-langkahnya: (1) Administrator membuka formulir tambah atau ubah data yang memiliki kolom logo. (2) Administrator menekan tombol "Pilih Berkas" dan memilih berkas gambar dari perangkatnya. (3) Sistem memeriksa jenis dan ukuran berkas tersebut. (4) Administrator menekan tombol "Simpan". (5) Sistem menyimpan berkas logo ke penyimpanan publik dan mencatat lintasannya pada kolom logo_path. |
+| Actor | : | Administrator |
+| Pre-condition | : | Kondisi sebelum :– Administrator telah login dengan role admin dan email yang terverifikasi.– Berkas gambar yang akan diunggah tersedia pada perangkat Administrator dengan jenis dan ukuran yang diizinkan. |
+| Post-condition | : | Kondisi setelah :– Berkas logo tersimpan pada penyimpanan aplikasi dan nilai logo_path terisi pada data terkait.– Logo tampil pada tabel panel admin serta pada katalog atau halaman detail layanan. |
+| Alternate flow | : | – Administrator dapat mengganti logo lama dengan mengunggah berkas baru sehingga nilai logo_path diperbarui.– Administrator dapat menghapus kolom logo sehingga sistem kembali memakai inisial nama sebagai pengganti logo. |
+| Exception flow | : | – Bila berkas yang diunggah bukan gambar atau ukurannya melebihi batas, sistem menampilkan pesan validasi dan berkas tidak disimpan.– Bila proses penyimpanan berkas gagal, sistem menampilkan pesan kesalahan dan data induk tetap tersimpan tanpa logo. |
+
+Tabel 3-32. Use case description : Menandai transaksi berhasil / gagal
+
+<!-- TABEL 37 -->
+| Name | : | Menandai transaksi berhasil / gagal |
+|---|---|---|
+| Description | : | Fitur untuk menetapkan status transaksi menjadi paid atau failed langsung dari daftar transaksi panel admin. Langkah-langkahnya: (1) Administrator membuka menu transaksi dan mencari transaksi berstatus pending. (2) Administrator menekan tombol "Tandai Berhasil" atau "Tandai Gagal" pada baris transaksi tersebut. (3) Sistem menampilkan dialog konfirmasi berisi kode pesanan dan nominal transaksi. (4) Administrator menyetujui konfirmasi tersebut. (5) Sistem memperbarui status transaksi, mengisi paid_at bila berhasil, dan membuat langganan baru bagi Pelanggan. |
+| Actor | : | Administrator |
+| Pre-condition | : | Kondisi sebelum :– Administrator telah login dengan role admin dan email yang terverifikasi.– Transaksi yang akan ditandai berstatus pending dan belum melewati nilai expires_at. |
+| Post-condition | : | Kondisi setelah :– Status transaksi berubah menjadi paid atau failed dan tampil pada riwayat transaksi Pelanggan.– Bila ditandai berhasil, langganan Pelanggan terbentuk dengan status active dan masa aktif sesuai duration_days paket. |
+| Alternate flow | : | – Bila Pelanggan telah memiliki langganan aktif pada layanan yang sama, sistem memperpanjang masa aktif mulai dari ends_at sebelumnya.– Administrator dapat menandai beberapa transaksi dari daftar dengan mengulangi langkah yang sama. |
+| Exception flow | : | – Bila transaksi sudah berstatus final seperti paid, failed, expired, atau cancelled, sistem menolak penandaan ulang dan menampilkan pesan bahwa status transaksi tidak dapat diubah lagi.– Bila dialog konfirmasi dibatalkan, sistem tidak mengubah status transaksi sehingga transaksi tetap pending. |
+
+## Activity Diagram
+Bagian ini menjelaskan Activity Diagram dari beberapa proses utama pada Aplikasi PRIM (Aggregator Fitur Premium). Activity diagram berikut menggambarkan alur kerja sistem mulai dari interaksi yang dilakukan oleh User hingga respons yang diberikan oleh Sistem maupun Payment Gateway, sesuai dengan kebutuhan fungsional yang telah dijelaskan pada bagian sebelumnya.
+
+<!-- TABEL 38 -->
+|  |
+|---|
+
+Gambar 3-2. Activity Diagram Registrasi Pengguna
+
+Activity diagram di atas menjelaskan alur proses registrasi akun baru pada Aplikasi PRIM (F-01). Proses dimulai ketika User membuka halaman registrasi dan mengisi form dengan data nama, email, dan password. Sistem kemudian memvalidasi data yang dimasukkan. Apabila data tidak valid, sistem akan menampilkan pesan kesalahan dan mengembalikan User ke form registrasi untuk memperbaiki data yang dimasukkan. Apabila data valid, sistem akan menyimpan data akun ke dalam database dan mengirimkan email verifikasi kepada User. Proses diakhiri setelah User berhasil memverifikasi akunnya melalui tautan yang dikirimkan pada email tersebut.
+
+<!-- TABEL 39 -->
+|  |
+|---|
+
+Gambar 3-3. Activity Diagram Login Pengguna
+Activity diagram di atas menjelaskan alur proses login pengguna ke dalam Aplikasi PRIM (F-01). User membuka halaman login, kemudian mengisi email dan password serta menekan tombol Login. Sistem selanjutnya memvalidasi kredensial yang dimasukkan. Jika kredensial tidak valid, sistem akan menampilkan pesan gagal login dan meminta User untuk memasukkan kembali data login. Jika kredensial valid, sistem akan membuat sesi/token akses dan mengarahkan User menuju halaman utama sesuai dengan hak akses atau peran yang dimiliki, baik sebagai User, Admin, maupun Provider.
+
+<!-- TABEL 40 -->
+|  |
+|---|
+
+Gambar 3-4. Activity Diagram Pembelian dan Pembayaran Layanan Premium
+Activity diagram di atas menjelaskan alur proses pembelian dan pembayaran layanan premium pada Aplikasi PRIM (F-08, F-09, F-10). Proses diawali ketika User memilih layanan dan paket premium yang diinginkan, kemudian melakukan checkout. Sistem menampilkan ringkasan pesanan, membuat data transaksi, dan mengirimkan permintaan pembayaran ke Payment Gateway (Midtrans/Xendit/Stripe). Payment Gateway kemudian memproses pembayaran tersebut. Apabila pembayaran gagal, Payment Gateway mengirimkan status gagal sehingga sistem memperbarui status transaksi menjadi Gagal dan menampilkan notifikasi kegagalan kepada User. Apabila pembayaran berhasil, Payment Gateway mengirimkan status berhasil sehingga sistem memperbarui status transaksi menjadi Berhasil, mengaktivasi layanan langganan, dan mengirimkan notifikasi aktivasi kepada User.
+
+## Entity Relationship Diagram
+
+<!-- TABEL 41 -->
+|  |
+|---|
+
+Gambar 3-5. ERD Sistem Informasi PRIM (Platform Aggregator Fitur Premium)
+
+Tabel 3-3. Kamus Data
+
+<!-- TABEL 42 -->
+| Entitas | Atribut | Keterangan | Tipe Data | Primary Key | Foreign Key |
+|---|---|---|---|---|---|
+| admin | admin_id | ID unik admin | int(11) | Ya |  |
+|  | username | Nama pengguna admin untuk login | varchar(50) |  |  |
+| pengguna | pengguna_id | ID unik pengguna | int(11) | Ya |  |
+|  | userName | Nama pengguna untuk login | varchar(50) |  |  |
+|  | email | Alamat email pengguna | varchar(100) |  |  |
+|  | password | Kata sandi akun pengguna | varchar(255) |  |  |
+|  | status_Akun | Status akun pengguna (aktif/nonaktif) | varchar(20) |  |  |
+| paket | paket_id | ID unik paket layanan | int(11) | Ya |  |
+|  | nama_Paket | Nama paket layanan | varchar(100) |  |  |
+|  | harga_Paket | Harga paket layanan | decimal(15,2) |  |  |
+|  | jumlah_Paket | Jumlah/stok paket tersedia | int(11) |  |  |
+|  | status_Paket | Status paket (aktif/nonaktif) | varchar(20) |  |  |
+|  | admin_id | Referensi admin yang mengelola paket | int(11) |  | Ya |
+| order | order_id | ID unik order/pemesanan | int(11) | Ya |  |
+|  | tgl_Order | Tanggal order dibuat | datetime |  |  |
+|  | total_Harga | Total harga order | decimal(15,2) |  |  |
+|  | status_Order | Status order (pending/selesai/batal) | varchar(20) |  |  |
+|  | pengguna_id | Referensi pengguna yang melakukan order | int(11) |  | Ya |
+|  | paket_id | Referensi paket yang dipesan | int(11) |  | Ya |
+| pembayaran | pembayaran_id | ID unik transaksi pembayaran | int(11) | Ya |  |
+|  | tgl_Pembayaran | Tanggal pembayaran dilakukan | datetime |  |  |
+|  | metode_Pembayaran | Metode pembayaran yang digunakan | varchar(50) |  |  |
+|  | status_Pembayaran | Status pembayaran (berhasil/gagal/pending) | varchar(20) |  |  |
+|  | order_id | Referensi order yang dibayar | int(11) |  | Ya |
+|  | gateway_id | Referensi payment gateway yang memproses | int(11) |  | Ya |
+| payment_gateway | gateway_id | ID unik payment gateway | int(11) | Ya |  |
+|  | nama | Nama penyedia payment gateway | varchar(50) |  |  |
+|  | endpoint | URL endpoint API payment gateway | varchar(255) |  |  |
+
+# Rancangan Antarmuka
+<rancangan antarmuka digambarkan dan diterangkan di bagian ini>
+
+## <Nama Modul 1>
+Berikut ini adalah rancangan antarmuka pada modul <nama modul 1>.
+
+<!-- TABEL 43 -->
+|  |
+|---|
+
+Gambar 4-1. Antarmuka untuk fitur <nama fitur>.
+<terangkan gambar diatas, seperti terdapat fungsi apa aja dan lain-lain.>
+
+<!-- TABEL 44 -->
+|  |
+|---|
+
+Gambar 4-2. Antarmuka untuk fitur <nama fitur>.
+<terangkan gambar diatas, seperti terdapat fungsi apa aja dan lain-lain.>
+
+## <Nama Modul 2>
+Berikut ini adalah rancangan antarmuka pada modul <nama modul 2>.
+
+<!-- TABEL 45 -->
+|  |
+|---|
+
+Gambar 4-3. Antarmuka untuk fitur <nama fitur>.
+<terangkan gambar diatas, seperti terdapat fungsi apa aja dan lain-lain.>
+
+## <Nama Modul 3>
+Berikut ini adalah rancangan antarmuka pada modul <nama modul 3>.
+
+<!-- TABEL 46 -->
+|  |
+|---|
+
+Gambar 4-4. Antarmuka untuk fitur <nama fitur>.
+<terangkan gambar diatas, seperti terdapat fungsi apa aja dan lain-lain.>
+
+# LAMPIRAN
