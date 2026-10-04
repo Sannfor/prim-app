@@ -34,3 +34,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 require __DIR__.'/auth.php';
 require __DIR__.'/support.php';
+
+// Rute bantuan untuk pengambilan gambar rancangan antarmuka. Hanya dimuat pada
+// lingkungan lokal; berkasnya dapat dihapus tanpa memengaruhi aplikasi.
+if (app()->environment('local')) {
+    require __DIR__.'/dev-screenshot.php';
+}
