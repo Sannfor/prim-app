@@ -2,57 +2,317 @@
 @import '../../vendor/livewire/flux/dist/flux.css';
 
 @source "../views";
+@source "../../Modules/*/resources/views";
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../vendor/livewire/flux-pro/stubs/**/*.blade.php';
 @source '../../vendor/livewire/flux/stubs/**/*.blade.php';
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/*
+|--------------------------------------------------------------------------
+| Token Desain PRIM (hasil ekstraksi Figma PRIM_KELOMPOK7)
+|--------------------------------------------------------------------------
+| Rujukan lengkap: docs/DESIGN-TOKENS.md
+*/
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-display: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-auth: 'Poppins', ui-sans-serif, system-ui, sans-serif;
 
-    --color-zinc-50: #fafafa;
-    --color-zinc-100: #f5f5f5;
-    --color-zinc-200: #e5e5e5;
-    --color-zinc-300: #d4d4d4;
-    --color-zinc-400: #a3a3a3;
-    --color-zinc-500: #737373;
-    --color-zinc-600: #525252;
-    --color-zinc-700: #404040;
-    --color-zinc-800: #262626;
-    --color-zinc-900: #171717;
-    --color-zinc-950: #0a0a0a;
+    /* Warna brand */
+    --color-brand: #534ab7;
+    --color-brand-light: #6c63d5;
+    --color-brand-violet: #8b5cf6;
+    --color-brand-surface: #d3cfff;
+    --color-brand-soft: #eeedfe;
+    --color-brand-deep: #43399b;
 
-    --color-accent: var(--color-neutral-800);
-    --color-accent-content: var(--color-neutral-800);
-    --color-accent-foreground: var(--color-white);
+    /* Netral */
+    --color-ink: #333333;
+    --color-ink-strong: #1c1e21;
+    --color-muted: #6b7280;
+    --color-muted-2: #8e8e93;
+    --color-line: #b8b8b8;
+    --color-line-soft: #e5e7eb;
+    --color-line-input: #cfd9de;
+    --color-canvas: #f8f9fa;
+
+    /* Status */
+    --color-status-done-bg: #eaf3de;
+    --color-status-done-fg: #3b6d11;
+    --color-status-process-bg: #e6f1fb;
+    --color-status-process-fg: #0c447c;
+    --color-status-wait-bg: #faeeda;
+    --color-status-wait-fg: #854f0b;
+    --color-status-cancel-bg: #fcebeb;
+    --color-status-cancel-fg: #e24b4a;
+    --color-status-new-bg: #eeedfe;
+    --color-status-new-fg: #534ab7;
+    --color-tag: #0ea5e9;
+
+    --radius-card: 12px;
+    --radius-auth: 30px;
+    --radius-control: 15px;
+    --radius-step: 117px;
+
+    --shadow-brand-xs: 0 1px 2px -1px #a78bfa;
+    --shadow-brand-sm: 0 1px 3px 0 #a78bfa;
+    --shadow-brand-lg: 0 25px 50px -12px #60a5fa;
 }
 
 @layer theme {
     .dark {
-        --color-accent: var(--color-white);
-        --color-accent-content: var(--color-white);
-        --color-accent-foreground: var(--color-neutral-800);
+        --color-accent: var(--color-brand-violet);
+        --color-accent-content: var(--color-brand-violet);
+        --color-accent-foreground: var(--color-white);
     }
 }
 
 @layer base {
-
     *,
     ::after,
     ::before,
     ::backdrop,
     ::file-selector-button {
-        border-color: var(--color-gray-200, currentColor);
+        border-color: var(--color-line-soft, currentColor);
+    }
+
+    body {
+        font-family: var(--font-sans);
+        color: var(--color-ink);
+    }
+
+    h1,
+    h2,
+    h3 {
+        font-family: var(--font-display);
+        color: var(--color-ink-strong);
     }
 }
 
+/*
+|--------------------------------------------------------------------------
+| Kelas komponen desain PRIM
+|--------------------------------------------------------------------------
+*/
+@layer components {
+    /* Latar ungu hero halaman publik */
+    .prim-hero-bg {
+        background-color: var(--color-brand-light);
+    }
+
+    /* Gradien latar halaman autentikasi: ungu tua -> putih */
+    .prim-auth-bg {
+        background: linear-gradient(197.5deg, #948bff 0%, #b9b3fb 34%, #eae7fd 68%, #fafaff 100%);
+    }
+
+    /* Transisi awan di kaki hero */
+    .prim-clouds {
+        height: 190px;
+        background-color: var(--color-brand-light);
+        background-image:
+            radial-gradient(circle at 6% 100%, #ffffff 46px, transparent 47px),
+            radial-gradient(circle at 17% 100%, #ffffff 66px, transparent 67px),
+            radial-gradient(circle at 30% 100%, #ffffff 50px, transparent 51px),
+            radial-gradient(circle at 43% 100%, #ffffff 74px, transparent 75px),
+            radial-gradient(circle at 57% 100%, #ffffff 54px, transparent 55px),
+            radial-gradient(circle at 70% 100%, #ffffff 70px, transparent 71px),
+            radial-gradient(circle at 83% 100%, #ffffff 52px, transparent 53px),
+            radial-gradient(circle at 95% 100%, #ffffff 62px, transparent 63px),
+            radial-gradient(circle at 11% 100%, #dbeafe 34px, transparent 35px),
+            radial-gradient(circle at 37% 100%, #dbeafe 40px, transparent 41px),
+            radial-gradient(circle at 64% 100%, #dbeafe 36px, transparent 37px),
+            radial-gradient(circle at 89% 100%, #dbeafe 42px, transparent 43px);
+        background-repeat: no-repeat;
+    }
+
+    /* Kartu putih dasar */
+    .prim-card {
+        border-radius: var(--radius-card);
+        background-color: #ffffff;
+        box-shadow: var(--shadow-brand-xs);
+    }
+
+    /* Kartu layanan pada katalog */
+    .prim-service-card {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        border-radius: var(--radius-card);
+        background-color: #ffffff;
+        box-shadow: var(--shadow-brand-xs);
+    }
+
+    /* Tombol utama */
+    .prim-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        border-radius: 9999px;
+        background-color: var(--color-brand);
+        padding: 0.625rem 1.5rem;
+        font-size: 0.9375rem;
+        font-weight: 500;
+        color: #ffffff;
+        transition: background-color 0.15s ease;
+    }
+
+    .prim-btn:hover {
+        background-color: var(--color-brand-deep);
+    }
+
+    .prim-btn-block {
+        border-radius: var(--radius-control);
+        padding-block: 0.75rem;
+        width: 100%;
+    }
+
+    .prim-btn-ghost {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        border-radius: 9999px;
+        border: 1px solid var(--color-brand-surface);
+        padding: 0.5rem 1.25rem;
+        font-size: 0.9375rem;
+        font-weight: 500;
+        color: var(--color-brand);
+        background-color: transparent;
+    }
+
+    .prim-btn-outline-white {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.375rem;
+        border: 1px solid #ffffff;
+        padding: 0.375rem 1.25rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #ffffff;
+    }
+
+    /* Kolom masukan */
+    .prim-input {
+        width: 100%;
+        border-radius: var(--radius-control);
+        border: 1px solid var(--color-line-input);
+        background-color: #ffffff;
+        padding: 0.75rem 1rem;
+        font-size: 0.9375rem;
+        color: var(--color-ink-strong);
+    }
+
+    .prim-input::placeholder {
+        color: var(--color-muted-2);
+    }
+
+    .prim-input:focus {
+        outline: none;
+        border-color: var(--color-brand);
+        box-shadow: 0 0 0 3px rgb(83 74 183 / 0.15);
+    }
+
+    /* Label kolom masukan */
+    .prim-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-size: 0.9375rem;
+        color: var(--color-ink);
+    }
+
+    /* Lencana status */
+    .prim-badge {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 9999px;
+        padding: 0.25rem 0.75rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    /* Tag durasi paket */
+    .prim-tag-period {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 9999px;
+        background-color: var(--color-tag);
+        padding: 0.125rem 0.5rem;
+        font-size: 0.6875rem;
+        font-weight: 600;
+        color: #ffffff;
+        white-space: nowrap;
+    }
+
+    /* Pita "Diskon n%" di sudut kiri atas kartu */
+    .prim-ribbon {
+        position: absolute;
+        top: 0;
+        left: 0;
+        border-radius: 5px 9999px 9999px 0;
+        padding: 0.25rem 0.75rem;
+        font-size: 0.6875rem;
+        font-weight: 600;
+        color: #ffffff;
+    }
+
+    /* Kartu langkah "Cara Berlangganan" */
+    .prim-step-card {
+        border-radius: 117px 117px 12px 12px;
+        background-color: var(--color-brand);
+        padding: 1rem 1.25rem 1.25rem;
+        text-align: center;
+        color: #ffffff;
+    }
+
+    /* Baris tabel admin */
+    .prim-table-head {
+        border-bottom: 1px solid var(--color-line-soft);
+        text-align: left;
+        font-size: 0.75rem;
+        font-weight: 400;
+        color: var(--color-muted);
+    }
+
+    .prim-table-head th {
+        padding: 0.75rem 0.5rem;
+        font-weight: 400;
+    }
+
+    /* Item menu sidebar admin */
+    .prim-sidebar-item {
+        display: flex;
+        align-items: center;
+        gap: 0.875rem;
+        padding: 0.75rem 1.5rem;
+        font-size: 1.125rem;
+        color: #ffffff;
+    }
+
+    .prim-sidebar-item:hover {
+        background-color: rgb(255 255 255 / 0.12);
+    }
+
+    .prim-sidebar-item-active {
+        background-color: #7d75d6;
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
+| Penyesuaian kontrol Flux agar selaras token PRIM
+|--------------------------------------------------------------------------
+*/
 [data-flux-field] {
     @apply grid gap-2;
 }
 
 [data-flux-label] {
-    @apply  !mb-0 !leading-tight;
+    @apply !mb-0 !leading-tight;
 }
 
 input:focus[data-flux-control],
@@ -60,7 +320,3 @@ textarea:focus[data-flux-control],
 select:focus[data-flux-control] {
     @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
 }
-
-/* \[:where(&)\]:size-4 {
-    @apply size-4;
-} */

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Casts\RoleCast;
 use App\Enums\Role;
 use App\Enums\SubscriptionStatus;
+use App\Enums\UserStatus;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -28,7 +29,11 @@ class User extends Authenticatable // implements MustVerifyEmail
         'email',
         'password',
         'role',
+        'status',
+        'last_login_at',
         'phone',
+        'address',
+        'settings',
         'avatar_path',
     ];
 
@@ -53,7 +58,31 @@ class User extends Authenticatable // implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'role' => RoleCast::class,
+            'status' => UserStatus::class,
+            'last_login_at' => 'datetime',
+            'settings' => 'array',
         ];
+    }
+
+    /**
+     * Preferensi notifikasi pengguna beserta nilai bawaannya.
+     *
+     * @return array<string, bool>
+     */
+    public function notificationPreferences(): array
+    {
+        $defaults = [
+            'daily_report' => true,
+            'new_order_popup' => true,
+            'new_order_email' => true,
+            'system_update' => false,
+            'new_device_login' => true,
+            'password_change' => true,
+            'user_message' => true,
+            'low_stock' => false,
+        ];
+
+        return array_merge($defaults, (array) ($this->settings['notifications'] ?? []));
     }
 
     /**
@@ -111,6 +140,32 @@ class User extends Authenticatable // implements MustVerifyEmail
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
+    }
+
+    /**
+     * Kredensial akun layanan yang dibagikan kepada pengguna ini.
+     *
+     * @return HasMany<ServiceCredential, $this>
+     */
+    public function serviceCredentials(): HasMany
+    {
+        return $this->hasMany(ServiceCredential::class);
+    }
+
+    /**
+     * Apakah akun pengguna ini masih boleh masuk.
+     */
+    public function canSignIn(): bool
+    {
+        return ($this->status ?? UserStatus::Aktif)->canSignIn();
+    }
+
+    /**
+     * Status akun dalam bentuk objek enum, dengan nilai bawaan "aktif".
+     */
+    public function statusEnum(): UserStatus
+    {
+        return $this->status instanceof UserStatus ? $this->status : UserStatus::Aktif;
     }
 
     /**

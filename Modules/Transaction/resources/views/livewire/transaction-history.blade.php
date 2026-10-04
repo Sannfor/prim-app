@@ -1,8 +1,8 @@
 <div class="space-y-6">
     <div class="flex flex-wrap items-end justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold tracking-tight">Riwayat Transaksi</h1>
-            <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+            <h1 class="text-2xl font-medium text-ink-strong">Riwayat Transaksi</h1>
+            <p class="mt-1 text-sm text-muted">
                 Seluruh pesanan layanan premium yang pernah Anda buat.
             </p>
         </div>
@@ -16,10 +16,10 @@
     </div>
 
     @if ($transactions->isEmpty())
-        <div class="rounded-xl border border-dashed border-zinc-300 bg-white p-12 text-center dark:border-zinc-600 dark:bg-zinc-800">
-            <flux:icon.receipt-percent class="mx-auto size-8 text-zinc-400" />
+        <div class="rounded-xl border border-dashed border-line bg-white p-12 text-center">
+            <flux:icon.receipt-percent class="mx-auto size-8 text-muted-2" />
             <p class="mt-3 font-medium">Belum ada transaksi</p>
-            <p class="mt-1 text-sm text-zinc-500">
+            <p class="mt-1 text-sm text-muted">
                 @if ($status !== '')
                     Tidak ada transaksi dengan status ini.
                 @else
@@ -35,7 +35,7 @@
             @foreach ($transactions as $transaction)
                 <article
                     wire:key="trx-{{ $transaction->id }}"
-                    class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-800"
+                    class="rounded-xl bg-canvas p-5"
                 >
                     <div class="flex flex-wrap items-start justify-between gap-4">
                         <div class="min-w-0">
@@ -46,17 +46,17 @@
                                 </flux:badge>
                             </div>
 
-                            <p class="mt-1 text-sm text-zinc-500">
+                            <p class="mt-1 text-sm text-muted">
                                 {{ $transaction->plan->name }} · {{ $transaction->plan->durationLabel() }}
                             </p>
-                            <p class="mt-0.5 font-mono text-xs text-zinc-400">{{ $transaction->order_code }}</p>
+                            <p class="mt-0.5 font-mono text-xs text-muted-2">{{ $transaction->order_code }}</p>
                         </div>
 
                         <div class="text-right">
-                            <p class="font-bold text-indigo-600 dark:text-indigo-400">
+                            <p class="font-bold text-brand">
                                 {{ $transaction->formattedAmount() }}
                             </p>
-                            <p class="mt-0.5 text-xs text-zinc-500">
+                            <p class="mt-0.5 text-xs text-muted">
                                 {{ $transaction->created_at->translatedFormat('d M Y, H:i') }}
                             </p>
                         </div>
@@ -86,7 +86,7 @@
                         @endif
 
                         @if ($transaction->subscription)
-                            <span class="text-xs text-zinc-500">
+                            <span class="text-xs text-muted">
                                 Langganan aktif hingga
                                 {{ $transaction->subscription->ends_at->translatedFormat('d M Y') }}
                             </span>

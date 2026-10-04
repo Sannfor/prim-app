@@ -6,6 +6,19 @@ Specification (SRS)* Kelompok 7, Ilmu Komputer FMIPA Universitas Lambung Mangkur
 
 ---
 
+## Menjalankan dengan cepat
+
+```bash
+cd prim
+php setup.php     # memasang dependensi, basis data, dan aset sekaligus
+php artisan serve # lalu buka http://127.0.0.1:8000
+```
+
+Panduan lengkap langkah demi langkah beserta pemecahan masalah tersedia di
+**[TUTORIAL-MENJALANKAN.txt](TUTORIAL-MENJALANKAN.txt)**.
+
+---
+
 ## Daftar Isi
 
 1. [Fitur Utama](#fitur-utama)
@@ -25,11 +38,14 @@ Specification (SRS)* Kelompok 7, Ilmu Komputer FMIPA Universitas Lambung Mangkur
 ## Fitur Utama
 
 ### Katalog (publik, tanpa login)
+- Katalog 27 layanan dengan **varian paket** (mis. "1 Perangkat", "Bulanan") dan tag periode
 - Pencarian layanan berdasarkan nama, tagline, dan deskripsi
-- Filter kategori, penyedia, dan batas harga
-- Pengurutan: terbaru, harga terendah/tertinggi, nama
+- Filter kategori dan penyedia, pengurutan harga/nama
+- Pita **diskon** dan penanda **preorder** pada kartu layanan
 - Halaman detail layanan: daftar paket, harga, fitur, dan ulasan pengguna
+- Panduan **Cara Berlangganan** beserta 11 kanal pembayaran
 - Komparasi side-by-side hingga 4 layanan dengan penanda nilai paling menguntungkan
+
 
 ### Transaksi (wajib login)
 - Checkout paket dengan pilihan metode pembayaran
@@ -47,10 +63,19 @@ Specification (SRS)* Kelompok 7, Ilmu Komputer FMIPA Universitas Lambung Mangkur
 
 ### Panel Pengelola (khusus admin)
 - Dashboard metrik nyata: pendapatan bulan ini + pertumbuhan, komposisi status
-  transaksi, diagram 14 hari, layanan teratas, langganan yang akan berakhir
-- CRUD Penyedia, Kategori, Layanan (dengan unggah logo), dan Paket
-- Pengelolaan peran pengguna
-- Verifikasi transaksi manual (tandai berhasil/gagal)
+  pesanan, diagram 14 hari, produk terlaris, langganan yang akan berakhir
+- Manajemen pesanan dengan verifikasi pembayaran manual (tandai selesai/gagal)
+- Manajemen pengguna: cari, ubah peran, dan ubah **status** (aktif/non-aktif/suspend)
+- Manajemen produk: CRUD penyedia, kategori, layanan (dengan unggah logo), dan paket
+- Manajemen pembayaran per kanal
+- **Laporan** dengan diagram pendapatan bulanan, komposisi status, dan insight
+- **Pengaturan** profil dan 8 saklar notifikasi
+
+### Akun pengguna (wajib login)
+- **Pusat pesanan** dengan 9 tab status dan pencarian
+- **Kode Login**: kredensial akun layanan per pesanan berhasil, tersembunyi sampai diminta
+- **Masuk dengan kode OTP** (verifikasi perangkat)
+- Pengaturan profil, kata sandi, dan tampilan
 
 ---
 
@@ -73,13 +98,26 @@ Specification (SRS)* Kelompok 7, Ilmu Komputer FMIPA Universitas Lambung Mangkur
 
 ## Persyaratan Sistem
 
-- PHP 8.2 atau lebih baru dengan ekstensi `pdo_sqlite`, `mbstring`, `openssl`, `curl`
+- PHP 8.2 atau lebih baru dengan ekstensi `pdo_sqlite`, `sqlite3`, `mbstring`, `openssl`, `tokenizer`, `xml`, `curl`, `fileinfo`, `zip`
 - Composer 2.x
-- Node.js 20+ dan npm
+- Node.js 18+ (disarankan 20+) dan npm
 
 ---
 
 ## Instalasi
+
+### Cara tercepat — satu perintah
+
+```bash
+cd prim
+php setup.php
+```
+
+Skrip `setup.php` mengerjakan seluruh langkah di bawah sekaligus: menyiapkan
+`.env`, memasang dependensi, membuat basis data, mengisi data contoh, dan
+membangun aset antarmuka. Setelah selesai, lanjut ke **Menjalankan aplikasi**.
+
+### Cara manual
 
 ```bash
 # 1. Pasang dependensi PHP dan JavaScript
@@ -91,9 +129,11 @@ cp .env.example .env        # Windows: copy .env.example .env
 php artisan key:generate
 
 # 3. Siapkan basis data SQLite
-#    Berkas database/database.sqlite sudah tersedia di repositori.
-#    Bila belum ada, buat dengan: type nul > database\database.sqlite  (Windows)
-#                                 touch database/database.sqlite       (Linux/macOS)
+#    database/database.sqlite tidak disertakan di repositori (diabaikan Git),
+#    jadi berkasnya perlu dibuat:
+#      Windows (Command Prompt) : type nul > database\database.sqlite
+#      Windows (PowerShell)     : New-Item database\database.sqlite -ItemType File
+#      Linux / macOS            : touch database/database.sqlite
 
 # 4. Jalankan migrasi sekaligus isi data contoh
 php artisan migrate:fresh --seed
@@ -101,16 +141,20 @@ php artisan migrate:fresh --seed
 # 5. Buat tautan penyimpanan publik (untuk unggah logo)
 php artisan storage:link
 
-# 6. Bangun aset frontend
+# 6. Bangun aset frontend (WAJIB — aset tidak disertakan di repositori)
 npm run build
 ```
+
+> **Penting:** langkah `npm run build` tidak boleh dilewati. Berkas
+> `public/build/` diabaikan Git, sehingga tanpa langkah ini tampilan akan polos
+> tanpa warna dan tanpa logo.
 
 ### Menjalankan aplikasi
 
 ```bash
 # Opsi 1 — server PHP bawaan
 php artisan serve
-# Buka http://localhost:8000
+# Buka http://127.0.0.1:8000
 
 # Opsi 2 — semua layanan sekaligus (server + queue + log + vite)
 composer dev
@@ -125,47 +169,92 @@ di terminal terpisah bersama `php artisan serve`.
 
 Seluruh akun hasil seeder memakai kata sandi **`password`**.
 
-| Peran | Email | Akses |
+### Administrator
+
+| Email | Peran | Akses |
 |---|---|---|
-| Administrator | `admin@prim.test` | Seluruh panel `/admin` |
-| Pelanggan | `ahmadi@prim.test` | Katalog, transaksi, langganan |
-| Pelanggan | `hidayatunnisa@prim.test` | Katalog, transaksi, langganan |
-| Pelanggan | `najwa@prim.test` | Katalog, transaksi, langganan |
-| Pelanggan | `misliani@prim.test` | Katalog, transaksi, langganan |
+| `admin@prim.com` | Administrator (Super Admin) | Seluruh panel `/admin` |
+| `admin@prim.test` | Administrator | Seluruh panel `/admin` |
+
+Cara masuk sebagai admin: buka `/login` → masukkan kredensial di atas → setelah
+masuk, klik avatar di kanan atas lalu pilih **Panel Pengelola**, atau langsung
+buka `/admin`.
+
+### Pelanggan
+
+| Email | Catatan |
+|---|---|
+| `andi@prim.test` | Paling lengkap — 2 transaksi, 2 kode login |
+| `rina@prim.test` | 2 transaksi |
+| `budi@prim.test` | 2 transaksi, 1 kode login |
+| `dewi@prim.test` | 2 transaksi, 1 kode login |
+
+Pelanggan lain (semuanya `@prim.test`, sandi `password`): `citra`, `doni`, `eko`,
+`faisal`, `fitri`, `fitriani`, `guntur`, `hendra`, `mega`, `maya`, `rizky`, `siti`.
+
+Dua akun berikut sengaja tidak aktif untuk menguji kolom Status di panel
+pengelola:
+
+| Email | Status |
+|---|---|
+| `maya@prim.test` | Suspend |
+| `mega@prim.test` | Non-aktif |
 
 ### Data contoh yang disediakan
 
-- **3 penyedia fiktif**: Nusantara Stream, Sonata Music, Cendekia Learn
-- **3 kategori**: Hiburan & Streaming, Produktivitas & Kreativitas, Edukasi & Pembelajaran
-- **6 layanan** dengan total **15 paket** beragam harga dan durasi
-- **7 transaksi** (4 berhasil, 2 menunggu pembayaran, 1 gagal) beserta langganannya
+- **27 layanan** dengan **43 varian paket** (varian, harga, tag periode, diskon, preorder)
+- **5 kategori**: Streaming, Musik, AI, Produktivitas, Penyimpanan, Edukasi
+- **18 akun**: 2 administrator dan 16 pelanggan dengan beragam status
+- **20 transaksi** pada berbagai status pesanan, beserta langganan dan kredensial kode login
 
-> Seluruh nama penyedia dan layanan bersifat **fiktif** dan dibuat hanya untuk
-> keperluan demonstrasi akademik.
+> Nama merek layanan mengikuti desain Figma dan dipakai hanya untuk keperluan
+> demonstrasi akademik.
 
 ---
 
 ## Peta URL
 
-| URL | Modul | Akses |
-|---|---|---|
-| `/` | Landing | Publik |
-| `/katalog` | Catalog | Publik |
-| `/katalog/{slug}` | Catalog | Publik |
-| `/bandingkan` | Catalog | Publik |
-| `/checkout/{plan}` | Transaction | Login + terverifikasi |
-| `/transaksi` | Transaction | Login + terverifikasi |
-| `/transaksi/{order_code}` | Transaction | Login (hanya milik sendiri) |
-| `/langganan` | Subscription | Login + terverifikasi |
-| `/langganan/{id}/perpanjang` | Subscription | Login (hanya milik sendiri) |
-| `/admin` | Admin | Peran `admin` |
-| `/admin/layanan` | Admin | Peran `admin` |
-| `/admin/layanan/{slug}/paket` | Admin | Peran `admin` |
-| `/admin/kategori` | Admin | Peran `admin` |
-| `/admin/provider` | Admin | Peran `admin` |
-| `/admin/pengguna` | Admin | Peran `admin` |
-| `/admin/transaksi` | Admin | Peran `admin` |
-| `/settings/profile`, `/settings/password`, `/settings/appearance` | Starter kit | Login |
+### Publik (tanpa login)
+
+| URL | Keterangan |
+|---|---|
+| `/` | Beranda |
+| `/katalog` | Katalog layanan (grid 4 kolom, pencarian, filter, urutan) |
+| `/katalog/{slug}` | Detail layanan, mis. `/katalog/netflix` |
+| `/bandingkan` | Perbandingan layanan |
+| `/cara-berlangganan` | Lima langkah berlangganan + metode pembayaran |
+| `/laporan-kendala` | Bantuan melalui WhatsApp |
+| `/login`, `/register` | Masuk dan daftar |
+| `/kode-login` | Masuk dengan kode OTP (verifikasi perangkat) |
+| `/forgot-password`, `/reset-password/{token}` | Pemulihan kata sandi |
+
+### Pelanggan (perlu login)
+
+| URL | Keterangan |
+|---|---|
+| `/profil/pesanan` | Pusat pesanan (9 tab status) |
+| `/profil/kode-login` | Kredensial akun layanan |
+| `/langganan` | Daftar langganan |
+| `/langganan/{id}/perpanjang` | Perpanjangan langganan |
+| `/transaksi` | Riwayat transaksi |
+| `/transaksi/{order_code}` | Detail pesanan |
+| `/checkout/{plan}` | Konfirmasi pemesanan |
+| `/settings/profile`, `/settings/password`, `/settings/appearance` | Pengaturan akun |
+
+### Pengelola (peran `admin`)
+
+| URL | Keterangan |
+|---|---|
+| `/admin` | Dashboard |
+| `/admin/pesanan` | Manajemen pesanan |
+| `/admin/pembayaran` | Manajemen pembayaran |
+| `/admin/pengguna` | Manajemen pengguna |
+| `/admin/produk` | Manajemen produk |
+| `/admin/produk/{service}/paket` | Pengelolaan paket per layanan |
+| `/admin/kategori`, `/admin/penyedia` | Master data pendukung |
+| `/admin/laporan` | Laporan |
+| `/admin/pengaturan/profil`, `/admin/pengaturan/notifikasi` | Pengaturan pengelola |
+
 
 ---
 

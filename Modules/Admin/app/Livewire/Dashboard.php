@@ -23,7 +23,7 @@ use Livewire\Component;
  * Menggantikan angka statis pada scaffold awal sehingga angka yang tampil
  * selalu mencerminkan kondisi data yang sebenarnya.
  */
-#[Layout('layouts::app')]
+#[Layout('layouts::admin')]
 #[Title('Dashboard Admin')]
 class Dashboard extends Component
 {

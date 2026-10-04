@@ -1,8 +1,8 @@
 <div class="space-y-6">
     <div class="flex flex-wrap items-end justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold tracking-tight">Kelola Layanan</h1>
-            <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+            <h1 class="text-2xl font-medium text-ink-strong">Kelola Layanan</h1>
+            <p class="mt-1 text-sm text-muted">
                 Layanan premium yang ditampilkan pada katalog PRIM.
             </p>
         </div>
@@ -11,15 +11,15 @@
     </div>
 
     @if ($services->isEmpty())
-        <div class="rounded-xl border border-dashed border-zinc-300 bg-white p-12 text-center dark:border-zinc-600 dark:bg-zinc-800">
-            <flux:icon.squares-2x2 class="mx-auto size-8 text-zinc-400" />
+        <div class="rounded-xl border border-dashed border-line bg-white p-12 text-center">
+            <flux:icon.squares-2x2 class="mx-auto size-8 text-muted-2" />
             <p class="mt-3 font-medium">Belum ada layanan</p>
-            <p class="mt-1 text-sm text-zinc-500">Tambahkan layanan untuk mulai mengisi katalog.</p>
+            <p class="mt-1 text-sm text-muted">Tambahkan layanan untuk mulai mengisi katalog.</p>
         </div>
     @else
-        <div class="overflow-x-auto rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-800">
+        <div class="overflow-x-auto rounded-xl bg-white shadow-brand-xs">
             <table class="w-full text-sm">
-                <thead class="border-b border-zinc-200 bg-zinc-50 text-left dark:border-zinc-700 dark:bg-zinc-900">
+                <thead class="border-b border-line-soft bg-canvas text-left">
                     <tr>
                         <th class="p-3 font-medium">Layanan</th>
                         <th class="p-3 font-medium">Kategori</th>
@@ -31,10 +31,10 @@
                 </thead>
                 <tbody>
                     @foreach ($services as $service)
-                        <tr wire:key="service-{{ $service->id }}" class="border-b border-zinc-100 last:border-0 dark:border-zinc-700">
+                        <tr wire:key="service-{{ $service->id }}" class="border-b border-line-soft last:border-0">
                             <td class="p-3">
                                 <p class="font-medium">{{ $service->name }}</p>
-                                <p class="font-mono text-xs text-zinc-500">{{ $service->slug }}</p>
+                                <p class="font-mono text-xs text-muted">{{ $service->slug }}</p>
                             </td>
                             <td class="p-3">{{ $service->category->name }}</td>
                             <td class="p-3">{{ $service->provider->name }}</td>
@@ -89,7 +89,7 @@
 
         <div>
             <flux:input wire:model="logo" type="file" accept="image/*" label="Logo (opsional)" />
-            <p class="mt-1 text-xs text-zinc-500">Format gambar, maksimal 2 MB.</p>
+            <p class="mt-1 text-xs text-muted">Format gambar, maksimal 2 MB.</p>
             @error('logo') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
         </div>
     </x-admin::form-modal>

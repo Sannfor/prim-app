@@ -1,8 +1,8 @@
 <div class="space-y-6">
     <div class="flex flex-wrap items-end justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold tracking-tight">Bandingkan Layanan</h1>
-            <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+            <h1 class="text-2xl font-medium text-ink-strong">Bandingkan Layanan</h1>
+            <p class="mt-1 text-sm text-muted">
                 Bandingkan hingga {{ \Modules\Catalog\Livewire\Comparison::MAX_SERVICES }} layanan sekaligus: harga, durasi, jumlah perangkat, dan fitur.
             </p>
         </div>
@@ -21,10 +21,10 @@
 
     @if ($services->isEmpty())
         {{-- Keadaan kosong --}}
-        <div class="rounded-xl border border-dashed border-zinc-300 bg-white p-12 text-center dark:border-zinc-600 dark:bg-zinc-800">
-            <flux:icon.arrows-right-left class="mx-auto size-8 text-zinc-400" />
+        <div class="rounded-xl border border-dashed border-line bg-white p-12 text-center">
+            <flux:icon.arrows-right-left class="mx-auto size-8 text-muted-2" />
             <p class="mt-3 font-medium">Belum ada layanan yang dipilih</p>
-            <p class="mx-auto mt-1 max-w-md text-sm text-zinc-500">
+            <p class="mx-auto mt-1 max-w-md text-sm text-muted">
                 Pilih layanan dari katalog dengan menekan tombol bandingkan, lalu bandingkan
                 paket, harga, dan fiturnya di sini.
             </p>
@@ -34,11 +34,11 @@
         </div>
     @else
         {{-- Tabel perbandingan --}}
-        <div class="overflow-x-auto rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-800">
+        <div class="overflow-x-auto rounded-xl bg-white shadow-brand-xs">
             <table class="w-full min-w-[40rem] border-collapse text-sm">
                 <thead>
                     <tr class="border-b border-zinc-200 dark:border-zinc-700">
-                        <th class="w-48 p-4 text-left align-bottom font-medium text-zinc-500">Perbandingan</th>
+                        <th class="w-48 p-4 text-left align-bottom font-medium text-muted">Perbandingan</th>
 
                         @foreach ($services as $service)
                             <th wire:key="head-{{ $service->id }}" class="p-4 text-left align-bottom">
@@ -46,12 +46,12 @@
                                     <div>
                                         <a
                                             href="{{ route('catalog.show', $service->slug) }}"
-                                            class="font-semibold hover:text-indigo-600"
+                                            class="font-semibold hover:text-brand"
                                             wire:navigate
                                         >
                                             {{ $service->name }}
                                         </a>
-                                        <p class="mt-0.5 text-xs font-normal text-zinc-500">{{ $service->provider->name }}</p>
+                                        <p class="mt-0.5 text-xs font-normal text-muted">{{ $service->provider->name }}</p>
                                     </div>
                                     <flux:button
                                         wire:click="remove({{ $service->id }})"
@@ -68,8 +68,8 @@
 
                 <tbody>
                     @foreach ($rows as $index => $row)
-                        <tr wire:key="row-{{ $index }}" class="border-b border-zinc-100 last:border-0 dark:border-zinc-700">
-                            <th class="p-4 text-left font-medium text-zinc-500">{{ $row['label'] }}</th>
+                        <tr wire:key="row-{{ $index }}" class="border-b border-line-soft last:border-0">
+                            <th class="p-4 text-left font-medium text-muted">{{ $row['label'] }}</th>
 
                             @foreach ($row['values'] as $columnIndex => $value)
                                 <td
@@ -87,7 +87,7 @@
 
                     {{-- Baris aksi pembelian --}}
                     <tr>
-                        <th class="p-4 text-left font-medium text-zinc-500">Paket termurah</th>
+                        <th class="p-4 text-left font-medium text-muted">Paket termurah</th>
                         @foreach ($services as $service)
                             @php $cheapest = $service->plans->where('is_active', true)->sortBy('price')->first(); @endphp
                             <td wire:key="buy-{{ $service->id }}" class="p-4">
@@ -101,9 +101,9 @@
                                     >
                                         {{ $cheapest->formattedPrice() }}
                                     </flux:button>
-                                    <p class="mt-1 text-xs text-zinc-500">{{ $cheapest->name }}</p>
+                                    <p class="mt-1 text-xs text-muted">{{ $cheapest->name }}</p>
                                 @else
-                                    <span class="text-zinc-500">Belum ada paket</span>
+                                    <span class="text-muted">Belum ada paket</span>
                                 @endif
                             </td>
                         @endforeach
@@ -112,7 +112,7 @@
             </table>
         </div>
 
-        <p class="text-xs text-zinc-500">
+        <p class="text-xs text-muted">
             Sel berwarna hijau menandai nilai paling menguntungkan pada baris tersebut.
             Perbandingan hanya mempertimbangkan paket yang berstatus aktif.
         </p>
@@ -127,11 +127,11 @@
                 @foreach ($available as $service)
                     <div
                         wire:key="available-{{ $service->id }}"
-                        class="flex items-center justify-between gap-3 rounded-lg border border-zinc-200 bg-white p-3 dark:border-zinc-700 dark:bg-zinc-800"
+                        class="flex items-center justify-between gap-3 rounded-lg border border-zinc-200 bg-white p-3 "
                     >
                         <div class="min-w-0">
                             <p class="truncate font-medium">{{ $service->name }}</p>
-                            <p class="truncate text-xs text-zinc-500">{{ $service->provider->name }}</p>
+                            <p class="truncate text-xs text-muted">{{ $service->provider->name }}</p>
                         </div>
 
                         <flux:button

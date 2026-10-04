@@ -10,7 +10,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
 use Livewire\Volt\Component;
 
-new #[Layout('components.layouts.auth')] class extends Component {
+new #[Layout('layouts::auth', ['title' => 'Ubah Password', 'cardClass' => 'max-w-[540px]'])] class extends Component {
     #[Locked]
     public string $token = '';
     public string $email = '';
@@ -28,7 +28,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
     }
 
     /**
-     * Reset the password for the given user.
+     * Simpan kata sandi baru untuk pengguna terkait.
      */
     public function resetPassword(): void
     {
@@ -38,9 +38,6 @@ new #[Layout('components.layouts.auth')] class extends Component {
             'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        // Here we will attempt to reset the user's password. If it is successful we
-        // will update the password on an actual user model and persist it to the
-        // database. Otherwise we will parse the error and return the response.
         $status = Password::reset(
             $this->only('email', 'password', 'password_confirmation', 'token'),
             function ($user) {
@@ -53,9 +50,6 @@ new #[Layout('components.layouts.auth')] class extends Component {
             }
         );
 
-        // If the password was successfully reset, we will redirect the user back to
-        // the application's home authenticated view. If there is an error we can
-        // redirect them back to where they came from with their error message.
         if ($status != Password::PasswordReset) {
             $this->addError('email', __($status));
 
@@ -68,50 +62,42 @@ new #[Layout('components.layouts.auth')] class extends Component {
     }
 }; ?>
 
-<div class="flex flex-col gap-6">
-    <x-auth-header title="Reset password" description="Please enter your new password below" />
+<div class="font-auth">
+    @php $inputClass = 'prim-input font-auth'; @endphp
 
-    <!-- Session Status -->
-    <x-auth-session-status class="text-center" :status="session('status')" />
+    <h1 class="font-auth text-[32px] font-bold leading-tight text-brand sm:text-[38px]">Ubah Password</h1>
+        <p class="mt-2 text-[15px] leading-relaxed text-ink sm:text-base">
+            Tentukan kata sandi baru untuk akunmu
+        </p>
 
-    <form wire:submit="resetPassword" class="flex flex-col gap-6">
-        <!-- Email Address -->
-        <div class="grid gap-2">
-            <flux:input wire:model="email" id="email" label="{{ __('Email') }}" type="email" name="email" required autocomplete="email" />
-        </div>
+        <x-auth-session-status class="mt-5 rounded-lg bg-status-done-bg px-3 py-2 text-sm text-status-done-fg" :status="session('status')" />
 
-        <!-- Password -->
-        <div class="grid gap-2">
-            <flux:input
-                wire:model="password"
-                id="password"
-                label="{{ __('Password') }}"
-                type="password"
-                name="password"
-                required
-                autocomplete="new-password"
-                placeholder="Password"
-            />
-        </div>
+        <form wire:submit="resetPassword" class="mt-7 space-y-5">
+            <div>
+                <label for="email" class="prim-label text-ink">Email</label>
+                <input id="email" type="email" name="email" wire:model="email" required autocomplete="email"
+                    placeholder="Masukkan email" class="{{ $inputClass }}">
+                @error('email') <p class="mt-2 text-sm text-status-cancel-fg">{{ $message }}</p> @enderror
+            </div>
 
-        <!-- Confirm Password -->
-        <div class="grid gap-2">
-            <flux:input
-                wire:model="password_confirmation"
-                id="password_confirmation"
-                label="{{ __('Confirm password') }}"
-                type="password"
-                name="password_confirmation"
-                required
-                autocomplete="new-password"
-                placeholder="Confirm password"
-            />
-        </div>
+            <div>
+                <label for="password" class="prim-label text-ink">Password Baru</label>
+                <input id="password" type="password" name="password" wire:model="password" required
+                    autocomplete="new-password" placeholder="Masukkan password baru" class="{{ $inputClass }}">
+                @error('password') <p class="mt-2 text-sm text-status-cancel-fg">{{ $message }}</p> @enderror
+            </div>
 
-        <div class="flex items-center justify-end">
-            <flux:button type="submit" variant="primary" class="w-full">
-                {{ __('Reset password') }}
-            </flux:button>
-        </div>
-    </form>
+            <div>
+                <label for="password_confirmation" class="prim-label text-ink">Konfirmasi Password Baru</label>
+                <input id="password_confirmation" type="password" name="password_confirmation"
+                    wire:model="password_confirmation" required autocomplete="new-password"
+                    placeholder="Masukkan lagi password baru" class="{{ $inputClass }}">
+                @error('password_confirmation') <p class="mt-2 text-sm text-status-cancel-fg">{{ $message }}</p> @enderror
+            </div>
+
+            <button type="submit" class="prim-btn prim-btn-block font-auth text-base" wire:loading.attr="disabled">
+                <span wire:loading.remove>Konfirmasi</span>
+                <span wire:loading>Menyimpan…</span>
+            </button>
+        </form>
 </div>

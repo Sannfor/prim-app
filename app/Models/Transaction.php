@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Number;
 use Illuminate\Support\Str;
@@ -36,6 +37,7 @@ class Transaction extends Model
         'amount',
         'status',
         'payment_method',
+        'payment_method_label',
         'paid_at',
         'expires_at',
         'notes',
@@ -112,6 +114,26 @@ class Transaction extends Model
     public function subscription(): HasOne
     {
         return $this->hasOne(Subscription::class);
+    }
+
+    /**
+     * Kredensial akun layanan yang dibagikan untuk pesanan ini.
+     *
+     * @return HasMany<ServiceCredential, $this>
+     */
+    public function serviceCredentials(): HasMany
+    {
+        return $this->hasMany(ServiceCredential::class);
+    }
+
+    /**
+     * Nama kanal pembayaran yang ditampilkan pada tabel pesanan.
+     *
+     * Desain menampilkan label seperti "E-Wallet (Dana)" atau "Bank Transfer".
+     */
+    public function paymentLabel(): string
+    {
+        return $this->payment_method_label ?: ($this->payment_method ?: 'Belum dipilih');
     }
 
     /**

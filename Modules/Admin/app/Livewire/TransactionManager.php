@@ -12,6 +12,7 @@ use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Illuminate\Support\Number;
 
 /**
  * Pemantauan dan pengelolaan transaksi oleh administrator.
@@ -21,7 +22,7 @@ use Livewire\WithPagination;
  * status menjadi lunas tetap memakai TransactionService agar langganan
  * pengguna ikut dibuat.
  */
-#[Layout('layouts::app')]
+#[Layout('layouts::admin')]
 #[Title('Kelola Transaksi')]
 class TransactionManager extends Component
 {
@@ -107,9 +108,51 @@ class TransactionManager extends Component
             ->latest()
             ->paginate(15);
 
+        $waiting = Transaction::query()->whereIn('status', [
+            TransactionStatus::Pending->value,
+            TransactionStatus::Processed->value,
+            TransactionStatus::WaitingProcess->value,
+            TransactionStatus::FollowUp->value,
+        ])->count();
+
+        $doneToday = Transaction::query()
+            ->where('status', TransactionStatus::Paid->value)
+            ->whereDate('updated_at', now()->toDateString())
+            ->count();
+
+        $doneYesterday = Transaction::query()
+            ->where('status', TransactionStatus::Paid->value)
+            ->whereDate('updated_at', now()->subDay()->toDateString())
+            ->count();
+
         return view('admin::livewire.transaction-manager', [
             'transactions' => $transactions,
             'statuses' => TransactionStatus::options(),
+            'summaryCards' => [
+                [
+                    'label' => 'Total Pesanan',
+                    'value' => Number::format(Transaction::query()->count(), locale: 'id'),
+                    'hint' => 'Semua waktu',
+                ],
+                [
+                    'label' => 'Menunggu',
+                    'value' => Number::format($waiting, locale: 'id'),
+                    'hint' => 'Perlu tindakan',
+                ],
+                [
+                    'label' => 'Selesai Hari Ini',
+                    'value' => Number::format($doneToday, locale: 'id'),
+                    'hint' => ($doneToday - $doneYesterday >= 0 ? '+' : '').($doneToday - $doneYesterday).' dari kemarin',
+                ],
+                [
+                    'label' => 'Dibatalkan',
+                    'value' => Number::format(
+                        Transaction::query()->where('status', TransactionStatus::Cancelled->value)->count(),
+                        locale: 'id'
+                    ),
+                    'hint' => 'Sepanjang waktu',
+                ],
+            ],
             'summary' => [
                 'paid' => Transaction::query()->where('status', TransactionStatus::Paid->value)->sum('amount'),
                 'pending' => Transaction::query()->where('status', TransactionStatus::Pending->value)->count(),

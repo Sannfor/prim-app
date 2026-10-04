@@ -5,7 +5,7 @@ use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
-new #[Layout('components.layouts.auth')] class extends Component {
+new #[Layout('layouts::auth', ['title' => 'Konfirmasi Password'])] class extends Component {
     public string $password = '';
 
     /**
@@ -32,30 +32,23 @@ new #[Layout('components.layouts.auth')] class extends Component {
     }
 }; ?>
 
-<div class="flex flex-col gap-6">
-    <x-auth-header
-        title="Confirm password"
-        description="This is a secure area of the application. Please confirm your password before continuing."
-    />
+<div class="font-auth">
+    <h1 class="font-auth text-[30px] font-bold leading-tight text-brand sm:text-[36px]">Konfirmasi Password</h1>
 
-    <!-- Session Status -->
-    <x-auth-session-status class="text-center" :status="session('status')" />
+    <p class="mt-2 text-[15px] leading-relaxed text-ink sm:text-base">
+        Ini area terproteksi. Masukkan kata sandimu untuk melanjutkan.
+    </p>
 
-    <form wire:submit="confirmPassword" class="flex flex-col gap-6">
-        <!-- Password -->
-        <div class="grid gap-2">
-            <flux:input
-                wire:model="password"
-                id="password"
-                label="{{ __('Password') }}"
-                type="password"
-                name="password"
-                required
-                autocomplete="new-password"
-                placeholder="Password"
-            />
+    <x-auth-session-status class="mt-5 rounded-lg bg-status-done-bg px-3 py-2 text-sm text-status-done-fg" :status="session('status')" />
+
+    <form wire:submit="confirmPassword" class="mt-7 space-y-5">
+        <div>
+            <label for="password" class="prim-label text-ink">Password</label>
+            <input id="password" type="password" name="password" wire:model="password" required
+                autocomplete="current-password" placeholder="Masukkan password" class="prim-input font-auth">
+            @error('password') <p class="mt-2 text-sm text-status-cancel-fg">{{ $message }}</p> @enderror
         </div>
 
-        <flux:button variant="primary" type="submit" class="w-full">{{ __('Confirm') }}</flux:button>
+        <button type="submit" class="prim-btn prim-btn-block font-auth text-base">Konfirmasi</button>
     </form>
 </div>

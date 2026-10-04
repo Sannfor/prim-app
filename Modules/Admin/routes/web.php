@@ -7,8 +7,8 @@ use Illuminate\Support\Facades\Route;
 | Admin Routes (ROLE: admin)
 |--------------------------------------------------------------------------
 |
-| Panel pengelola: dashboard metrik nyata dan CRUD seluruh master data PRIM.
-| Dilindungi middleware 'role:admin' selain auth.
+| Struktur menu mengikuti sidebar pada desain Figma:
+| Dashboard, Pesanan, Pengguna, Produk, Pembayaran, Laporan, Pengaturan.
 |
 | Komponen dirujuk memakai nama bernamespace (admin::...) yang didaftarkan
 | pada App\Providers\ModuleLivewireServiceProvider.
@@ -21,10 +21,28 @@ Route::middleware(['auth', 'verified', 'role:admin'])
     ->group(function () {
         Route::livewire('/', 'admin::dashboard')->name('dashboard');
 
-        Route::livewire('provider', 'admin::provider-manager')->name('providers.index');
-        Route::livewire('kategori', 'admin::category-manager')->name('categories.index');
-        Route::livewire('layanan', 'admin::service-manager')->name('services.index');
-        Route::livewire('layanan/{service}/paket', 'admin::plan-manager')->name('plans.index');
+        // Pesanan & pembayaran.
+        Route::livewire('pesanan', 'admin::transaction-manager')->name('transactions.index');
+        Route::livewire('pembayaran', 'admin::payment-manager')->name('payments.index');
+
+        // Pengguna.
         Route::livewire('pengguna', 'admin::user-manager')->name('users.index');
-        Route::livewire('transaksi', 'admin::transaction-manager')->name('transactions.index');
+
+        // Produk (layanan) beserta paketnya.
+        Route::livewire('produk', 'admin::service-manager')->name('services.index');
+        Route::livewire('produk/{service}/paket', 'admin::plan-manager')->name('plans.index');
+
+        // Master data pendukung.
+        Route::livewire('kategori', 'admin::category-manager')->name('categories.index');
+        Route::livewire('penyedia', 'admin::provider-manager')->name('providers.index');
+
+        // Laporan & pengaturan.
+        Route::livewire('laporan', 'admin::report')->name('reports.index');
+        Route::livewire('pengaturan/profil', 'admin::settings-profile')->name('settings.profile');
+        Route::livewire('pengaturan/notifikasi', 'admin::settings-notification')->name('settings.notifications');
+
+        // Tautan lama dipertahankan agar rute yang sudah dipakai tidak putus.
+        Route::livewire('transaksi', 'admin::transaction-manager')->name('transactions.legacy');
+        Route::livewire('layanan', 'admin::service-manager')->name('services.legacy');
+        Route::livewire('layanan/{service}/paket', 'admin::plan-manager')->name('plans.legacy');
     });

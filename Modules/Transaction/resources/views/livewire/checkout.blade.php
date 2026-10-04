@@ -1,13 +1,13 @@
 <div class="mx-auto max-w-3xl space-y-6">
-    <nav class="flex items-center gap-2 text-sm text-zinc-500">
-        <a href="{{ route('catalog.show', $plan->service->slug) }}" class="hover:text-indigo-600" wire:navigate>
+    <nav class="flex items-center gap-2 text-sm text-muted">
+        <a href="{{ route('catalog.show', $plan->service->slug) }}" class="hover:text-brand" wire:navigate>
             {{ $plan->service->name }}
         </a>
         <span>/</span>
         <span class="font-medium text-zinc-800 dark:text-zinc-200">Checkout</span>
     </nav>
 
-    <h1 class="text-2xl font-bold tracking-tight">Konfirmasi Pemesanan</h1>
+    <h1 class="text-2xl font-medium text-ink-strong">Konfirmasi Pemesanan</h1>
 
     @if ($activeSubscription)
         <div class="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm dark:border-amber-800 dark:bg-amber-950">
@@ -21,21 +21,21 @@
     @endif
 
     {{-- Ringkasan paket --}}
-    <section class="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-800">
+    <section class="rounded-xl border border-zinc-200 bg-white p-6 ">
         <h2 class="font-semibold">Paket yang dipilih</h2>
 
         <div class="mt-4 flex flex-wrap items-start justify-between gap-4">
             <div>
                 <p class="text-lg font-semibold">{{ $plan->service->name }}</p>
-                <p class="text-sm text-zinc-500">
+                <p class="text-sm text-muted">
                     {{ $plan->name }} · {{ $plan->durationLabel() }} · {{ $plan->max_devices }} perangkat
                 </p>
-                <p class="mt-1 text-xs text-zinc-500">
+                <p class="mt-1 text-xs text-muted">
                     Penyedia: {{ $plan->service->provider->name }} · Kategori: {{ $plan->service->category->name }}
                 </p>
             </div>
 
-            <p class="text-xl font-bold text-indigo-600 dark:text-indigo-400">{{ $plan->formattedPrice() }}</p>
+            <p class="text-xl font-bold text-brand">{{ $plan->formattedPrice() }}</p>
         </div>
 
         @if (! empty($plan->features))
@@ -43,7 +43,7 @@
                 @foreach ($plan->features as $feature)
                     <li class="flex items-start gap-2">
                         <flux:icon.check class="mt-0.5 size-4 shrink-0 text-green-600" />
-                        <span class="text-zinc-600 dark:text-zinc-400">{{ $feature }}</span>
+                        <span class="text-muted">{{ $feature }}</span>
                     </li>
                 @endforeach
             </ul>
@@ -51,9 +51,9 @@
     </section>
 
     {{-- Metode pembayaran --}}
-    <section class="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-800">
+    <section class="rounded-xl border border-zinc-200 bg-white p-6 ">
         <h2 class="font-semibold">Metode pembayaran</h2>
-        <p class="mt-1 text-sm text-zinc-500">
+        <p class="mt-1 text-sm text-muted">
             Diproses melalui {{ $gatewayName }}.
         </p>
 
@@ -63,7 +63,7 @@
                     wire:key="method-{{ $code }}"
                     @class([
                         'flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition',
-                        'border-indigo-500 bg-indigo-50 dark:bg-indigo-950' => $paymentMethod === $code,
+                        'border-indigo-500 bg-brand-soft dark:bg-indigo-950' => $paymentMethod === $code,
                         'border-zinc-200 hover:border-zinc-300 dark:border-zinc-700' => $paymentMethod !== $code,
                     ])
                 >
@@ -79,15 +79,15 @@
     </section>
 
     {{-- Ringkasan biaya --}}
-    <section class="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-800">
+    <section class="rounded-xl border border-zinc-200 bg-white p-6 ">
         <dl class="space-y-2 text-sm">
             <div class="flex justify-between">
-                <dt class="text-zinc-500">Harga paket</dt>
+                <dt class="text-muted">Harga paket</dt>
                 <dd>{{ $plan->formattedPrice() }}</dd>
             </div>
             <div class="flex justify-between border-t border-zinc-100 pt-2 text-base font-bold dark:border-zinc-700">
                 <dt>Total pembayaran</dt>
-                <dd class="text-indigo-600 dark:text-indigo-400">{{ $plan->formattedPrice() }}</dd>
+                <dd class="text-brand">{{ $plan->formattedPrice() }}</dd>
             </div>
         </dl>
 
@@ -95,7 +95,7 @@
             Buat Pesanan
         </flux:button>
 
-        <p class="mt-3 text-center text-xs text-zinc-500">
+        <p class="mt-3 text-center text-xs text-muted">
             Pesanan berlaku {{ \App\Models\Transaction::PAYMENT_WINDOW_HOURS }} jam sebelum kedaluwarsa.
         </p>
     </section>

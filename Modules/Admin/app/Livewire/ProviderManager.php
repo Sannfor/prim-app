@@ -16,7 +16,7 @@ use Modules\Admin\Livewire\Concerns\ManagesResource;
 /**
  * Pengelolaan data penyedia layanan premium.
  */
-#[Layout('layouts::app')]
+#[Layout('layouts::admin')]
 #[Title('Kelola Penyedia')]
 class ProviderManager extends Component
 {

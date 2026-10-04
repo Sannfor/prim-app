@@ -1,165 +1,188 @@
-<div class="space-y-6">
-    {{-- Kepala halaman --}}
-    <div class="flex flex-wrap items-end justify-between gap-4">
-        <div>
-            <h1 class="text-2xl font-bold tracking-tight">Katalog Layanan Premium</h1>
-            <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-                Telusuri, saring, dan bandingkan layanan digital dari berbagai penyedia.
-            </p>
+<div>
+    {{-- Kepala halaman: latar ungu sesuai desain --}}
+    <section class="prim-hero-bg">
+        <div class="mx-auto w-full max-w-[1728px] px-6 pt-10 pb-8 lg:px-12">
+            <h1 class="text-center font-display text-[30px] font-bold text-white sm:text-[36px] lg:text-[40px]">
+                Layanan
+            </h1>
         </div>
+    </section>
 
-        @if (count($compareSelection) > 0)
-            <flux:button :href="route('catalog.compare')" variant="primary" icon="arrows-right-left" wire:navigate>
-                Bandingkan ({{ count($compareSelection) }})
-            </flux:button>
-        @endif
-    </div>
+    <section class="prim-hero-bg pb-16">
+        <div class="mx-auto w-full max-w-[1728px] px-6 lg:px-12">
+            {{-- Baris pencarian & filter --}}
+            <div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+                <div class="relative">
+                    <flux:icon.magnifying-glass class="pointer-events-none absolute top-1/2 left-4 size-5 -translate-y-1/2 text-muted-2" />
+                    <input
+                        type="search"
+                        wire:model.live.debounce.400ms="search"
+                        placeholder="Cari Produk"
+                        class="prim-input h-[49px] pl-12"
+                    >
+                </div>
 
-    <div class="grid gap-6 lg:grid-cols-[18rem_1fr]">
-        {{-- Panel filter --}}
-        <aside class="space-y-5 rounded-xl border border-zinc-200 bg-white p-5 lg:sticky lg:top-6 lg:self-start dark:border-zinc-700 dark:bg-zinc-800">
-            <div class="flex items-center justify-between">
-                <h2 class="font-semibold">Filter</h2>
-                @if ($this->hasActiveFilters())
-                    <flux:button wire:click="resetFilters" variant="subtle" size="sm" icon="arrow-path">
-                        Reset
-                    </flux:button>
-                @endif
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <select wire:model.live="category" class="prim-input h-[49px]">
+                        <option value="">Semua Kategori</option>
+                        @foreach ($categories as $item)
+                            <option value="{{ $item->slug }}">{{ $item->name }}</option>
+                        @endforeach
+                    </select>
+
+                    <select wire:model.live="sort" class="prim-input h-[49px]">
+                        <option value="terbaru">Urutkan: Terbaru</option>
+                        <option value="termurah">Harga terendah</option>
+                        <option value="termahal">Harga tertinggi</option>
+                        <option value="nama">Nama layanan</option>
+                    </select>
+                </div>
             </div>
 
-            <flux:input
-                wire:model.live.debounce.400ms="search"
-                icon="magnifying-glass"
-                placeholder="Cari layanan…"
-                label="Pencarian"
-                clearable
-            />
+            {{-- Ringkasan hasil + aksi bandingkan --}}
+            <div class="mt-6 flex flex-wrap items-center justify-between gap-3">
+                <p class="text-sm text-white/90">
+                    Menampilkan {{ $services->count() }} dari {{ $services->total() }} layanan
+                </p>
 
-            <flux:select wire:model.live="category" label="Kategori">
-                <flux:select.option value="">Semua kategori</flux:select.option>
-                @foreach ($categories as $item)
-                    <flux:select.option value="{{ $item->slug }}">{{ $item->name }}</flux:select.option>
-                @endforeach
-            </flux:select>
+                <div class="flex items-center gap-3">
+                    <div wire:loading class="text-xs text-white/80">Memuat hasil…</div>
 
-            <flux:select wire:model.live="provider" label="Penyedia">
-                <flux:select.option value="">Semua penyedia</flux:select.option>
-                @foreach ($providers as $item)
-                    <flux:select.option value="{{ $item->slug }}">{{ $item->name }}</flux:select.option>
-                @endforeach
-            </flux:select>
+                    @if (count($compareSelection) > 0)
+                        <a href="{{ route('catalog.compare') }}" class="prim-btn h-9 bg-white px-5 text-sm !text-brand hover:bg-white/90" wire:navigate>
+                            Bandingkan ({{ count($compareSelection) }})
+                        </a>
+                    @endif
 
-            <flux:input
-                wire:model.live.debounce.500ms="maxPrice"
-                type="number"
-                min="0"
-                step="5000"
-                label="Harga maksimum (Rp)"
-                placeholder="Contoh: 100000"
-                description="Menampilkan layanan yang memiliki paket di bawah harga ini."
-            />
-
-            <flux:select wire:model.live="sort" label="Urutkan">
-                <flux:select.option value="terbaru">Terbaru</flux:select.option>
-                <flux:select.option value="termurah">Harga terendah</flux:select.option>
-                <flux:select.option value="termahal">Harga tertinggi</flux:select.option>
-                <flux:select.option value="nama">Nama layanan</flux:select.option>
-            </flux:select>
-
-            <div wire:loading class="text-xs text-zinc-500">Memuat hasil…</div>
-        </aside>
-
-        {{-- Hasil --}}
-        <section class="space-y-4">
-            <p class="text-sm text-zinc-600 dark:text-zinc-400">
-                Menampilkan {{ $services->count() }} dari {{ $services->total() }} layanan.
-            </p>
-
-            @if ($services->isEmpty())
-                <div class="rounded-xl border border-dashed border-zinc-300 bg-white p-12 text-center dark:border-zinc-600 dark:bg-zinc-800">
-                    <flux:icon.magnifying-glass class="mx-auto size-8 text-zinc-400" />
-                    <p class="mt-3 font-medium">Tidak ada layanan yang cocok</p>
-                    <p class="mt-1 text-sm text-zinc-500">Coba ubah kata kunci atau bersihkan filter yang aktif.</p>
                     @if ($this->hasActiveFilters())
-                        <flux:button wire:click="resetFilters" variant="filled" size="sm" class="mt-4">
+                        <button type="button" wire:click="resetFilters" class="text-sm font-medium text-white underline underline-offset-4">
+                            Reset filter
+                        </button>
+                    @endif
+                </div>
+            </div>
+
+            {{-- Grid kartu layanan --}}
+            @if ($services->isEmpty())
+                <div class="mt-8 rounded-xl bg-white p-12 text-center">
+                    <flux:icon.magnifying-glass class="mx-auto size-8 text-muted-2" />
+                    <p class="mt-3 font-medium text-ink-strong">Tidak ada layanan yang cocok</p>
+                    <p class="mt-1 text-sm text-muted">Coba ubah kata kunci atau bersihkan filter yang aktif.</p>
+
+                    @if ($this->hasActiveFilters())
+                        <button type="button" wire:click="resetFilters" class="prim-btn mt-5">
                             Bersihkan filter
-                        </flux:button>
+                        </button>
                     @endif
                 </div>
             @else
-                <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     @foreach ($services as $service)
-                        @php $isCompared = in_array($service->id, $compareSelection, true); @endphp
+                        @php
+                            $isCompared = in_array($service->id, $compareSelection, true);
+                            $activePlans = $service->plans->where('is_active', true)->sortBy('price');
+                            $firstPlan = $activePlans->first();
+                            $discountedPlan = $activePlans->firstWhere(fn ($plan) => $plan->hasDiscount());
+                            $preorderPlan = $activePlans->firstWhere('is_preorder', true);
+                        @endphp
 
                         <article
                             wire:key="service-{{ $service->id }}"
-                            class="flex flex-col rounded-xl border border-zinc-200 bg-white p-5 transition hover:border-indigo-300 hover:shadow-sm dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-indigo-700"
+                            class="prim-service-card relative transition hover:shadow-brand-sm"
                         >
-                            <div class="flex items-start justify-between gap-3">
-                                <div class="flex items-center gap-3">
-                                    <span class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-sm font-bold text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300">
-                                        {{ Str::of($service->name)->substr(0, 2)->upper() }}
-                                    </span>
-                                    <div>
-                                        <h3 class="font-semibold leading-tight">{{ $service->name }}</h3>
-                                        <p class="text-xs text-zinc-500">{{ $service->provider->name }}</p>
-                                    </div>
+                            @if ($discountedPlan)
+                                <span class="prim-ribbon bg-tag">{{ $discountedPlan->discountLabel() }}</span>
+                            @elseif ($preorderPlan)
+                                <span class="prim-ribbon bg-brand">{{ 'Preorder' }}</span>
+                            @endif
+
+                            <div class="p-5 pb-4">
+                                <x-service-logo :service="$service" class="h-[74px]" />
+
+                                <h2 class="mt-4 font-display text-xl font-semibold text-ink-strong">
+                                    {{ $service->name }}
+                                </h2>
+
+                                <div class="mt-3 space-y-3">
+                                    @forelse ($activePlans as $plan)
+                                        <div>
+                                            <div class="flex items-start justify-between gap-2">
+                                                <p class="text-[13px] text-ink">{{ $plan->groupLabel() }}</p>
+                                                <span class="prim-tag-period">{{ $plan->periodsLabel() }}</span>
+                                            </div>
+
+                                            <p class="text-sm font-semibold text-ink-strong">
+                                                Rp{{ Number::format($plan->price, locale: 'id') }}
+                                                <span class="text-xs font-normal text-muted">/ bln</span>
+                                            </p>
+                                        </div>
+                                    @empty
+                                        <p class="text-sm text-status-cancel-fg">Produk Varian tidak tersedia</p>
+                                    @endforelse
+                                </div>
+
+                                <div class="mt-4 flex items-center justify-between gap-2">
+                                    <a
+                                        href="{{ route('catalog.show', $service->slug) }}"
+                                        class="text-[13px] text-muted underline-offset-2 hover:text-brand hover:underline"
+                                        wire:navigate
+                                    >
+                                        Lihat Skema Harga
+                                    </a>
+
+                                    <button
+                                        type="button"
+                                        wire:click="toggleCompare({{ $service->id }})"
+                                        class="flex size-7 items-center justify-center rounded-full border transition {{ $isCompared ? 'border-brand bg-brand text-white' : 'border-line-soft text-muted hover:border-brand hover:text-brand' }}"
+                                        title="{{ $isCompared ? 'Lepas dari perbandingan' : 'Tambah ke perbandingan' }}"
+                                    >
+                                        <flux:icon :name="$isCompared ? 'check' : 'plus'" class="size-4" />
+                                    </button>
                                 </div>
                             </div>
 
-                            <flux:badge size="sm" color="indigo" class="mt-3 self-start">
-                                {{ $service->category->name }}
-                            </flux:badge>
-
-                            <p class="mt-3 line-clamp-2 flex-1 text-sm text-zinc-600 dark:text-zinc-400">
-                                {{ $service->tagline }}
-                            </p>
-
-                            <div class="mt-4 flex items-baseline gap-1">
-                                @if ($service->lowestPrice() !== null)
-                                    <span class="text-xs text-zinc-500">Mulai</span>
-                                    <span class="text-lg font-bold text-indigo-600 dark:text-indigo-400">
-                                        Rp{{ Number::format($service->lowestPrice(), locale: 'id') }}
-                                    </span>
+                            <div class="mt-auto p-5 pt-0">
+                                @if ($firstPlan)
+                                    <a
+                                        href="{{ route('transaction.checkout', $firstPlan) }}"
+                                        class="prim-btn prim-btn-block"
+                                        wire:navigate
+                                    >Pesan</a>
                                 @else
-                                    <span class="text-sm text-zinc-500">Belum ada paket aktif</span>
+                                    <span class="prim-btn prim-btn-block cursor-not-allowed bg-line-soft !text-muted">
+                                        Belum tersedia
+                                    </span>
                                 @endif
-                            </div>
-
-                            <p class="mt-1 text-xs text-zinc-500">
-                                {{ $service->plans->count() }} paket tersedia
-                                @if ($service->averageRating() !== null)
-                                    · ★ {{ $service->averageRating() }}
-                                @endif
-                            </p>
-
-                            <div class="mt-4 flex gap-2">
-                                <flux:button
-                                    :href="route('catalog.show', $service->slug)"
-                                    variant="filled"
-                                    size="sm"
-                                    class="flex-1"
-                                    wire:navigate
-                                >
-                                    Lihat Detail
-                                </flux:button>
-
-                                <flux:button
-                                    wire:click="toggleCompare({{ $service->id }})"
-                                    variant="{{ $isCompared ? 'primary' : 'ghost' }}"
-                                    size="sm"
-                                    icon="{{ $isCompared ? 'check' : 'arrows-right-left' }}"
-                                    title="Tambah/lepas dari perbandingan"
-                                />
                             </div>
                         </article>
                     @endforeach
                 </div>
 
-                <div class="pt-2">
+                <div class="mt-10 [&_a]:text-white [&_span]:text-white/80 [&_button]:text-white">
                     {{ $services->links() }}
                 </div>
             @endif
-        </section>
-    </div>
+        </div>
+    </section>
+
+    {{-- Keterangan tambahan di luar area ungu --}}
+    <section class="mx-auto w-full max-w-[1728px] px-6 py-14 lg:px-12">
+        <div class="grid gap-5 sm:grid-cols-3">
+            @foreach ([
+                ['icon' => 'shield-check', 'title' => 'Akun bergaransi', 'desc' => 'Setiap pembelian dilindungi garansi selama masa aktif langganan.'],
+                ['icon' => 'bolt', 'title' => 'Proses cepat', 'desc' => 'Pesanan diproses maksimal 1x24 jam setelah pembayaran terverifikasi.'],
+                ['icon' => 'chat-bubble-left-right', 'title' => 'Dukungan langsung', 'desc' => 'Tim PRIM siap membantu melalui kanal WhatsApp resmi.'],
+            ] as $item)
+                <div class="prim-card flex items-start gap-4 p-5">
+                    <span class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-brand-soft">
+                        <flux:icon :name="$item['icon']" class="size-5 text-brand" />
+                    </span>
+                    <div>
+                        <h3 class="font-display text-sm font-semibold text-ink-strong">{{ $item['title'] }}</h3>
+                        <p class="mt-1 text-sm text-muted">{{ $item['desc'] }}</p>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </section>
 </div>

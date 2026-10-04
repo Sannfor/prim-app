@@ -23,22 +23,32 @@ class Plan extends Model
     protected $fillable = [
         'service_id',
         'name',
+        'variant_group',
         'price',
+        'compare_at_price',
+        'discount_percent',
         'duration_days',
+        'periods_label',
         'max_devices',
         'description',
         'features',
         'is_active',
+        'is_preorder',
+        'stock',
     ];
 
     protected function casts(): array
     {
         return [
             'price' => 'integer',
+            'compare_at_price' => 'integer',
+            'discount_percent' => 'integer',
             'duration_days' => 'integer',
             'max_devices' => 'integer',
             'features' => 'array',
             'is_active' => 'boolean',
+            'is_preorder' => 'boolean',
+            'stock' => 'integer',
         ];
     }
 
@@ -123,5 +133,86 @@ class Plan extends Model
         }
 
         return $this->duration_days.' Hari';
+    }
+
+    /**
+     * Nama grup varian paket, mis. "Bulanan" atau "1 Perangkat".
+     *
+     * Bila kolom varian belum diisi, dipakai nama paket agar tampilan katalog
+     * tetap masuk akal.
+     */
+    public function groupLabel(): string
+    {
+        return $this->variant_group ?: $this->name;
+    }
+
+    /**
+     * Daftar periode tagihan yang dapat dipilih, mis. "1, 2, 3, 6 bln".
+     */
+    public function periodsLabel(): string
+    {
+        if (filled($this->periods_label)) {
+            return $this->periods_label;
+        }
+
+        $months = max(1, (int) round($this->duration_days / 30));
+
+        return $months.' bln';
+    }
+
+    /**
+     * Apakah paket ini sedang memakai pita diskon.
+     */
+    public function hasDiscount(): bool
+    {
+        return $this->discount_percent > 0;
+    }
+
+    /**
+     * Teks pita diskon, mis. "Diskon 10%".
+     */
+    public function discountLabel(): string
+    {
+        return 'Diskon '.$this->discount_percent.'%';
+    }
+
+    /**
+     * Harga sebelum diskon yang ditampilkan sebagai harga coret.
+     */
+    public function compareAtPrice(): int
+    {
+        if ($this->compare_at_price !== null) {
+            return $this->compare_at_price;
+        }
+
+        if (! $this->hasDiscount()) {
+            return $this->price;
+        }
+
+        return (int) round($this->price / (1 - $this->discount_percent / 100));
+    }
+
+    /**
+     * Harga coret dalam format rupiah.
+     */
+    public function formattedCompareAtPrice(): string
+    {
+        return 'Rp'.Number::format($this->compareAtPrice(), locale: 'id');
+    }
+
+    /**
+     * Apakah stok paket ini habis.
+     */
+    public function isOutOfStock(): bool
+    {
+        return $this->stock <= 0;
+    }
+
+    /**
+     * Label stok untuk kolom pada tabel admin.
+     */
+    public function stockLabel(): string
+    {
+        return $this->isOutOfStock() ? 'Habis' : (string) $this->stock;
     }
 }

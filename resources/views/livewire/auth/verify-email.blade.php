@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
-new #[Layout('components.layouts.auth')] class extends Component {
+new #[Layout('layouts::auth', ['title' => 'Verifikasi Email'])] class extends Component {
     /**
      * Send an email verification notification to the user.
      */
@@ -34,28 +34,30 @@ new #[Layout('components.layouts.auth')] class extends Component {
     }
 }; ?>
 
-<div class="mt-4 flex flex-col gap-6">
-    <div class="text-center text-sm text-gray-600">
-        {{ __('Please verify your email address by clicking on the link we just emailed to you.') }}
-    </div>
+<div class="font-auth">
+    <h1 class="font-auth text-[30px] font-bold leading-tight text-brand sm:text-[36px]">Verifikasi Email</h1>
+
+    <p class="mt-2 text-[15px] leading-relaxed text-ink sm:text-base">
+        Silakan verifikasi alamat emailmu melalui tautan yang baru kami kirimkan.
+    </p>
 
     @if (session('status') == 'verification-link-sent')
-        <div class="font-medium text-center text-sm text-green-600">
-            {{ __('A new verification link has been sent to the email address you provided during registration.') }}
-        </div>
+        <p class="mt-5 rounded-lg bg-status-done-bg px-3 py-2 text-sm text-status-done-fg">
+            Tautan verifikasi baru telah dikirim ke alamat email yang kamu daftarkan.
+        </p>
     @endif
 
-    <div class="flex flex-col items-center justify-between space-y-3">
-        <flux:button wire:click="sendVerification" variant="primary" class="w-full">
-            {{ __('Resend verification email') }}
-        </flux:button>
+    <div class="mt-7 space-y-3">
+        <button type="button" wire:click="sendVerification" class="prim-btn prim-btn-block font-auth text-base">
+            Kirim ulang email verifikasi
+        </button>
 
         <button
+            type="button"
             wire:click="logout"
-            type="submit"
-            class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            class="w-full text-center text-sm text-muted underline hover:text-ink"
         >
-            {{ __('Log out') }}
+            Keluar
         </button>
     </div>
 </div>

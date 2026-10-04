@@ -1,8 +1,8 @@
 <div class="space-y-6">
     <div class="flex flex-wrap items-end justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold tracking-tight">Kelola Penyedia Layanan</h1>
-            <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+            <h1 class="text-2xl font-medium text-ink-strong">Kelola Penyedia Layanan</h1>
+            <p class="mt-1 text-sm text-muted">
                 Data penyedia yang menaungi layanan premium pada katalog PRIM.
             </p>
         </div>
@@ -11,15 +11,15 @@
     </div>
 
     @if ($providers->isEmpty())
-        <div class="rounded-xl border border-dashed border-zinc-300 bg-white p-12 text-center dark:border-zinc-600 dark:bg-zinc-800">
-            <flux:icon.building-office class="mx-auto size-8 text-zinc-400" />
+        <div class="rounded-xl border border-dashed border-line bg-white p-12 text-center">
+            <flux:icon.building-office class="mx-auto size-8 text-muted-2" />
             <p class="mt-3 font-medium">Belum ada penyedia</p>
-            <p class="mt-1 text-sm text-zinc-500">Tambahkan penyedia sebelum mendaftarkan layanan.</p>
+            <p class="mt-1 text-sm text-muted">Tambahkan penyedia sebelum mendaftarkan layanan.</p>
         </div>
     @else
-        <div class="overflow-x-auto rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-800">
+        <div class="overflow-x-auto rounded-xl bg-white shadow-brand-xs">
             <table class="w-full text-sm">
-                <thead class="border-b border-zinc-200 bg-zinc-50 text-left dark:border-zinc-700 dark:bg-zinc-900">
+                <thead class="border-b border-line-soft bg-canvas text-left">
                     <tr>
                         <th class="p-3 font-medium">Penyedia</th>
                         <th class="p-3 font-medium">Situs Web</th>
@@ -29,7 +29,7 @@
                 </thead>
                 <tbody>
                     @foreach ($providers as $provider)
-                        <tr wire:key="provider-{{ $provider->id }}" class="border-b border-zinc-100 last:border-0 dark:border-zinc-700">
+                        <tr wire:key="provider-{{ $provider->id }}" class="border-b border-line-soft last:border-0">
                             <td class="p-3">
                                 <div class="flex items-center gap-3">
                                     @if ($provider->logo_path)
@@ -39,14 +39,14 @@
                                             class="size-9 rounded-lg object-cover"
                                         >
                                     @else
-                                        <span class="flex size-9 items-center justify-center rounded-lg bg-indigo-50 text-xs font-bold text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300">
+                                        <span class="flex size-9 items-center justify-center rounded-lg bg-brand-soft text-xs font-bold text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300">
                                             {{ Str::of($provider->name)->substr(0, 2)->upper() }}
                                         </span>
                                     @endif
 
                                     <div>
                                         <p class="font-medium">{{ $provider->name }}</p>
-                                        <p class="font-mono text-xs text-zinc-500">{{ $provider->slug }}</p>
+                                        <p class="font-mono text-xs text-muted">{{ $provider->slug }}</p>
                                     </div>
                                 </div>
                             </td>
@@ -56,7 +56,7 @@
                                         {{ Str::limit($provider->website, 32) }}
                                     </a>
                                 @else
-                                    <span class="text-zinc-400">—</span>
+                                    <span class="text-muted-2">—</span>
                                 @endif
                             </td>
                             <td class="p-3">{{ $provider->services_count }}</td>
@@ -80,7 +80,7 @@
 
         <div>
             <flux:input wire:model="logo" type="file" accept="image/*" label="Logo (opsional)" />
-            <p class="mt-1 text-xs text-zinc-500">Format gambar, maksimal 2 MB.</p>
+            <p class="mt-1 text-xs text-muted">Format gambar, maksimal 2 MB.</p>
             @error('logo') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
         </div>
     </x-admin::form-modal>

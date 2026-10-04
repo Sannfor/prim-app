@@ -1,14 +1,14 @@
 <div class="mx-auto max-w-3xl space-y-6">
-    <nav class="flex items-center gap-2 text-sm text-zinc-500">
-        <a href="{{ route('transaction.index') }}" class="hover:text-indigo-600" wire:navigate>Riwayat Transaksi</a>
+    <nav class="flex items-center gap-2 text-sm text-muted">
+        <a href="{{ route('transaction.index') }}" class="hover:text-brand" wire:navigate>Riwayat Transaksi</a>
         <span>/</span>
         <span class="font-medium text-zinc-800 dark:text-zinc-200">{{ $transaction->order_code }}</span>
     </nav>
 
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold tracking-tight">Detail Pesanan</h1>
-            <p class="mt-1 font-mono text-sm text-zinc-500">{{ $transaction->order_code }}</p>
+            <h1 class="text-2xl font-medium text-ink-strong">Detail Pesanan</h1>
+            <p class="mt-1 font-mono text-sm text-muted">{{ $transaction->order_code }}</p>
         </div>
 
         <flux:badge :color="$transaction->status->badgeColor()" size="lg">
@@ -18,7 +18,7 @@
 
     {{-- Instruksi pembayaran --}}
     @if ($isPayable)
-        <section class="rounded-xl border border-indigo-200 bg-indigo-50 p-5 dark:border-indigo-800 dark:bg-indigo-950">
+        <section class="rounded-xl border border-indigo-200 bg-brand-soft p-5 dark:border-indigo-800 dark:bg-indigo-950">
             <h2 class="font-semibold text-indigo-900 dark:text-indigo-200">Selesaikan pembayaran</h2>
             <p class="mt-1 text-sm text-indigo-800 dark:text-indigo-300">
                 Lakukan pembayaran sebesar <strong>{{ $transaction->formattedAmount() }}</strong>
@@ -27,8 +27,8 @@
             </p>
 
             <div class="mt-5 rounded-lg border border-dashed border-indigo-300 bg-white p-4 dark:border-indigo-700 dark:bg-zinc-900">
-                <p class="text-xs font-medium tracking-wide text-zinc-500 uppercase">Mode simulasi</p>
-                <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+                <p class="text-xs font-medium tracking-wide text-muted uppercase">Mode simulasi</p>
+                <p class="mt-1 text-sm text-muted">
                     PRIM belum terhubung ke penyedia pembayaran nyata. Gunakan tombol di bawah untuk
                     mensimulasikan hasil pembayaran.
                 </p>
@@ -44,9 +44,9 @@
             </div>
         </section>
     @elseif ($hasExpired)
-        <section class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-800">
+        <section class="rounded-xl bg-canvas p-5">
             <h2 class="font-semibold">Pesanan sudah kedaluwarsa</h2>
-            <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+            <p class="mt-1 text-sm text-muted">
                 Batas waktu pembayaran telah terlewat. Silakan buat pesanan baru untuk paket ini.
             </p>
             <flux:button
@@ -73,9 +73,9 @@
             </flux:button>
         </section>
     @else
-        <section class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-800">
+        <section class="rounded-xl bg-canvas p-5">
             <h2 class="font-semibold">Pesanan tidak dapat dilanjutkan</h2>
-            <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+            <p class="mt-1 text-sm text-muted">
                 {{ $transaction->notes ?? 'Pesanan ini tidak lagi dapat dibayar.' }}
             </p>
             <flux:button
@@ -90,42 +90,42 @@
     @endif
 
     {{-- Rincian --}}
-    <section class="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-800">
+    <section class="rounded-xl border border-zinc-200 bg-white p-6 ">
         <h2 class="font-semibold">Rincian pesanan</h2>
 
         <dl class="mt-4 space-y-3 text-sm">
             <div class="flex justify-between gap-4">
-                <dt class="text-zinc-500">Layanan</dt>
+                <dt class="text-muted">Layanan</dt>
                 <dd class="text-right font-medium">{{ $transaction->plan->service->name }}</dd>
             </div>
             <div class="flex justify-between gap-4">
-                <dt class="text-zinc-500">Paket</dt>
+                <dt class="text-muted">Paket</dt>
                 <dd class="text-right font-medium">{{ $transaction->plan->name }}</dd>
             </div>
             <div class="flex justify-between gap-4">
-                <dt class="text-zinc-500">Penyedia</dt>
+                <dt class="text-muted">Penyedia</dt>
                 <dd class="text-right">{{ $transaction->plan->service->provider->name }}</dd>
             </div>
             <div class="flex justify-between gap-4">
-                <dt class="text-zinc-500">Durasi</dt>
+                <dt class="text-muted">Durasi</dt>
                 <dd class="text-right">{{ $transaction->plan->durationLabel() }}</dd>
             </div>
             <div class="flex justify-between gap-4">
-                <dt class="text-zinc-500">Metode pembayaran</dt>
+                <dt class="text-muted">Metode pembayaran</dt>
                 <dd class="text-right">{{ $paymentMethodLabel }}</dd>
             </div>
             <div class="flex justify-between gap-4">
-                <dt class="text-zinc-500">Dibuat pada</dt>
+                <dt class="text-muted">Dibuat pada</dt>
                 <dd class="text-right">{{ $transaction->created_at->translatedFormat('d F Y, H:i') }} WITA</dd>
             </div>
             <div class="flex justify-between gap-4 border-t border-zinc-100 pt-3 text-base font-bold dark:border-zinc-700">
                 <dt>Total</dt>
-                <dd class="text-indigo-600 dark:text-indigo-400">{{ $transaction->formattedAmount() }}</dd>
+                <dd class="text-brand">{{ $transaction->formattedAmount() }}</dd>
             </div>
         </dl>
 
         @if ($transaction->notes)
-            <p class="mt-4 rounded-lg bg-zinc-50 p-3 text-xs text-zinc-600 dark:bg-zinc-900 dark:text-zinc-400">
+            <p class="mt-4 rounded-lg bg-zinc-50 p-3 text-xs text-zinc-600 dark:bg-zinc-900 dark:text-muted-2">
                 {{ $transaction->notes }}
             </p>
         @endif

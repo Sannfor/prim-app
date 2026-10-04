@@ -1,0 +1,391 @@
+================================================================================
+  PRIM — TUTORIAL MENJALANKAN DI KOMPUTER SENDIRI
+  Platform Digital Aggregator Layanan Premium
+  Ilmu Komputer, FMIPA, Universitas Lambung Mangkurat
+================================================================================
+
+Dokumen ini menjelaskan cara menjalankan aplikasi PRIM dari nol sampai bisa
+dibuka di peramban. Ikuti berurutan. Perkiraan waktu: 10-20 menit (tergantung
+kecepatan internet saat memasang dependensi).
+
+
+================================================================================
+1. APA YANG AKAN ANDA JALANKAN
+================================================================================
+
+PRIM adalah aplikasi web katalog layanan digital premium. Fitur utamanya:
+
+  - Katalog 27 layanan dengan varian paket, harga, dan pita diskon
+  - Pemesanan, pembayaran (simulasi), dan riwayat transaksi
+  - Pengelolaan langganan beserta masa aktifnya
+  - Panel pengelola: dashboard, pesanan, pengguna, produk, pembayaran, laporan
+  - Autentikasi: masuk, daftar, lupa kata sandi, dan verifikasi perangkat (OTP)
+
+Teknologi: Laravel 12, Livewire 3, Flux UI 2, Tailwind CSS 4, SQLite.
+
+
+================================================================================
+2. KEBUTUHAN SISTEM
+================================================================================
+
+Pasang dulu ketiga perangkat lunak berikut.
+
+  +----------------+---------------------+--------------------------------------+
+  | Perangkat      | Versi minimal       | Cara memasang                        |
+  +----------------+---------------------+--------------------------------------+
+  | PHP            | 8.2                 | Windows: laragon.org atau php.net    |
+  |                |                     | macOS:   brew install php            |
+  |                |                     | Linux:   sudo apt install php        |
+  +----------------+---------------------+--------------------------------------+
+  | Composer       | 2.x                 | getcomposer.org/download             |
+  +----------------+---------------------+--------------------------------------+
+  | Node.js + npm  | 18 (disarankan 20+) | nodejs.org (pilih LTS)               |
+  +----------------+---------------------+--------------------------------------+
+
+Ekstensi PHP yang WAJIB aktif:
+
+  pdo_sqlite, sqlite3, mbstring, openssl, tokenizer, xml, curl, fileinfo, zip
+
+Pada Windows, buka php.ini lalu hapus tanda ";" di depan baris berikut:
+
+  extension=pdo_sqlite
+  extension=sqlite3
+  extension=mbstring
+  extension=openssl
+  extension=curl
+  extension=fileinfo
+  extension=zip
+
+Pada Laragon biasanya seluruh ekstensi ini sudah aktif sejak awal.
+
+Cek apakah semuanya sudah siap dengan perintah:
+
+  php -v
+  composer -V
+  node -v
+  npm -v
+
+Bila keempat perintah itu menampilkan versi, lanjutkan ke langkah 3.
+
+
+================================================================================
+3. CARA TERCEPAT — SATU PERINTAH
+================================================================================
+
+Buka terminal (Command Prompt / PowerShell / Terminal), lalu:
+
+  cd prim
+  php setup.php
+
+Skrip itu mengerjakan seluruh langkah 4 sekaligus: menyiapkan .env, memasang
+dependensi, membuat basis data, mengisi data contoh, dan membangun aset.
+
+Bila skrip berhasil, langsung lompat ke langkah 5 (MENJALANKAN APLIKASI).
+
+Catatan: skrip memakai perintah "composer" dan "npm", jadi keduanya harus sudah
+bisa dipanggil dari terminal. Bila muncul pesan bahwa perintah tidak ditemukan,
+kembali ke langkah 2.
+
+
+================================================================================
+4. CARA MANUAL — LANGKAH PER LANGKAH
+================================================================================
+
+Lakukan ini bila Anda ingin tahu setiap tahapnya, atau bila php setup.php gagal.
+
+--- 4.1 Masuk ke folder proyek ------------------------------------------------
+
+  cd prim
+
+--- 4.2 Siapkan berkas konfigurasi --------------------------------------------
+
+Windows (Command Prompt):
+
+  copy .env.example .env
+
+Windows (PowerShell):
+
+  Copy-Item .env.example .env
+
+macOS / Linux:
+
+  cp .env.example .env
+
+Berkas .env berisi pengaturan lokal. Nilai bawaannya sudah benar untuk
+pengembangan dengan SQLite, jadi tidak perlu diubah.
+
+--- 4.3 Pasang dependensi PHP -------------------------------------------------
+
+  composer install
+
+--- 4.4 Buat kunci aplikasi ---------------------------------------------------
+
+  php artisan key:generate
+
+--- 4.5 Buat berkas basis data SQLite -----------------------------------------
+
+Windows (Command Prompt):
+
+  type nul > database\database.sqlite
+
+Windows (PowerShell):
+
+  New-Item database\database.sqlite -ItemType File
+
+macOS / Linux:
+
+  touch database/database.sqlite
+
+--- 4.6 Bangun tabel dan isi data contoh --------------------------------------
+
+  php artisan migrate:fresh --seed
+
+Perintah ini membuat seluruh tabel lalu mengisinya dengan 27 layanan, 18 akun,
+20 transaksi, dan kredensial kode login.
+
+PERINGATAN: "migrate:fresh" menghapus seluruh isi basis data. Pada pemasangan
+pertama ini tidak masalah karena basis datanya masih kosong. Jangan dijalankan
+bila Anda sudah punya data yang ingin dipertahankan.
+
+--- 4.7 Pasang dependensi JavaScript -----------------------------------------
+
+  npm install
+
+--- 4.8 Bangun aset antarmuka -------------------------------------------------
+
+  npm run build
+
+Langkah ini WAJIB. Berkas CSS dan gambar hasil build tidak ikut tersimpan di
+GitHub, sehingga tanpa langkah ini tampilan akan polos tanpa warna dan tanpa
+logo. Jalankan "npm run build" setiap kali Anda mengubah tampilan.
+
+
+================================================================================
+5. MENJALANKAN APLIKASI
+================================================================================
+
+Dari dalam folder prim:
+
+  php artisan serve
+
+Terminal akan menampilkan:
+
+  INFO  Server running on [http://127.0.0.1:8000].
+
+Buka peramban dan kunjungi:
+
+  http://127.0.0.1:8000
+
+Biarkan terminal itu tetap terbuka selama aplikasi dipakai. Untuk menghentikan
+server, tekan Ctrl + C.
+
+Bila port 8000 sudah dipakai program lain, jalankan dengan port berbeda:
+
+  php artisan serve --port=8001
+
+
+================================================================================
+6. AKUN DEMO
+================================================================================
+
+Seluruh akun memakai kata sandi yang sama:  password
+
+--- Administrator ------------------------------------------------------------
+
+  Email : admin@prim.com
+  Sandi : password
+  Peran : Administrator (Super Admin)
+
+  Email : admin@prim.test
+  Sandi : password
+  Peran : Administrator
+
+--- Pelanggan ----------------------------------------------------------------
+
+  Email : andi@prim.test      <- paling lengkap (2 transaksi, 2 kode login)
+  Email : rina@prim.test
+  Email : budi@prim.test
+  Email : dewi@prim.test
+  Sandi : password
+
+Pelanggan lain yang tersedia (semuanya @prim.test, sandi password):
+citra, doni, eko, faisal, fitri, fitriani, guntur, hendra, mega, maya, rizky, siti
+
+Dua akun ini sengaja dibuat tidak aktif untuk menguji kolom Status di panel
+pengelola:
+
+  maya@prim.test   -> Suspend
+  mega@prim.test   -> Non-aktif
+
+
+================================================================================
+7. CARA MASUK SEBAGAI ADMIN DAN SEBAGAI USER
+================================================================================
+
+--- 7.1 Masuk sebagai Administrator -------------------------------------------
+
+  1. Buka http://127.0.0.1:8000/login
+  2. Isi Email: admin@prim.com   dan   Password: password
+  3. Klik tombol "Masuk"
+  4. Setelah masuk, klik avatar di kanan atas, lalu pilih "Panel Pengelola"
+     ATAU langsung buka http://127.0.0.1:8000/admin
+
+  Di panel pengelola tersedia menu: Dashboard, Pesanan, Pengguna, Produk,
+  Pembayaran, Laporan, dan Pengaturan.
+
+--- 7.2 Masuk sebagai Pelanggan ----------------------------------------------
+
+  1. Buka http://127.0.0.1:8000/login
+  2. Isi Email: andi@prim.test   dan   Password: password
+  3. Setelah masuk, Anda diarahkan ke http://127.0.0.1:8000/profil/pesanan
+
+  Menu pelanggan: Pesanan (9 tab status), Kode Login, Langganan, Pengaturan.
+
+--- 7.3 Masuk memakai kode OTP (verifikasi perangkat) -------------------------
+
+  1. Buka http://127.0.0.1:8000/kode-login
+  2. Masukkan email terdaftar, misalnya admin@prim.com
+  3. Klik "Dapatkan Kode" — kode 6 angka muncul di halaman itu sendiri
+     (pengiriman email belum dikonfigurasi, jadi kode ditampilkan langsung
+     sebagai sarana demonstrasi)
+  4. Masukkan kode tersebut, lalu klik "Verifikasi & Masuk"
+
+--- 7.4 Mendaftar akun baru ---------------------------------------------------
+
+  1. Buka http://127.0.0.1:8000/register
+  2. Isi nama lengkap, email, nomor WhatsApp, kata sandi, dan konfirmasi
+  3. Centang persetujuan syarat, lalu klik "Daftar"
+
+Tidak ada halaman login terpisah untuk admin. Peran akun yang menentukan akses;
+akun dengan peran Administrator otomatis melihat menu "Panel Pengelola".
+
+
+================================================================================
+8. DENAH HALAMAN
+================================================================================
+
+--- Halaman publik (tanpa login) ---------------------------------------------
+
+  /                       Beranda
+  /katalog                Katalog layanan (grid 4 kolom, pencarian, filter)
+  /katalog/{slug}         Contoh: /katalog/netflix
+  /bandingkan             Perbandingan layanan
+  /cara-berlangganan      Lima langkah + metode pembayaran
+  /laporan-kendala        Bantuan melalui WhatsApp
+  /login                  Masuk
+  /register               Daftar
+  /kode-login             Masuk dengan kode OTP
+  /forgot-password        Lupa kata sandi
+
+--- Halaman pelanggan (perlu login) ------------------------------------------
+
+  /profil/pesanan         Pusat pesanan
+  /profil/kode-login      Kredensial akun layanan
+  /langganan              Langganan saya
+  /transaksi              Riwayat transaksi
+  /checkout/{id}          Konfirmasi pemesanan
+  /settings/profile       Pengaturan akun
+
+--- Halaman pengelola (peran admin) ------------------------------------------
+
+  /admin                          Dashboard
+  /admin/pesanan                  Manajemen pesanan
+  /admin/pembayaran               Manajemen pembayaran
+  /admin/pengguna                 Manajemen pengguna
+  /admin/produk                   Manajemen produk
+  /admin/laporan                  Laporan
+  /admin/pengaturan/profil        Pengaturan profil admin
+
+
+================================================================================
+9. MASALAH YANG SERING MUNCUL
+================================================================================
+
+--- Tampilan polos, tanpa warna dan tanpa logo -------------------------------
+
+  Penyebab: aset belum dibangun.
+  Solusi  : jalankan "npm install" lalu "npm run build", kemudian muat ulang
+            peramban dengan Ctrl + Shift + R.
+
+--- "could not find driver" saat migrate -------------------------------------
+
+  Penyebab: ekstensi pdo_sqlite belum aktif.
+  Solusi  : aktifkan extension=pdo_sqlite dan extension=sqlite3 pada php.ini,
+            lalu mulai ulang terminal.
+
+--- "Database file at path ... does not exist" ------------------------------
+
+  Penyebab: berkas basis data belum dibuat.
+  Solusi  : buat berkas kosong database/database.sqlite (lihat langkah 4.5).
+
+--- "No application encryption key has been specified" ----------------------
+
+  Penyebab: APP_KEY belum dibuat.
+  Solusi  : jalankan "php artisan key:generate".
+
+--- Halaman error 500 setelah menarik pembaruan kode ------------------------
+
+  Solusi  : jalankan berurutan:
+              php artisan optimize:clear
+              php artisan migrate
+              npm run build
+
+--- "php" atau "composer" atau "npm" tidak dikenali -------------------------
+
+  Penyebab: perangkat belum terpasang, atau belum masuk ke PATH.
+  Solusi  : pasang ulang (lihat langkah 2). Pada Windows, tutup lalu buka lagi
+            terminal setelah memasang agar PATH terbarui.
+            Untuk Laragon, gunakan terminal bawaan Laragon.
+
+--- Port 8000 sudah dipakai -------------------------------------------------
+
+  Solusi  : php artisan serve --port=8001
+            lalu buka http://127.0.0.1:8001
+
+--- Ingin mengembalikan data ke kondisi awal --------------------------------
+
+  Solusi  : php artisan migrate:fresh --seed
+            (menghapus seluruh data dan mengisi ulang data contoh)
+
+
+================================================================================
+10. PERINTAH YANG SERING DIPAKAI
+================================================================================
+
+  php artisan serve              Jalankan server pengembangan
+  npm run build                  Bangun aset tampilan (wajib setelah ubah CSS)
+  npm run dev                    Pantau perubahan tampilan secara otomatis
+  php artisan migrate:fresh --seed   Setel ulang basis data + data contoh
+  php artisan test               Jalankan seluruh pengujian otomatis
+  php artisan optimize:clear     Bersihkan cache
+  php artisan route:list         Lihat daftar seluruh rute
+
+
+================================================================================
+11. CATATAN TEKNIS
+================================================================================
+
+Basis data  : SQLite, tersimpan sebagai satu berkas di database/database.sqlite.
+              Tidak perlu memasang MySQL atau PostgreSQL.
+
+Pembayaran  : masih berupa simulasi internal. Tidak ada integrasi payment
+              gateway sungguhan.
+
+Email       : belum dikonfigurasi (MAIL_MAILER=log). Karena itu kode OTP
+              ditampilkan langsung di halaman /kode-login.
+
+Struktur    : arsitektur modular (HMVC). Setiap modul berada pada folder
+              Modules/ dengan folder app, resources, routes, dan database
+              tersendiri. Modul yang ada: Admin, Catalog, Subscription,
+              Transaction.
+
+Dokumentasi : prim/docs/DESAIN-FIGMA.md    Catatan penyesuaian tampilan ke Figma
+              prim/docs/SRS-SINKRONISASI.md Sinkronisasi SRS dengan implementasi
+
+Kalau ada kendala yang belum tercantum di dokumen ini, kirimkan pesan galat
+lengkapnya beserta langkah yang sedang dijalankan.
+
+
+================================================================================
+  Selamat mencoba. — Kelompok 7
+================================================================================

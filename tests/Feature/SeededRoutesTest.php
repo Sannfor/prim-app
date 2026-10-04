@@ -25,20 +25,24 @@ beforeEach(function () {
 });
 
 test('seluruh halaman publik dapat dibuka dengan data seeder', function () {
-    $this->get('/')->assertOk()->assertSee('Temukan, bandingkan');
+    $this->get('/')->assertOk()->assertSee('Satu Platform, Semua Layanan Premium Favoritmu');
 
-    $this->get(route('catalog.index'))->assertOk()->assertSee('Katalog Layanan Premium');
+    $this->get(route('catalog.index'))->assertOk()->assertSee('Layanan');
 
-    $this->get(route('catalog.index', ['q' => 'sonata']))
+    $this->get(route('catalog.index', ['q' => 'spotify']))
         ->assertOk()
-        ->assertSee('Sonata Music Unlimited');
+        ->assertSee('Spotify Premium');
 
-    $this->get(route('catalog.show', 'nusantara-film-premium'))
+    $this->get(route('catalog.show', 'netflix'))
         ->assertOk()
-        ->assertSee('Pilih paket langganan')
-        ->assertSee('Premium 6 Bulan');
+        ->assertSee('Netflix')
+        ->assertSee('2 Perangkat');
 
-    $this->get(route('catalog.compare'))->assertOk()->assertSee('Bandingkan Layanan');
+    $this->get(route('catalog.compare'))->assertOk()->assertSee('Bandingkan');
+
+    $this->get(route('catalog.how-to-subscribe'))->assertOk()->assertSee('Cara Berlangganan');
+
+    $this->get(route('support.report'))->assertOk()->assertSee('Laporan Kendala');
 });
 
 test('tamu dialihkan ke halaman masuk pada seluruh rute terlindungi', function () {
@@ -69,16 +73,20 @@ test('akun admin demo dapat membuka seluruh halaman panel pengelola', function (
 
     $this->get(route('admin.dashboard'))
         ->assertOk()
-        ->assertSee('Dashboard Pengelola')
+        ->assertSee('Dashboard Admin')
         ->assertSee('Pendapatan Bulan Ini')
-        ->assertSee('Transaksi 14 Hari Terakhir');
+        ->assertSee('Pesanan 14 Hari Terakhir');
 
     $pages = [
         'admin.services.index' => 'Kelola Layanan',
         'admin.categories.index' => 'Kelola Kategori',
-        'admin.providers.index' => 'Kelola Penyedia',
-        'admin.users.index' => 'Kelola Pengguna',
-        'admin.transactions.index' => 'Kelola Transaksi',
+        'admin.providers.index' => 'Kelola Penyedia Layanan',
+        'admin.users.index' => 'Manajemen Pengguna',
+        'admin.transactions.index' => 'Manajemen Pesanan',
+        'admin.payments.index' => 'Manajemen Pembayaran',
+        'admin.reports.index' => 'Laporan Admin',
+        'admin.settings.profile' => 'Profile Admin',
+        'admin.settings.notifications' => 'Notifikasi Email',
     ];
 
     foreach ($pages as $name => $heading) {
@@ -94,12 +102,14 @@ test('akun admin demo dapat membuka seluruh halaman panel pengelola', function (
 });
 
 test('akun pelanggan demo dapat membuka halaman akun dan checkout', function () {
-    $customer = User::query()->where('email', 'ahmadi@prim.test')->firstOrFail();
+    $customer = User::query()->where('email', 'andi@prim.test')->firstOrFail();
     $plan = Plan::query()->where('is_active', true)->firstOrFail();
 
     $this->actingAs($customer);
 
-    $this->get(route('subscription.index'))->assertOk()->assertSee('Langganan Saya');
+    $this->get(route('profile.orders'))->assertOk()->assertSee('Pesanan');
+    $this->get(route('profile.login-code'))->assertOk()->assertSee('Kode Login');
+    $this->get(route('subscription.index'))->assertOk()->assertSee('Langganan');
     $this->get(route('transaction.index'))->assertOk()->assertSee('Riwayat Transaksi');
 
     $this->get(route('transaction.checkout', $plan->id))
@@ -110,7 +120,7 @@ test('akun pelanggan demo dapat membuka halaman akun dan checkout', function () 
 
 test('pelanggan demo dapat membuka detail transaksinya dari seeder', function () {
     $transaction = Transaction::query()
-        ->whereHas('user', fn ($q) => $q->where('email', 'ahmadi@prim.test'))
+        ->whereHas('user', fn ($q) => $q->where('email', 'andi@prim.test'))
         ->firstOrFail();
 
     $this->actingAs($transaction->user)

@@ -1,120 +1,128 @@
-<div class="space-y-8">
+<div class="space-y-7">
     <div class="flex flex-wrap items-end justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold tracking-tight">Dashboard Pengelola</h1>
-            <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-                Ringkasan kondisi katalog, transaksi, dan langganan PRIM saat ini.
-            </p>
+            <h1 class="font-display text-2xl font-medium text-ink-strong">Dashboard Admin</h1>
+            <p class="mt-1 text-sm text-muted">Ringkasan kondisi katalog, pesanan, dan langganan PRIM.</p>
         </div>
-        <flux:button :href="route('home')" variant="ghost" icon="arrow-top-right-on-square" wire:navigate>
+
+        <a href="{{ route('home') }}" class="prim-btn-ghost" wire:navigate>
+            <flux:icon.arrow-top-right-on-square class="size-4" />
             Lihat Situs Publik
-        </flux:button>
+        </a>
     </div>
 
-    {{-- Metrik utama --}}
-    <section class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    {{-- Kartu metrik --}}
+    <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         @foreach ($metrics as $key => $metric)
-            <div wire:key="metric-{{ $key }}" class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-800">
+            <div wire:key="metric-{{ $key }}" class="rounded-xl bg-canvas p-5">
                 <div class="flex items-start justify-between gap-3">
-                    <p class="text-sm text-zinc-500">{{ $metric['label'] }}</p>
-                    <flux:icon :name="$metric['icon']" class="size-5 text-indigo-500" />
+                    <p class="text-sm text-muted">{{ $metric['label'] }}</p>
+                    <span class="flex size-9 items-center justify-center rounded-lg bg-white">
+                        <flux:icon :name="$metric['icon']" class="size-4 text-brand" />
+                    </span>
                 </div>
-                <p class="mt-2 text-3xl font-bold">{{ Number::format($metric['value'], locale: 'id') }}</p>
-                <p class="mt-1 text-xs text-zinc-500">{{ $metric['hint'] }}</p>
+                <p class="mt-2 font-display text-xl font-medium text-ink-strong">
+                    {{ Number::format($metric['value'], locale: 'id') }}
+                </p>
+                <p class="mt-1 text-xs text-muted">{{ $metric['hint'] }}</p>
             </div>
         @endforeach
     </section>
 
-    <div class="grid gap-6 lg:grid-cols-3">
-        {{-- Pendapatan --}}
-        <section class="rounded-xl border border-zinc-200 bg-white p-6 lg:col-span-1 dark:border-zinc-700 dark:bg-zinc-800">
-            <h2 class="font-semibold">Pendapatan Bulan Ini</h2>
+    {{-- Pendapatan + diagram 14 hari --}}
+    <div class="grid gap-5 lg:grid-cols-3">
+        <section class="rounded-xl bg-white p-6 shadow-brand-xs">
+            <h2 class="font-display text-base font-semibold text-ink-strong">Pendapatan Bulan Ini</h2>
 
-            <p class="mt-3 text-3xl font-bold text-indigo-600 dark:text-indigo-400">
+            <p class="mt-3 font-display text-2xl font-bold text-brand">
                 Rp{{ Number::format($revenue['this_month'], locale: 'id') }}
             </p>
 
-            <p class="mt-1 text-xs text-zinc-500">
+            <p class="mt-1 text-xs text-muted">
                 Bulan lalu: Rp{{ Number::format($revenue['last_month'], locale: 'id') }}
             </p>
 
             @if ($revenue['growth'] !== null)
                 <p @class([
-                    'mt-3 inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium',
-                    'bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300' => $revenue['growth'] >= 0,
-                    'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300' => $revenue['growth'] < 0,
+                    'mt-4 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium',
+                    'bg-status-done-bg text-status-done-fg' => $revenue['growth'] >= 0,
+                    'bg-status-cancel-bg text-status-cancel-fg' => $revenue['growth'] < 0,
                 ])>
                     <flux:icon :name="$revenue['growth'] >= 0 ? 'arrow-trending-up' : 'arrow-trending-down'" class="size-3.5" />
                     {{ $revenue['growth'] >= 0 ? '+' : '' }}{{ $revenue['growth'] }}% dibanding bulan lalu
                 </p>
             @else
-                <p class="mt-3 text-xs text-zinc-500">Belum ada pembanding dari bulan lalu.</p>
+                <p class="mt-4 text-xs text-muted">Belum ada pembanding dari bulan lalu.</p>
             @endif
         </section>
 
-        {{-- Diagram transaksi 14 hari --}}
-        <section class="rounded-xl border border-zinc-200 bg-white p-6 lg:col-span-2 dark:border-zinc-700 dark:bg-zinc-800">
-            <h2 class="font-semibold">Transaksi 14 Hari Terakhir</h2>
+        <section class="rounded-xl bg-white p-6 shadow-brand-xs lg:col-span-2">
+            <h2 class="font-display text-base font-semibold text-ink-strong">Pesanan 14 Hari Terakhir</h2>
 
-            <div class="mt-6 flex h-40 items-end gap-1.5">
+            <div class="mt-8 flex h-40 items-end gap-1.5">
                 @foreach ($dailyTransactions as $day)
                     <div wire:key="day-{{ $day['date']->toDateString() }}" class="group flex flex-1 flex-col items-center gap-1">
-                        <span class="text-[10px] font-medium text-zinc-500 opacity-0 transition group-hover:opacity-100">
+                        <span class="text-[10px] font-medium text-muted opacity-0 transition group-hover:opacity-100">
                             {{ $day['count'] }}
                         </span>
                         <div
-                            class="w-full rounded-t bg-indigo-500 transition hover:bg-indigo-600"
-                            style="height: {{ $day['height'] }}%"
-                            title="{{ $day['label'] }}: {{ $day['count'] }} transaksi"
+                            class="w-full rounded-t bg-brand transition hover:bg-brand-deep"
+                            style="height: {{ max(2, $day['height']) }}%"
+                            title="{{ $day['label'] }}: {{ $day['count'] }} pesanan"
                         ></div>
                     </div>
                 @endforeach
             </div>
 
-            <div class="mt-2 flex justify-between text-[10px] text-zinc-500">
+            <div class="mt-2 flex justify-between text-[10px] text-muted">
                 <span>{{ $dailyTransactions[0]['label'] }}</span>
                 <span>{{ end($dailyTransactions)['label'] }}</span>
             </div>
         </section>
     </div>
 
-    <div class="grid gap-6 lg:grid-cols-2">
-        {{-- Status transaksi --}}
-        <section class="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-800">
-            <h2 class="font-semibold">Komposisi Status Transaksi</h2>
+    <div class="grid gap-5 lg:grid-cols-2">
+        {{-- Komposisi status --}}
+        <section class="rounded-xl bg-white p-6 shadow-brand-xs">
+            <h2 class="font-display text-base font-semibold text-ink-strong">Komposisi Status Pesanan</h2>
 
-            <div class="mt-4 space-y-3">
+            <div class="mt-5 space-y-4">
                 @foreach ($statusBreakdown as $row)
                     <div wire:key="status-{{ $row['label'] }}">
                         <div class="flex items-center justify-between text-sm">
-                            <span>{{ $row['label'] }}</span>
-                            <span class="font-medium">{{ $row['value'] }} ({{ $row['percentage'] }}%)</span>
+                            <span class="text-ink">{{ $row['label'] }}</span>
+                            <span class="text-muted">{{ $row['value'] }} · {{ $row['percentage'] }}%</span>
                         </div>
-                        <div class="mt-1 h-2 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-700">
-                            <div class="h-full rounded-full bg-indigo-500" style="width: {{ $row['percentage'] }}%"></div>
+                        <div class="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-canvas">
+                            <div class="h-full rounded-full bg-brand" style="width: {{ max(1, $row['percentage']) }}%"></div>
                         </div>
                     </div>
                 @endforeach
             </div>
         </section>
 
-        {{-- Layanan teratas --}}
-        <section class="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-800">
-            <h2 class="font-semibold">Layanan dengan Pendapatan Tertinggi</h2>
+        {{-- Produk terlaris --}}
+        <section class="rounded-xl bg-white p-6 shadow-brand-xs">
+            <h2 class="font-display text-base font-semibold text-ink-strong">Produk Terlaris</h2>
 
             @if ($topServices->isEmpty())
-                <p class="mt-3 text-sm text-zinc-500">Belum ada transaksi berhasil.</p>
+                <p class="mt-4 text-sm text-muted">Belum ada transaksi berhasil.</p>
             @else
-                <div class="mt-4 space-y-3">
+                @php $peak = max(1, (int) $topServices->max('total_transactions')); @endphp
+
+                <div class="mt-5 space-y-4">
                     @foreach ($topServices as $service)
-                        <div wire:key="top-{{ $service->name }}" class="flex items-center justify-between gap-3 text-sm">
-                            <div class="min-w-0">
-                                <p class="truncate font-medium">{{ $service->name }}</p>
-                                <p class="text-xs text-zinc-500">{{ $service->total_transactions }} transaksi</p>
+                        <div wire:key="top-{{ $service->name }}">
+                            <div class="flex items-center justify-between gap-3 text-sm">
+                                <span class="truncate text-ink">{{ $service->name }}</span>
+                                <span class="shrink-0 text-muted">{{ $service->total_transactions }}</span>
                             </div>
-                            <p class="shrink-0 font-semibold text-indigo-600 dark:text-indigo-400">
-                                Rp{{ Number::format((int) $service->revenue, locale: 'id') }}
-                            </p>
+                            <div class="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-canvas">
+                                <div
+                                    class="h-full rounded-full bg-brand"
+                                    style="width: {{ max(2, round(($service->total_transactions / $peak) * 100)) }}%"
+                                ></div>
+                            </div>
                         </div>
                     @endforeach
                 </div>
@@ -124,61 +132,58 @@
 
     {{-- Langganan akan berakhir --}}
     @if ($expiringSubscriptions->isNotEmpty())
-        <section class="rounded-xl border border-amber-200 bg-amber-50 p-6 dark:border-amber-800 dark:bg-amber-950">
-            <h2 class="font-semibold text-amber-900 dark:text-amber-200">Langganan Akan Berakhir (7 Hari)</h2>
+        <section class="rounded-xl bg-status-wait-bg p-6">
+            <h2 class="font-display text-base font-semibold text-status-wait-fg">Langganan Akan Berakhir (7 Hari)</h2>
 
             <div class="mt-4 space-y-2">
                 @foreach ($expiringSubscriptions as $subscription)
-                    <div wire:key="exp-{{ $subscription->id }}" class="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-white p-3 text-sm dark:bg-zinc-900">
-                        <span class="font-medium">{{ $subscription->user->name }}</span>
-                        <span class="text-zinc-600 dark:text-zinc-400">
-                            {{ $subscription->plan->service->name }} — {{ $subscription->plan->name }}
+                    <div wire:key="exp-{{ $subscription->id }}" class="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-white p-3 text-sm">
+                        <span class="font-medium text-ink-strong">{{ $subscription->user->name }}</span>
+                        <span class="text-muted">
+                            {{ $subscription->plan->service->name }} — {{ $subscription->plan->groupLabel() }}
                         </span>
-                        <span class="text-amber-700 dark:text-amber-300">
-                            {{ $subscription->daysRemaining() }} hari lagi
-                        </span>
+                        <span class="text-status-wait-fg">{{ $subscription->daysRemaining() }} hari lagi</span>
                     </div>
                 @endforeach
             </div>
         </section>
     @endif
 
-    {{-- Transaksi terbaru --}}
-    <section class="rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-800">
-        <div class="flex items-center justify-between p-6 pb-4">
-            <h2 class="font-semibold">Transaksi Terbaru</h2>
-            <flux:button :href="route('admin.transactions.index')" variant="ghost" size="sm" wire:navigate>
-                Lihat Semua
-            </flux:button>
+    {{-- Pesanan terbaru --}}
+    <section class="rounded-xl bg-white shadow-brand-xs">
+        <div class="flex items-center justify-between px-6 py-4">
+            <h2 class="font-display text-base font-semibold text-ink-strong">Pesanan Terbaru</h2>
+            <a href="{{ route('admin.transactions.index') }}" class="text-sm text-brand hover:underline" wire:navigate>
+                Lihat semua ↗
+            </a>
         </div>
 
         <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-                <thead class="border-y border-zinc-200 bg-zinc-50 text-left dark:border-zinc-700 dark:bg-zinc-900">
+            <table class="w-full min-w-[720px] text-sm">
+                <thead class="prim-table-head bg-canvas">
                     <tr>
-                        <th class="p-3 font-medium">Kode Pesanan</th>
-                        <th class="p-3 font-medium">Pengguna</th>
-                        <th class="p-3 font-medium">Layanan</th>
-                        <th class="p-3 font-medium">Nominal</th>
-                        <th class="p-3 font-medium">Status</th>
+                        <th class="px-6 py-3">ID</th>
+                        <th class="px-6 py-3">Pelanggan</th>
+                        <th class="px-6 py-3">Produk</th>
+                        <th class="px-6 py-3">Total</th>
+                        <th class="px-6 py-3">Status</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($recentTransactions as $transaction)
-                        <tr wire:key="trx-{{ $transaction->id }}" class="border-b border-zinc-100 last:border-0 dark:border-zinc-700">
-                            <td class="p-3 font-mono text-xs">{{ $transaction->order_code }}</td>
-                            <td class="p-3">{{ $transaction->user->name }}</td>
-                            <td class="p-3">{{ $transaction->plan->service->name }}</td>
-                            <td class="p-3">{{ $transaction->formattedAmount() }}</td>
-                            <td class="p-3">
-                                <flux:badge size="sm" :color="$transaction->status->badgeColor()">
-                                    {{ $transaction->status->label() }}
-                                </flux:badge>
+                        <tr wire:key="trx-{{ $transaction->id }}" class="border-b border-line-soft last:border-0">
+                            <td class="px-6 py-3 font-mono text-xs">{{ $transaction->order_code }}</td>
+                            <td class="px-6 py-3 text-ink">{{ $transaction->user->name }}</td>
+                            <td class="px-6 py-3 text-ink">
+                                {{ $transaction->plan->service->name }}
+                                <span class="text-xs text-muted">{{ $transaction->plan->groupLabel() }}</span>
                             </td>
+                            <td class="px-6 py-3 font-medium whitespace-nowrap">{{ $transaction->formattedAmount() }}</td>
+                            <td class="px-6 py-3"><x-status-badge :status="$transaction->status" /></td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="p-6 text-center text-zinc-500">Belum ada transaksi.</td>
+                            <td colspan="5" class="px-6 py-10 text-center text-muted">Belum ada pesanan.</td>
                         </tr>
                     @endforelse
                 </tbody>

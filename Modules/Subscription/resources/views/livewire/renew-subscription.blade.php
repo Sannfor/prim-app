@@ -1,14 +1,14 @@
 <div class="mx-auto max-w-4xl space-y-6">
-    <nav class="flex items-center gap-2 text-sm text-zinc-500">
-        <a href="{{ route('subscription.index') }}" class="hover:text-indigo-600" wire:navigate>Langganan Saya</a>
+    <nav class="flex items-center gap-2 text-sm text-muted">
+        <a href="{{ route('subscription.index') }}" class="hover:text-brand" wire:navigate>Langganan Saya</a>
         <span>/</span>
         <span class="font-medium text-zinc-800 dark:text-zinc-200">Perpanjang</span>
     </nav>
 
-    <header class="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-800">
-        <h1 class="text-2xl font-bold tracking-tight">Perpanjang {{ $service->name }}</h1>
+    <header class="rounded-2xl border border-zinc-200 bg-white p-6 ">
+        <h1 class="text-2xl font-medium text-ink-strong">Perpanjang {{ $service->name }}</h1>
 
-        <p class="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+        <p class="mt-2 text-sm text-muted">
             Langganan <strong>{{ $subscription->plan->name }}</strong>
             @if ($subscription->isActive())
                 masih aktif hingga {{ $subscription->ends_at->translatedFormat('d F Y') }}
@@ -25,9 +25,9 @@
         <h2 class="text-lg font-semibold tracking-tight">Pilih paket perpanjangan</h2>
 
         @if ($plans->isEmpty())
-            <div class="mt-4 rounded-xl border border-dashed border-zinc-300 bg-white p-10 text-center dark:border-zinc-600 dark:bg-zinc-800">
+            <div class="mt-4 rounded-xl border border-dashed border-line bg-white p-10 text-center dark:border-zinc-600 dark:bg-zinc-800">
                 <p class="font-medium">Belum ada paket aktif</p>
-                <p class="mt-1 text-sm text-zinc-500">Penyedia belum menawarkan paket untuk layanan ini.</p>
+                <p class="mt-1 text-sm text-muted">Penyedia belum menawarkan paket untuk layanan ini.</p>
             </div>
         @else
             <div class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -45,15 +45,15 @@
                         @endif
 
                         <h3 class="font-semibold">{{ $plan->name }}</h3>
-                        <p class="mt-2 text-xl font-bold text-indigo-600 dark:text-indigo-400">
+                        <p class="mt-2 text-xl font-bold text-brand">
                             {{ $plan->formattedPrice() }}
                         </p>
-                        <p class="mt-1 text-xs text-zinc-500">
+                        <p class="mt-1 text-xs text-muted">
                             {{ $plan->durationLabel() }} · {{ $plan->max_devices }} perangkat
                         </p>
 
                         @if ($plan->description)
-                            <p class="mt-3 flex-1 text-sm text-zinc-600 dark:text-zinc-400">{{ $plan->description }}</p>
+                            <p class="mt-3 flex-1 text-sm text-muted">{{ $plan->description }}</p>
                         @endif
 
                         <flux:button

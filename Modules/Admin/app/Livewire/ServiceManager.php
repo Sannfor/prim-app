@@ -18,7 +18,7 @@ use Modules\Admin\Livewire\Concerns\ManagesResource;
 /**
  * Pengelolaan data layanan premium pada katalog PRIM.
  */
-#[Layout('layouts::app')]
+#[Layout('layouts::admin')]
 #[Title('Kelola Layanan')]
 class ServiceManager extends Component
 {

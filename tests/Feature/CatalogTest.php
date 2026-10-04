@@ -46,7 +46,7 @@ test('pencarian menyaring layanan berdasarkan kata kunci', function () {
     Livewire::test(ServiceList::class)
         ->set('search', 'Zebra')
         ->assertSee('Zebra Analytics')
-        ->assertDontSee('Nusantara Film Premium');
+        ->assertDontSee('Netflix');
 });
 
 test('filter kategori hanya menampilkan layanan pada kategori tersebut', function () {
@@ -54,24 +54,24 @@ test('filter kategori hanya menampilkan layanan pada kategori tersebut', functio
 
     Livewire::test(ServiceList::class)
         ->set('category', $edukasi->slug)
-        ->assertSee('Cendekia Kelas Online')
-        ->assertDontSee('Nusantara Film Premium');
+        ->assertSee('Duolingo')
+        ->assertDontSee('Netflix');
 });
 
 test('filter penyedia hanya menampilkan layanan dari penyedia tersebut', function () {
-    $sonata = Provider::query()->where('slug', 'sonata')->firstOrFail();
+    $spotify = Provider::query()->where('slug', 'spotify')->firstOrFail();
 
     Livewire::test(ServiceList::class)
-        ->set('provider', $sonata->slug)
-        ->assertSee('Sonata Music Unlimited')
-        ->assertDontSee('Nusantara Film Premium');
+        ->set('provider', $spotify->slug)
+        ->assertSee('Spotify Premium')
+        ->assertDontSee('Netflix');
 });
 
 test('filter harga maksimum menyaring layanan yang terlalu mahal', function () {
     Livewire::test(ServiceList::class)
         ->set('maxPrice', 30000)
-        ->assertSee('Sonata Podcast Plus')
-        ->assertDontSee('Nusantara Film Premium');
+        ->assertSee('iQIYI')
+        ->assertDontSee('Netflix');
 });
 
 test('pengurutan harga termurah menempatkan layanan termurah di depan', function () {
@@ -92,7 +92,7 @@ test('mengubah filter mengembalikan ke halaman pertama', function () {
     Livewire::test(ServiceList::class)
         ->call('setPage', 2)
         ->assertSet('paginators.page', 2)
-        ->set('search', 'Nusantara')
+        ->set('search', 'Netflix')
         ->assertSet('paginators.page', 1)
         ->assertOk();
 });
@@ -133,8 +133,8 @@ test('komparasi dibatasi maksimum empat layanan', function () {
 
 test('reset filter mengembalikan seluruh filter ke nilai awal', function () {
     Livewire::test(ServiceList::class)
-        ->set('search', 'film')
-        ->set('category', 'hiburan')
+        ->set('search', 'netflix')
+        ->set('category', 'streaming')
         ->set('sort', 'termurah')
         ->call('resetFilters')
         ->assertSet('search', '')
@@ -143,13 +143,13 @@ test('reset filter mengembalikan seluruh filter ke nilai awal', function () {
 });
 
 test('halaman detail layanan menampilkan seluruh paket aktif', function () {
-    $service = Service::query()->where('slug', 'nusantara-film-premium')->firstOrFail();
+    $service = Service::query()->where('slug', 'netflix')->firstOrFail();
 
     $this->get(route('catalog.show', $service->slug))
         ->assertOk()
         ->assertSee($service->name)
-        ->assertSee('Basic 1 Bulan')
-        ->assertSee('Premium 6 Bulan');
+        ->assertSee('1 Perangkat')
+        ->assertSee('5 Perangkat');
 });
 
 test('halaman detail layanan yang tidak ada menghasilkan 404', function () {
@@ -157,7 +157,7 @@ test('halaman detail layanan yang tidak ada menghasilkan 404', function () {
 });
 
 test('halaman detail tidak menampilkan paket yang tidak aktif', function () {
-    $service = Service::query()->where('slug', 'nusantara-film-premium')->firstOrFail();
+    $service = Service::query()->where('slug', 'netflix')->firstOrFail();
 
     Plan::factory()->inactive()->create([
         'service_id' => $service->id,
@@ -219,7 +219,7 @@ test('komponen komparasi dapat melepas layanan terpilih', function () {
 });
 
 test('komponen detail layanan dapat menambah dan melepas dari perbandingan', function () {
-    $service = Service::query()->where('slug', 'nusantara-film-premium')->firstOrFail();
+    $service = Service::query()->where('slug', 'netflix')->firstOrFail();
 
     Livewire::test(ServiceDetail::class, ['service' => $service->slug])
         ->call('toggleCompare')

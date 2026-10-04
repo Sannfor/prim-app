@@ -1,7 +1,7 @@
 <div class="space-y-8">
     {{-- Navigasi remah --}}
-    <nav class="flex items-center gap-2 text-sm text-zinc-500">
-        <a href="{{ route('catalog.index') }}" class="hover:text-indigo-600" wire:navigate>Katalog</a>
+    <nav class="flex items-center gap-2 text-sm text-muted">
+        <a href="{{ route('catalog.index') }}" class="hover:text-brand" wire:navigate>Katalog</a>
         <span>/</span>
         <span>{{ $service->category->name }}</span>
         <span>/</span>
@@ -9,16 +9,16 @@
     </nav>
 
     {{-- Kepala layanan --}}
-    <header class="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-8 dark:border-zinc-700 dark:bg-zinc-800">
+    <header class="rounded-2xl border border-zinc-200 bg-white p-6 sm:p-8 ">
         <div class="flex flex-wrap items-start justify-between gap-6">
             <div class="flex items-start gap-4">
-                <span class="flex size-16 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-xl font-bold text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300">
+                <span class="flex size-16 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-xl font-bold text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300">
                     {{ Str::of($service->name)->substr(0, 2)->upper() }}
                 </span>
 
                 <div>
-                    <h1 class="text-2xl font-bold tracking-tight">{{ $service->name }}</h1>
-                    <p class="mt-1 text-sm text-zinc-500">
+                    <h1 class="text-2xl font-medium text-ink-strong">{{ $service->name }}</h1>
+                    <p class="mt-1 text-sm text-muted">
                         oleh {{ $service->provider->name }}
                         @if ($service->provider->website)
                             · <a href="{{ $service->provider->website }}" target="_blank" class="text-indigo-600 hover:underline">Kunjungi situs penyedia</a>
@@ -45,7 +45,7 @@
             </div>
         </div>
 
-        <p class="mt-6 max-w-3xl text-sm/relaxed text-zinc-600 dark:text-zinc-400">
+        <p class="mt-6 max-w-3xl text-sm/relaxed text-muted">
             {{ $service->description }}
         </p>
     </header>
@@ -53,29 +53,29 @@
     {{-- Daftar paket --}}
     <section>
         <h2 class="text-lg font-semibold tracking-tight">Pilih paket langganan</h2>
-        <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+        <p class="mt-1 text-sm text-muted">
             Harga dan fitur di bawah ini disediakan oleh penyedia layanan.
         </p>
 
         @if ($plans->isEmpty())
-            <div class="mt-4 rounded-xl border border-dashed border-zinc-300 bg-white p-10 text-center dark:border-zinc-600 dark:bg-zinc-800">
+            <div class="mt-4 rounded-xl border border-dashed border-line bg-white p-10 text-center dark:border-zinc-600 dark:bg-zinc-800">
                 <p class="font-medium">Belum ada paket aktif</p>
-                <p class="mt-1 text-sm text-zinc-500">Penyedia layanan belum menawarkan paket untuk layanan ini.</p>
+                <p class="mt-1 text-sm text-muted">Penyedia layanan belum menawarkan paket untuk layanan ini.</p>
             </div>
         @else
             <div class="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 @foreach ($plans as $plan)
                     <article
                         wire:key="plan-{{ $plan->id }}"
-                        class="flex flex-col rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-800"
+                        class="flex flex-col rounded-xl bg-canvas p-5"
                     >
                         <h3 class="font-semibold">{{ $plan->name }}</h3>
 
-                        <p class="mt-2 text-2xl font-bold text-indigo-600 dark:text-indigo-400">
+                        <p class="mt-2 text-2xl font-bold text-brand">
                             {{ $plan->formattedPrice() }}
                         </p>
 
-                        <p class="mt-1 text-xs text-zinc-500">
+                        <p class="mt-1 text-xs text-muted">
                             {{ $plan->durationLabel() }}
                             @if ($plan->monthlyPrice() !== null)
                                 · setara Rp{{ Number::format($plan->monthlyPrice(), locale: 'id') }}/bulan
@@ -83,16 +83,16 @@
                         </p>
 
                         @if ($plan->description)
-                            <p class="mt-3 text-sm text-zinc-600 dark:text-zinc-400">{{ $plan->description }}</p>
+                            <p class="mt-3 text-sm text-muted">{{ $plan->description }}</p>
                         @endif
 
                         <dl class="mt-4 flex-1 space-y-2 text-sm">
                             <div class="flex justify-between gap-3">
-                                <dt class="text-zinc-500">Durasi</dt>
+                                <dt class="text-muted">Durasi</dt>
                                 <dd class="font-medium">{{ $plan->durationLabel() }}</dd>
                             </div>
                             <div class="flex justify-between gap-3">
-                                <dt class="text-zinc-500">Perangkat</dt>
+                                <dt class="text-muted">Perangkat</dt>
                                 <dd class="font-medium">{{ $plan->max_devices }} bersamaan</dd>
                             </div>
                         </dl>
@@ -102,7 +102,7 @@
                                 @foreach ($plan->features as $feature)
                                     <li class="flex items-start gap-2">
                                         <flux:icon.check class="mt-0.5 size-4 shrink-0 text-green-600" />
-                                        <span class="text-zinc-600 dark:text-zinc-400">{{ $feature }}</span>
+                                        <span class="text-muted">{{ $feature }}</span>
                                     </li>
                                 @endforeach
                             </ul>
@@ -125,7 +125,7 @@
 
     {{-- Ulasan pengguna --}}
     @if ($service->reviews->isNotEmpty())
-        <section class="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-800">
+        <section class="rounded-2xl border border-zinc-200 bg-white p-6 ">
             <h2 class="text-lg font-semibold tracking-tight">Ulasan pengguna</h2>
 
             <div class="mt-4 space-y-4">
@@ -136,7 +136,7 @@
                             <span class="text-amber-500">{{ str_repeat('★', $review->rating) }}</span>
                         </div>
                         @if ($review->comment)
-                            <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{{ $review->comment }}</p>
+                            <p class="mt-1 text-sm text-muted">{{ $review->comment }}</p>
                         @endif
                     </article>
                 @endforeach

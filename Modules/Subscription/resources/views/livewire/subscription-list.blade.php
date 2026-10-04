@@ -1,19 +1,19 @@
 <div class="space-y-6">
     <div>
-        <h1 class="text-2xl font-bold tracking-tight">Langganan Saya</h1>
-        <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+        <h1 class="text-2xl font-medium text-ink-strong">Langganan Saya</h1>
+        <p class="mt-1 text-sm text-muted">
             Pantau masa aktif layanan premium Anda dan perpanjang sebelum berakhir.
         </p>
     </div>
 
     {{-- Ringkasan --}}
     <div class="grid gap-4 sm:grid-cols-2">
-        <div class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-800">
-            <p class="text-sm text-zinc-500">Langganan aktif</p>
+        <div class="rounded-xl bg-canvas p-5">
+            <p class="text-sm text-muted">Langganan aktif</p>
             <p class="mt-1 text-2xl font-bold">{{ $activeCount }}</p>
         </div>
-        <div class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-800">
-            <p class="text-sm text-zinc-500">Akan berakhir dalam 7 hari</p>
+        <div class="rounded-xl bg-canvas p-5">
+            <p class="text-sm text-muted">Akan berakhir dalam 7 hari</p>
             <p class="mt-1 text-2xl font-bold {{ $expiringSoonCount > 0 ? 'text-amber-600' : '' }}">
                 {{ $expiringSoonCount }}
             </p>
@@ -34,10 +34,10 @@
     </div>
 
     @if ($subscriptions->isEmpty())
-        <div class="rounded-xl border border-dashed border-zinc-300 bg-white p-12 text-center dark:border-zinc-600 dark:bg-zinc-800">
-            <flux:icon.arrow-path-rounded-square class="mx-auto size-8 text-zinc-400" />
+        <div class="rounded-xl border border-dashed border-line bg-white p-12 text-center">
+            <flux:icon.arrow-path-rounded-square class="mx-auto size-8 text-muted-2" />
             <p class="mt-3 font-medium">Tidak ada langganan pada kategori ini</p>
-            <p class="mt-1 text-sm text-zinc-500">
+            <p class="mt-1 text-sm text-muted">
                 Mulai berlangganan layanan premium dari katalog PRIM.
             </p>
             <flux:button :href="route('catalog.index')" variant="filled" class="mt-4" wire:navigate>
@@ -55,17 +55,17 @@
 
                 <article
                     wire:key="sub-{{ $subscription->id }}"
-                    class="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-800"
+                    class="rounded-xl bg-canvas p-5"
                 >
                     <div class="flex flex-wrap items-start justify-between gap-4">
                         <div class="flex items-start gap-3">
-                            <span class="flex size-11 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-sm font-bold text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300">
+                            <span class="flex size-11 shrink-0 items-center justify-center rounded-lg bg-brand-soft text-sm font-bold text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300">
                                 {{ Str::of($service->name)->substr(0, 2)->upper() }}
                             </span>
                             <div>
                                 <h2 class="font-semibold">{{ $service->name }}</h2>
-                                <p class="text-sm text-zinc-500">{{ $subscription->plan->name }}</p>
-                                <p class="text-xs text-zinc-500">{{ $service->provider->name }}</p>
+                                <p class="text-sm text-muted">{{ $subscription->plan->name }}</p>
+                                <p class="text-xs text-muted">{{ $service->provider->name }}</p>
                             </div>
                         </div>
 
@@ -85,13 +85,13 @@
                     {{-- Progres masa aktif --}}
                     @if ($isActive)
                         <div class="mt-4">
-                            <div class="h-1.5 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-700">
+                            <div class="h-1.5 w-full overflow-hidden rounded-full bg-canvas">
                                 <div
-                                    class="h-full rounded-full {{ $days <= 7 ? 'bg-amber-500' : 'bg-indigo-500' }}"
+                                    class="h-full rounded-full {{ $days <= 7 ? 'bg-amber-500' : 'bg-brand-soft0' }}"
                                     style="width: {{ $subscription->progressPercentage() }}%"
                                 ></div>
                             </div>
-                            <div class="mt-2 flex justify-between text-xs text-zinc-500">
+                            <div class="mt-2 flex justify-between text-xs text-muted">
                                 <span>{{ $subscription->started_at->translatedFormat('d M Y') }}</span>
                                 <span>{{ $subscription->ends_at->translatedFormat('d M Y') }}</span>
                             </div>
@@ -152,7 +152,7 @@
                         @if ($subscription->transaction)
                             <a
                                 href="{{ route('transaction.show', $subscription->transaction->order_code) }}"
-                                class="text-xs text-zinc-500 hover:text-indigo-600"
+                                class="text-xs text-muted hover:text-brand"
                                 wire:navigate
                             >
                                 Pesanan {{ $subscription->transaction->order_code }}

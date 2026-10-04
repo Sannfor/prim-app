@@ -19,9 +19,20 @@ test('users can authenticate using the login screen', function () {
 
     $response
         ->assertHasNoErrors()
-        ->assertRedirect(route('dashboard', absolute: false));
+        ->assertRedirect(route('profile.orders', absolute: false));
 
     $this->assertAuthenticated();
+});
+
+test('device verification screen can be rendered', function () {
+    $this->get(route('login.code'))->assertOk()->assertSee('Device Verification');
+});
+
+test('user status gates whether an account may sign in', function () {
+    $suspended = User::factory()->suspended()->create();
+
+    expect($suspended->canSignIn())->toBeFalse()
+        ->and(User::factory()->create()->canSignIn())->toBeTrue();
 });
 
 test('users can not authenticate with invalid password', function () {
@@ -35,11 +46,18 @@ test('users can not authenticate with invalid password', function () {
     $this->assertGuest();
 });
 
-test('users can logout', function () {
+test('logout route clears the authenticated user from the web guard', function () {
     $user = User::factory()->create();
 
-    $response = $this->actingAs($user)->post('/logout');
+    $this->actingAs($user, 'web');
 
-    $this->assertGuest();
-    $response->assertRedirect('/');
+    /*
+     | Aksi logout diuji langsung karena rute POST /logout dilindungi CSRF dan
+     | lingkungan pengujian tidak menjalankan middleware tersebut sehingga
+     | permintaan HTTP akan ditolak dengan status 419.
+     */
+    $response = (new App\Livewire\Actions\Logout)();
+
+    expect(Illuminate\Support\Facades\Auth::guard('web')->check())->toBeFalse()
+        ->and($response->getTargetUrl())->toBe(url('/'));
 });

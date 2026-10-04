@@ -1,5 +1,7 @@
 <?php
 
+use App\Livewire\Actions\Logout;
+use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
@@ -8,18 +10,21 @@ use Livewire\Volt\Volt;
 | PRIM — Route Utama
 |--------------------------------------------------------------------------
 |
-| Route publik (katalog) didaftarkan oleh modul Catalog. Berkas ini hanya
-| menangani landing page, dashboard, dan pengaturan akun.
+| Route publik (katalog & bantuan) didaftarkan oleh modulnya masing-masing.
+| Berkas ini menangani beranda, pusat pesanan pengguna, dan pengaturan akun.
 |
 */
 
 Route::view('/', 'welcome')->name('home');
 
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+Route::middleware(['auth', 'verified'])->group(function () {
+    Volt::route('profil/pesanan', 'profile.orders')->name('profile.orders');
+    Volt::route('profil/kode-login', 'profile.login-code')->name('profile.login-code');
 
-Route::middleware(['auth'])->group(function () {
+    // Rute /dashboard dari starter kit dipertahankan sebagai nama rute agar
+    // tautan lama tidak putus, tetapi diarahkan ke pusat pesanan pengguna.
+    Route::redirect('dashboard', 'profil/pesanan')->name('dashboard');
+
     Route::redirect('settings', 'settings/profile');
 
     Volt::route('settings/profile', 'settings.profile')->name('settings.profile');
@@ -28,3 +33,4 @@ Route::middleware(['auth'])->group(function () {
 });
 
 require __DIR__.'/auth.php';
+require __DIR__.'/support.php';

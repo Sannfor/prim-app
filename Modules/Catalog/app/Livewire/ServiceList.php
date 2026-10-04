@@ -56,9 +56,9 @@ class ServiceList extends Component
     public string $sort = 'terbaru';
 
     /**
-     * Jumlah kartu per halaman.
+     * Jumlah kartu per halaman. Desain menampilkan grid 4 kolom.
      */
-    public int $perPage = 9;
+    public int $perPage = 12;
 
     /**
      * Kembalikan ke halaman pertama setiap kali filter berubah.

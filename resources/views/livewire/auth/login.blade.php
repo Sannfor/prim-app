@@ -10,17 +10,15 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Validate;
 use Livewire\Volt\Component;
 
-new #[Layout('components.layouts.auth')] class extends Component {
+new #[Layout('layouts::auth', ['title' => 'Masuk'])] class extends Component {
     #[Validate('required|string|email')]
     public string $email = '';
 
     #[Validate('required|string')]
     public string $password = '';
 
-    public bool $remember = false;
-
     /**
-     * Handle an incoming authentication request.
+     * Proses permintaan masuk.
      */
     public function login(): void
     {
@@ -28,7 +26,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
 
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
+        if (! Auth::attempt(['email' => $this->email, 'password' => $this->password])) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
@@ -39,11 +37,11 @@ new #[Layout('components.layouts.auth')] class extends Component {
         RateLimiter::clear($this->throttleKey());
         Session::regenerate();
 
-        $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+        $this->redirectIntended(default: route('profile.orders', absolute: false), navigate: true);
     }
 
     /**
-     * Ensure the authentication request is not rate limited.
+     * Pastikan permintaan masuk belum melewati batas percobaan.
      */
     protected function ensureIsNotRateLimited(): void
     {
@@ -64,7 +62,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
     }
 
     /**
-     * Get the authentication rate limiting throttle key.
+     * Kunci pembatas percobaan masuk.
      */
     protected function throttleKey(): string
     {
@@ -72,45 +70,79 @@ new #[Layout('components.layouts.auth')] class extends Component {
     }
 }; ?>
 
-<div class="flex flex-col gap-6">
-    <x-auth-header title="Log in to your account" description="Enter your email and password below to log in" />
+@php
+    $inputClass = 'prim-input font-auth';
+    $labelClass = 'prim-label text-ink';
+@endphp
 
-    <!-- Session Status -->
-    <x-auth-session-status class="text-center" :status="session('status')" />
+<div class="font-auth">
+    <h1 class="font-auth text-[34px] font-bold leading-tight text-brand sm:text-[40px]">Login</h1>
 
-    <form wire:submit="login" class="flex flex-col gap-6">
-        <!-- Email Address -->
-        <flux:input wire:model="email" label="{{ __('Email address') }}" type="email" name="email" required autofocus autocomplete="email" placeholder="email@example.com" />
+    <p class="mt-2 text-[15px] text-ink sm:text-base">
+        Belum punya akun?
+        <a href="{{ route('register') }}" class="font-medium text-brand-violet hover:underline" wire:navigate>Daftar</a>
+    </p>
 
-        <!-- Password -->
-        <div class="relative">
-            <flux:input
-                wire:model="password"
-                label="{{ __('Password') }}"
-                type="password"
-                name="password"
+    <x-auth-session-status class="mt-4 rounded-lg bg-status-done-bg px-3 py-2 text-sm text-status-done-fg" :status="session('status')" />
+
+    <form wire:submit="login" class="mt-7 space-y-5">
+        <div>
+            <label for="email" class="{{ $labelClass }}">Email</label>
+
+            <input
+                id="email"
+                type="email"
+                name="email"
+                wire:model="email"
                 required
-                autocomplete="current-password"
-                placeholder="Password"
+                autofocus
+                autocomplete="email"
+                placeholder="Masukkan email"
+                class="{{ $inputClass }}"
             />
 
+            @error('email')
+                <p class="mt-2 text-sm text-status-cancel-fg">{{ $message }}</p>
+            @enderror
+        </div>
+
+        <div>
+            <label for="password" class="{{ $labelClass }}">Password</label>
+
+            <input
+                id="password"
+                type="password"
+                name="password"
+                wire:model="password"
+                required
+                autocomplete="current-password"
+                placeholder="Masukkan password"
+                class="{{ $inputClass }}"
+            />
+
+            @error('password')
+                <p class="mt-2 text-sm text-status-cancel-fg">{{ $message }}</p>
+            @enderror
+        </div>
+
+        <div class="flex items-center justify-end">
             @if (Route::has('password.request'))
-                <x-text-link class="absolute right-0 top-0" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
-                </x-text-link>
+                <a
+                    href="{{ route('password.request') }}"
+                    class="text-sm font-medium text-brand-violet hover:underline"
+                    wire:navigate
+                >Lupa password?</a>
             @endif
         </div>
 
-        <!-- Remember Me -->
-        <flux:checkbox wire:model="remember" label="{{ __('Remember me') }}" />
-
-        <div class="flex items-center justify-end">
-            <flux:button variant="primary" type="submit" class="w-full">{{ __('Log in') }}</flux:button>
-        </div>
+        <button type="submit" class="prim-btn prim-btn-block font-auth text-base" wire:loading.attr="disabled">
+            <span wire:loading.remove>Masuk</span>
+            <span wire:loading>Memproses…</span>
+        </button>
     </form>
 
-    <div class="space-x-1 text-center text-sm text-zinc-600 dark:text-zinc-400">
-        Don't have an account?
-        <x-text-link href="{{ route('register') }}">Sign up</x-text-link>
-    </div>
+    <p class="mt-6 text-center text-sm text-ink">
+        Punya akun dengan verifikasi perangkat?
+        <a href="{{ route('login.code') }}" class="font-medium text-brand-violet hover:underline" wire:navigate>Masuk dengan kode</a>
+    </p>
 </div>

@@ -17,7 +17,7 @@ use Modules\Admin\Livewire\Concerns\ManagesResource;
  * Halaman ini menangani paket untuk satu layanan tertentu, dipilih melalui
  * parameter URL, sehingga daftar paket tetap ringkas dan relevan.
  */
-#[Layout('layouts::app')]
+#[Layout('layouts::admin')]
 class PlanManager extends Component
 {
     use ManagesResource;
