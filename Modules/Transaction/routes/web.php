@@ -19,4 +19,7 @@ Route::middleware(['auth', 'verified'])->name('transaction.')->group(function ()
     Route::livewire('checkout/{plan}', 'transaction::checkout')->name('checkout');
     Route::livewire('transaksi', 'transaction::transaction-history')->name('index');
     Route::livewire('transaksi/{order}', 'transaction::transaction-detail')->name('show');
+
+    // Struk digital: halaman cetak untuk pesanan yang sudah berhasil dibayar.
+    Route::livewire('transaksi/{order}/struk', 'transaction::receipt')->name('receipt');
 });

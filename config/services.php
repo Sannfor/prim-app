@@ -35,4 +35,36 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Midtrans
+    |--------------------------------------------------------------------------
+    |
+    | Kunci API Midtrans. Selama MIDTRANS_SERVER_KEY kosong, aplikasi memakai
+    | mode simulasi sehingga seluruh alur pembayaran tetap dapat didemonstrasikan
+    | tanpa akun Midtrans.
+    |
+    | Cara mengaktifkan pembayaran sungguhan:
+    |   1. Buat akun di dashboard.midtrans.com (mode Sandbox).
+    |   2. Salin Server Key dan Client Key dari menu Settings > Access Keys.
+    |   3. Isi baris berikut pada berkas .env:
+    |        MIDTRANS_MODE=snap
+    |        MIDTRANS_SERVER_KEY=SB-Mid-server-xxxxxxxxxxxx
+    |        MIDTRANS_CLIENT_KEY=SB-Mid-client-xxxxxxxxxxxx
+    |   4. Daftarkan alamat notifikasi pada dashboard Midtrans:
+    |        https://domain-anda/midtrans/notification
+    |
+    */
+
+    'midtrans' => [
+        'mode' => env('MIDTRANS_MODE', 'simulation'),
+
+        'server_key' => env('MIDTRANS_SERVER_KEY'),
+
+        'client_key' => env('MIDTRANS_CLIENT_KEY'),
+
+        // Ubah menjadi true hanya setelah beralih ke kunci produksi.
+        'production' => env('MIDTRANS_PRODUCTION', false),
+    ],
+
 ];

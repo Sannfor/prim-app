@@ -1,7 +1,8 @@
 <?php
 
-use App\Livewire\Actions\Logout;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\MidtransNotificationController;
+use App\Livewire\Actions\Logout;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
@@ -16,6 +17,17 @@ use Livewire\Volt\Volt;
 */
 
 Route::view('/', 'welcome')->name('home');
+
+/*
+ * Notifikasi pembayaran dari Midtrans.
+ *
+ * Diletakkan di luar grup middleware auth karena pemanggilnya adalah server
+ * Midtrans, bukan pengguna. Keaslian permintaan diperiksa memakai signature_key
+ * di dalam controller, dan alamat ini dikecualikan dari proteksi CSRF pada
+ * bootstrap/app.php.
+ */
+Route::post('midtrans/notification', MidtransNotificationController::class)
+    ->name('midtrans.notification');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Volt::route('profil/pesanan', 'profile.orders')->name('profile.orders');

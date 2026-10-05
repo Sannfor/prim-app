@@ -15,6 +15,15 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => EnsureUserHasRole::class,
         ]);
+
+        /*
+         * Notifikasi pembayaran Midtrans dikirim oleh server penyedia, bukan oleh
+         * peramban pengguna, sehingga tidak membawa token CSRF. Keaslian
+         * permintaan diperiksa memakai signature_key di dalam controller.
+         */
+        $middleware->validateCsrfTokens(except: [
+            'midtrans/notification',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

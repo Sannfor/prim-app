@@ -38,6 +38,14 @@ class MockPaymentGateway implements PaymentGateway
         ];
     }
 
+    /**
+     * Simulasi menyelesaikan pembayaran langsung, tanpa pengalihan halaman.
+     */
+    public function requiresRedirect(): bool
+    {
+        return false;
+    }
+
     public function charge(Transaction $transaction, User $payer, string $method, bool $succeed = true): PaymentResult
     {
         $reference = $this->reference($transaction, $method);

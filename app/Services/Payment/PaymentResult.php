@@ -18,14 +18,42 @@ class PaymentResult
         public readonly TransactionStatus $status,
         public readonly string $reference,
         public readonly string $message,
+        public readonly bool $requiresAction = false,
+        public readonly ?string $token = null,
+        public readonly ?string $redirectUrl = null,
+        public readonly ?string $methodLabel = null,
     ) {}
 
     /**
-     * Pembayaran berhasil.
+     * Pembayaran berhasil dan langsung lunas.
      */
     public static function success(string $reference, string $message = 'Pembayaran berhasil diproses.'): self
     {
         return new self(true, TransactionStatus::Paid, $reference, $message);
+    }
+
+    /**
+     * Pembayaran menunggu tindakan pengguna pada halaman penyedia.
+     *
+     * Dipakai oleh gateway berbasis pengalihan halaman, misalnya Midtrans Snap:
+     * transaksi belum lunas sampai penyedia mengirim notifikasi pembayaran.
+     */
+    public static function menungguTindakan(
+        string $reference,
+        string $token,
+        string $redirectUrl,
+        ?string $methodLabel = null,
+    ): self {
+        return new self(
+            successful: false,
+            status: TransactionStatus::Pending,
+            reference: $reference,
+            message: 'Menunggu pembayaran diselesaikan pada halaman penyedia.',
+            requiresAction: true,
+            token: $token,
+            redirectUrl: $redirectUrl,
+            methodLabel: $methodLabel,
+        );
     }
 
     /**

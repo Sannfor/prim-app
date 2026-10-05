@@ -28,6 +28,22 @@ interface PaymentGateway
     public function methods(): array;
 
     /**
+     * Nama metode pembayaran yang mudah dibaca.
+     *
+     * @param  string  $method  Kode metode pembayaran.
+     */
+    public function label(string $method): string;
+
+    /**
+     * Apakah gateway memerlukan tindakan pengguna pada halaman penyedia.
+     *
+     * Bernilai benar untuk gateway berbasis pengalihan halaman seperti Midtrans
+     * Snap, dan salah untuk gateway simulasi yang menyelesaikan pembayaran
+     * langsung di dalam aplikasi.
+     */
+    public function requiresRedirect(): bool;
+
+    /**
      * Proses pembayaran sebuah transaksi.
      *
      * @param  string  $method  Kode metode pembayaran yang dipilih pengguna.

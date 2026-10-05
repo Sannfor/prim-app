@@ -44,7 +44,11 @@ class TransactionDetail extends Component
     }
 
     /**
-     * Jalankan simulasi pembayaran.
+     * Jalankan pembayaran.
+     *
+     * Bila gateway memerlukan tindakan pengguna (mis. Midtrans Snap), pengguna
+     * diarahkan ke halaman pembayaran penyedia. Bila gateway bekerja dalam mode
+     * simulasi, hasilnya langsung ditentukan dan langganan langsung aktif.
      */
     public function pay(TransactionService $transactions, bool $succeed = true)
     {
@@ -55,9 +59,16 @@ class TransactionDetail extends Component
         $result = $transactions->pay(
             $transaction,
             auth()->user(),
-            $transaction->payment_method ?? 'transfer',
+            $transaction->payment_method ?? 'qris',
             $succeed
         );
+
+        // Pembayaran daring: arahkan pengguna ke halaman penyedia.
+        if ($result->requiresAction && filled($result->redirectUrl)) {
+            Flux::toast(variant: 'success', text: 'Mengarahkan ke halaman pembayaran…');
+
+            return redirect()->away($result->redirectUrl);
+        }
 
         Flux::toast(
             variant: $result->successful ? 'success' : 'danger',
@@ -65,7 +76,7 @@ class TransactionDetail extends Component
         );
 
         if ($result->successful) {
-            return redirect()->route('subscription.index');
+            return redirect()->route('transaction.receipt', $transaction->order_code);
         }
 
         return null;
@@ -74,6 +85,7 @@ class TransactionDetail extends Component
     public function render(TransactionService $transactions): View
     {
         $transaction = $this->transaction();
+        $gateway = $transactions->gateway();
 
         return view('transaction::livewire.transaction-detail', [
             'transaction' => $transaction,
@@ -81,7 +93,9 @@ class TransactionDetail extends Component
             'hasExpired' => $transaction->hasExpired(),
             'paymentMethodLabel' => $transaction->payment_method === null
                 ? 'metode yang dipilih'
-                : $transactions->gateway()->label($transaction->payment_method),
+                : $gateway->label($transaction->payment_method),
+            'gatewayName' => $gateway->name(),
+            'usesOnlineGateway' => $gateway->requiresRedirect(),
         ])->title('Pembayaran '.$transaction->order_code);
     }
 }

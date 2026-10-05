@@ -43,7 +43,11 @@ class TransactionService
     /**
      * Proses pembayaran sebuah transaksi melalui gateway.
      *
-     * Bila berhasil, transaksi ditandai lunas dan langganan dibuat otomatis.
+     * Tiga kemungkinan hasil:
+     *   1. Berhasil langsung  — transaksi ditandai lunas dan langganan dibuat.
+     *   2. Menunggu tindakan  — token dan tautan pembayaran disimpan, transaksi
+     *                           tetap menunggu sampai penyedia mengirim notifikasi.
+     *   3. Gagal              — status transaksi diperbarui menjadi gagal.
      */
     public function pay(Transaction $transaction, User $payer, string $method, bool $succeed = true): PaymentResult
     {
@@ -57,12 +61,27 @@ class TransactionService
         $result = $this->gateway->charge($transaction, $payer, $method, $succeed);
 
         DB::transaction(function () use ($transaction, $method, $result) {
-            $transaction->forceFill([
+            $label = $result->methodLabel ?? $this->gateway->methods()[$method] ?? $method;
+
+            $atribut = [
                 'payment_method' => $method,
-                'status' => $result->status,
-                'paid_at' => $result->successful ? now() : null,
+                'payment_method_label' => $label,
                 'notes' => $result->message,
-            ])->save();
+                'payment_reference' => $result->reference,
+            ];
+
+            if ($result->requiresAction) {
+                // Belum lunas: simpan tautan pembayaran, status tetap menunggu.
+                $atribut['payment_token'] = $result->token;
+                $atribut['payment_url'] = $result->redirectUrl;
+            } else {
+                $atribut['status'] = $result->status;
+                $atribut['paid_at'] = $result->successful ? now() : null;
+                $atribut['payment_token'] = null;
+                $atribut['payment_url'] = null;
+            }
+
+            $transaction->forceFill($atribut)->save();
 
             if ($result->successful) {
                 $this->activateSubscription($transaction->fresh());
@@ -70,6 +89,31 @@ class TransactionService
         });
 
         return $result;
+    }
+
+    /**
+     * Tandai transaksi lunas setelah pembayaran terkonfirmasi di luar aplikasi,
+     * misalnya dari notifikasi penyedia pembayaran.
+     *
+     * Berbeda dari pay(), metode ini tidak memanggil gateway karena pembayaran
+     * sudah terjadi di sisi penyedia.
+     */
+    public function markAsPaid(Transaction $transaction, ?string $reference = null): Subscription
+    {
+        $subscription = DB::transaction(function () use ($transaction, $reference) {
+            $transaction->forceFill([
+                'status' => TransactionStatus::Paid,
+                'paid_at' => now(),
+                'payment_reference' => $reference ?? $transaction->payment_reference,
+                'notes' => 'Pembayaran terkonfirmasi oleh penyedia pembayaran.',
+                'payment_token' => null,
+                'payment_url' => null,
+            ])->save();
+
+            return $this->activateSubscription($transaction->fresh());
+        });
+
+        return $subscription;
     }
 
     /**

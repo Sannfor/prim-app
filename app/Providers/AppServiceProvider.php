@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Services\Payment\MockPaymentGateway;
+use App\Services\Payment\MidtransGateway;
 use App\Services\Payment\PaymentGateway;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -14,10 +14,29 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // PRIM belum terhubung ke penyedia pembayaran nyata, sehingga gateway
-        // yang dipakai adalah simulasi internal. Untuk beralih ke penyedia
-        // sungguhan, cukup ganti binding di bawah ini.
-        $this->app->bind(PaymentGateway::class, MockPaymentGateway::class);
+        /*
+         * Gateway pembayaran dipilih berdasarkan konfigurasi.
+         *
+         * Bila MIDTRANS_SERVER_KEY diisi dan MIDTRANS_MODE=snap, pembayaran
+         * diarahkan ke halaman Midtrans. Bila belum, gateway bekerja dalam mode
+         * simulasi sehingga seluruh alur transaksi tetap dapat didemonstrasikan.
+         * Pemanggil tidak perlu berubah karena keduanya memakai kontrak
+         * PaymentGateway yang sama.
+         */
+        $this->app->bind(PaymentGateway::class, function () {
+            $key = config('services.midtrans.server_key');
+            $mode = config('services.midtrans.mode', 'simulation');
+
+            if (filled($key) && $mode === 'snap') {
+                return new MidtransGateway(
+                    serverKey: $key,
+                    mode: 'snap',
+                    production: (bool) config('services.midtrans.production', false),
+                );
+            }
+
+            return new MidtransGateway(serverKey: null, mode: 'simulation');
+        });
     }
 
     /**
