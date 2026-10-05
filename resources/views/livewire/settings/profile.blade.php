@@ -4,9 +4,10 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
+use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
-new class extends Component {
+new #[Layout('layouts::settings', ['title' => 'Profil'])] class extends Component {
     public string $name = '';
     public string $email = '';
 
@@ -69,49 +70,52 @@ new class extends Component {
     }
 }; ?>
 
-<section class="w-full">
-    @include('partials.settings-heading')
+<div>
+    <x-settings.layout heading="Profil" subheading="Perbarui nama dan alamat surel akunmu.">
+        <form wire:submit="updateProfileInformation" class="rounded-xl bg-white p-6 shadow-brand-xs">
+            <div class="grid gap-5 sm:grid-cols-2">
+                <div class="sm:col-span-2">
+                    <label for="name" class="prim-label">Nama Lengkap</label>
+                    <input id="name" type="text" wire:model="name" name="name" required autofocus
+                        autocomplete="name" class="prim-input" placeholder="Nama lengkap">
+                    @error('name') <p class="mt-2 text-sm text-status-cancel-fg">{{ $message }}</p> @enderror
+                </div>
 
-    <x-settings.layout heading="Profile" subheading="Update your name and email address">
-        <form wire:submit="updateProfileInformation" class="my-6 w-full space-y-6">
-            <flux:input wire:model="name" label="{{ __('Name') }}" type="text" name="name" required autofocus autocomplete="name" />
+                <div class="sm:col-span-2">
+                    <label for="email" class="prim-label">Email</label>
+                    <input id="email" type="email" wire:model="email" name="email" required
+                        autocomplete="email" class="prim-input" placeholder="nama@email.com">
+                    @error('email') <p class="mt-2 text-sm text-status-cancel-fg">{{ $message }}</p> @enderror
 
-            <div>
-                <flux:input wire:model="email" label="{{ __('Email') }}" type="email" name="email" required autocomplete="email" />
-
-                @if (auth()->user() instanceof \Illuminate\Contracts\Auth\MustVerifyEmail &&! auth()->user()->hasVerifiedEmail())
-                    <div>
-                        <p class="mt-2 text-sm text-gray-800">
-                            {{ __('Your email address is unverified.') }}
-
-                            <button
-                                wire:click.prevent="resendVerificationNotification"
-                                class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                            >
-                                {{ __('Click here to re-send the verification email.') }}
+                    @if (auth()->user() instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! auth()->user()->hasVerifiedEmail())
+                        <p class="mt-2 text-sm text-status-wait-fg">
+                            Alamat surelmu belum diverifikasi.
+                            <button type="button" wire:click.prevent="resendVerificationNotification" class="font-medium underline">
+                                Kirim ulang tautan verifikasi
                             </button>
                         </p>
 
                         @if (session('status') === 'verification-link-sent')
-                            <p class="mt-2 text-sm font-medium text-green-600">
-                                {{ __('A new verification link has been sent to your email address.') }}
+                            <p class="mt-2 text-sm font-medium text-status-done-fg">
+                                Tautan verifikasi baru telah dikirim ke alamat surelmu.
                             </p>
                         @endif
-                    </div>
-                @endif
+                    @endif
+                </div>
             </div>
 
-            <div class="flex items-center gap-4">
-                <div class="flex items-center justify-end">
-                    <flux:button variant="primary" type="submit" class="w-full">{{ __('Save') }}</flux:button>
-                </div>
+            <div class="mt-6 flex flex-wrap items-center gap-3 border-t border-line-soft pt-5">
+                <button type="submit" class="prim-btn px-7" wire:loading.attr="disabled">
+                    <span wire:loading.remove>Simpan Perubahan</span>
+                    <span wire:loading>Menyimpan…</span>
+                </button>
 
-                <x-action-message class="me-3" on="profile-updated">
-                    {{ __('Saved.') }}
+                <x-action-message class="text-sm text-status-done-fg" on="profile-updated">
+                    Tersimpan.
                 </x-action-message>
             </div>
         </form>
 
         <livewire:settings.delete-user-form />
     </x-settings.layout>
-</section>
+</div>

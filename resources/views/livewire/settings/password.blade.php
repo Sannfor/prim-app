@@ -4,9 +4,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
+use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
-new class extends Component {
+new #[Layout('layouts::settings', ['title' => 'Password'])] class extends Component {
     public string $current_password = '';
     public string $password = '';
     public string $password_confirmation = '';
@@ -37,48 +38,44 @@ new class extends Component {
     }
 }; ?>
 
-<section class="w-full">
-    @include('partials.settings-heading')
-
-    <x-settings.layout heading="Update password" subheading="Ensure your account is using a long, random password to stay secure">
-        <form wire:submit="updatePassword" class="mt-6 space-y-6">
-            <flux:input
-                wire:model="current_password"
-                id="update_password_current_passwordpassword"
-                label="{{ __('Current password') }}"
-                type="password"
-                name="current_password"
-                required
-                autocomplete="current-password"
-            />
-            <flux:input
-                wire:model="password"
-                id="update_password_password"
-                label="{{ __('New password') }}"
-                type="password"
-                name="password"
-                required
-                autocomplete="new-password"
-            />
-            <flux:input
-                wire:model="password_confirmation"
-                id="update_password_password_confirmation"
-                label="{{ __('Confirm Password') }}"
-                type="password"
-                name="password_confirmation"
-                required
-                autocomplete="new-password"
-            />
-
-            <div class="flex items-center gap-4">
-                <div class="flex items-center justify-end">
-                    <flux:button variant="primary" type="submit" class="w-full">{{ __('Save') }}</flux:button>
+<div>
+    <x-settings.layout heading="Kata Sandi" subheading="Gunakan kata sandi yang panjang dan tidak dipakai di layanan lain.">
+        <form wire:submit="updatePassword" class="rounded-xl bg-white p-6 shadow-brand-xs">
+            <div class="space-y-5">
+                <div>
+                    <label for="update_password_current_password" class="prim-label">Kata Sandi Saat Ini</label>
+                    <input id="update_password_current_password" type="password" wire:model="current_password"
+                        name="current_password" required autocomplete="current-password" class="prim-input"
+                        placeholder="Masukkan kata sandi saat ini">
+                    @error('current_password') <p class="mt-2 text-sm text-status-cancel-fg">{{ $message }}</p> @enderror
                 </div>
 
-                <x-action-message class="me-3" on="password-updated">
-                    {{ __('Saved.') }}
+                <div>
+                    <label for="update_password_password" class="prim-label">Kata Sandi Baru</label>
+                    <input id="update_password_password" type="password" wire:model="password" name="password"
+                        required autocomplete="new-password" class="prim-input" placeholder="Minimal 8 karakter">
+                    @error('password') <p class="mt-2 text-sm text-status-cancel-fg">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
+                    <label for="update_password_password_confirmation" class="prim-label">Konfirmasi Kata Sandi Baru</label>
+                    <input id="update_password_password_confirmation" type="password" wire:model="password_confirmation"
+                        name="password_confirmation" required autocomplete="new-password" class="prim-input"
+                        placeholder="Ulangi kata sandi baru">
+                    @error('password_confirmation') <p class="mt-2 text-sm text-status-cancel-fg">{{ $message }}</p> @enderror
+                </div>
+            </div>
+
+            <div class="mt-6 flex flex-wrap items-center gap-3 border-t border-line-soft pt-5">
+                <button type="submit" class="prim-btn px-7" wire:loading.attr="disabled">
+                    <span wire:loading.remove>Simpan Kata Sandi</span>
+                    <span wire:loading>Menyimpan…</span>
+                </button>
+
+                <x-action-message class="text-sm text-status-done-fg" on="password-updated">
+                    Tersimpan.
                 </x-action-message>
             </div>
         </form>
     </x-settings.layout>
-</section>
+</div>
