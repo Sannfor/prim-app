@@ -141,7 +141,7 @@ macOS / Linux:
   php artisan migrate:fresh --seed
 
 Perintah ini membuat seluruh tabel lalu mengisinya dengan 27 layanan, 18 akun,
-20 transaksi, dan kredensial kode login.
+20 transaksi, kredensial kode login, dan 4 kode voucher.
 
 PERINGATAN: "migrate:fresh" menghapus seluruh isi basis data. Pada pemasangan
 pertama ini tidak masalah karena basis datanya masih kosong. Jangan dijalankan
@@ -231,7 +231,7 @@ pengelola:
      ATAU langsung buka http://127.0.0.1:8000/admin
 
   Di panel pengelola tersedia menu: Dashboard, Pesanan, Pengguna, Produk,
-  Pembayaran, Laporan, dan Pengaturan.
+  Pembayaran, Voucher, Laporan, dan Pengaturan.
 
 --- 7.2 Masuk sebagai Pelanggan ----------------------------------------------
 
@@ -258,6 +258,59 @@ pengelola:
 
 Tidak ada halaman login terpisah untuk admin. Peran akun yang menentukan akses;
 akun dengan peran Administrator otomatis melihat menu "Panel Pengelola".
+
+
+================================================================================
+7A. KODE VOUCHER YANG TERSEDIA
+================================================================================
+
+Saat menjalankan "php artisan migrate --seed", sistem membuat empat kode promo
+yang bisa langsung dicoba pada halaman konfirmasi pemesanan.
+
+  KODE          POTONGAN       SYARAT
+  HEMAT20       20%            maksimal potongan Rp50.000
+  NEWMEMBER     15%            maksimal potongan Rp30.000
+  POTONGAN10K   Rp10.000       tanpa minimum belanja
+  PRIM50K       Rp50.000       minimum belanja Rp150.000
+
+--- Cara mencoba voucher -----------------------------------------------------
+
+  1. Masuk sebagai pelanggan, mis. andi@prim.test
+  2. Buka salah satu layanan di katalog, lalu klik "Berlangganan"
+  3. Pada halaman "Konfirmasi Pemesanan", gulir ke bagian "Kode Voucher"
+  4. Ketik HEMAT20 (atau klik tombol "Isi" pada daftar voucher yang berlaku)
+  5. Klik "Pakai Voucher" — potongan langsung muncul di Ringkasan Biaya
+  6. Klik "Buat Pesanan", lalu selesaikan pembayaran
+
+--- Mencoba tanpa koneksi pembayaran -----------------------------------------
+
+  Aplikasi berjalan dalam MODE SIMULASI, sehingga seluruh alur pembayaran dapat
+  didemonstrasikan tanpa akun Midtrans:
+
+  1. Buka pesanan yang masih "Menunggu Pembayaran"
+  2. Pilih metode pembayaran (QRIS, Dana, GoPay, OVO, ShopeePay, VA Bank, atau
+     gerai retail)
+  3. Klik "Simulasikan Berhasil" atau "Simulasikan Gagal"
+  4. Bila berhasil, Anda diarahkan ke STRUK DIGITAL yang bisa dicetak atau
+     disimpan sebagai PDF lewat dialog cetak peramban
+
+  Untuk mengaktifkan pembayaran daring sungguhan, isi berkas .env:
+
+     MIDTRANS_MODE=snap
+     MIDTRANS_SERVER_KEY=SB-Mid-server-xxxxxxxxxxxx
+     MIDTRANS_CLIENT_KEY=SB-Mid-client-xxxxxxxxxxxx
+
+  Lalu daftarkan alamat notifikasi di dashboard Midtrans:
+     http://domain-anda/midtrans/notification
+
+--- Mengelola voucher sebagai administrator ----------------------------------
+
+  1. Masuk sebagai admin@prim.com, buka menu "Voucher"
+  2. Klik "Tambah Voucher" untuk membuat kode baru
+  3. Atur jenis potongan (persentase atau nominal), minimum belanja, batas
+     kuota, batas pemakaian per pengguna, dan tanggal berakhir
+  4. Voucher yang sudah pernah dipakai tidak dapat dihapus, melainkan hanya
+     dinonaktifkan, agar riwayat pada transaksi lama tetap utuh
 
 
 ================================================================================
