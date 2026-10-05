@@ -59,30 +59,44 @@
 
                 {{-- Pratinjau pesan yang akan terkirim --}}
                 <div class="mx-auto w-full max-w-md">
-                    <div class="rounded-2xl bg-white p-5 shadow-brand-sm">
-                        <div class="flex items-center gap-3 border-b border-line-soft pb-3">
-                            <span class="flex size-9 items-center justify-center rounded-full bg-status-done-bg text-status-done-fg">
-                                <flux:icon.chat-bubble-oval-left class="size-5" />
+                    <div class="overflow-hidden rounded-2xl bg-white shadow-brand-sm">
+                        {{-- Kepala bergaya aplikasi pesan, memakai identitas resmi PRIM --}}
+                        <div class="flex items-center gap-3 bg-brand px-4 py-3">
+                            <span class="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white p-1">
+                                <x-brand-logo size="sm" />
                             </span>
-                            <div>
-                                <p class="font-display text-sm font-semibold text-ink-strong">Prim</p>
-                                <p class="text-xs text-status-done-fg">online</p>
+
+                            <div class="min-w-0 flex-1">
+                                <p class="truncate text-sm font-semibold text-white">PRIM Official</p>
+                                <p class="flex items-center gap-1.5 text-[11px] text-white/80">
+                                    <span class="size-1.5 rounded-full bg-status-done-bg"></span>
+                                    Online · biasanya membalas dalam 5 menit
+                                </p>
                             </div>
+
+                            <flux:icon.chat-bubble-left-right class="size-5 shrink-0 text-white/80" />
                         </div>
 
-                        <div class="mt-4 rounded-xl rounded-tl-none bg-[#dcf8c6] p-3.5 text-[13px] leading-relaxed whitespace-pre-line text-ink-strong">
+                        <div class="flex items-center justify-center bg-canvas px-4 py-2">
+                            <p class="rounded-full bg-white px-3 py-1 text-[10px] text-muted">Hari ini</p>
+                        </div>
+
+                        <div class="px-4 pt-2 pb-4">
+                            <div class="max-w-[92%] rounded-2xl rounded-tl-sm bg-[#d9fdd3] p-3.5 text-[13px] leading-relaxed whitespace-pre-line text-ink-strong shadow-brand-xs">
 {{ $message }}
-                        </div>
+                                <span class="mt-1.5 block text-right text-[10px] text-muted">belum terkirim</span>
+                            </div>
 
-                        <a
-                            href="{{ $waLink }}"
-                            target="_blank"
-                            rel="noopener"
-                            class="prim-btn prim-btn-block mt-4 gap-2"
-                        >
-                            <flux:icon.arrow-top-right-on-square class="size-4" />
-                            Continue to WhatsApp Web
-                        </a>
+                            <a
+                                href="{{ $waLink }}"
+                                target="_blank"
+                                rel="noopener"
+                                class="prim-btn prim-btn-block mt-4 gap-2"
+                            >
+                                <flux:icon.arrow-top-right-on-square class="size-4" />
+                                Lanjutkan ke WhatsApp
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>

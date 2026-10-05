@@ -269,6 +269,65 @@
         color: #ffffff;
     }
 
+    /*
+     | Paginasi Laravel.
+     |
+     | Bawaan Laravel memakai tombol berwarna gelap yang bertabrakan dengan tema
+     | terang PRIM. Seluruh halaman yang memakai paginasi (katalog, pesanan,
+     | pengguna, dan transaksi) dibungkus elemen nav dengan peran navigasi.
+     */
+    nav[role='navigation'] {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+    }
+
+    nav[role='navigation'] p {
+        font-size: 0.8125rem;
+        color: var(--color-muted);
+        margin: 0;
+    }
+
+    nav[role='navigation'] span[aria-current='page'] > span,
+    nav[role='navigation'] a {
+        display: inline-flex;
+        min-width: 2.25rem;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.5rem;
+        border: 1px solid var(--color-line-soft);
+        background-color: #ffffff;
+        padding: 0.375rem 0.625rem;
+        font-size: 0.8125rem;
+        color: var(--color-ink);
+        transition: all 0.15s ease;
+    }
+
+    nav[role='navigation'] a:hover {
+        border-color: var(--color-brand);
+        color: var(--color-brand);
+    }
+
+    nav[role='navigation'] span[aria-current='page'] > span {
+        border-color: var(--color-brand);
+        background-color: var(--color-brand);
+        color: #ffffff;
+    }
+
+    nav[role='navigation'] span[aria-disabled='true'] > span {
+        color: var(--color-muted-2);
+        border-color: var(--color-line-soft);
+        background-color: var(--color-canvas);
+    }
+
+    /* Pemisah halaman (…) tidak perlu kotak */
+    nav[role='navigation'] span[aria-disabled='true'] > span:only-child {
+        border: none;
+        background: none;
+    }
+
     /* Baris tabel admin */
     .prim-table-head {
         border-bottom: 1px solid var(--color-line-soft);
