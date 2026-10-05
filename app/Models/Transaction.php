@@ -34,11 +34,18 @@ class Transaction extends Model
         'order_code',
         'user_id',
         'plan_id',
+        'voucher_id',
+        'subtotal_amount',
+        'discount_amount',
         'amount',
         'status',
         'payment_method',
         'payment_method_label',
+        'payment_reference',
+        'payment_token',
+        'payment_url',
         'paid_at',
+        'paid_confirmed_at',
         'expires_at',
         'notes',
     ];
@@ -46,9 +53,12 @@ class Transaction extends Model
     protected function casts(): array
     {
         return [
+            'subtotal_amount' => 'integer',
+            'discount_amount' => 'integer',
             'amount' => 'integer',
             'status' => TransactionStatusCast::class,
             'paid_at' => 'datetime',
+            'paid_confirmed_at' => 'datetime',
             'expires_at' => 'datetime',
         ];
     }
@@ -104,6 +114,43 @@ class Transaction extends Model
     public function plan(): BelongsTo
     {
         return $this->belongsTo(Plan::class);
+    }
+
+    /**
+     * Voucher yang dipakai pada pesanan ini, bila ada.
+     *
+     * @return BelongsTo<Voucher, $this>
+     */
+    public function voucher(): BelongsTo
+    {
+        return $this->belongsTo(Voucher::class);
+    }
+
+    /**
+     * Harga paket sebelum potongan voucher.
+     *
+     * Transaksi lama yang belum memiliki subtotal_amount memakai nilai amount,
+     * sehingga rincian tetap benar tanpa perlu mengisi ulang data lama.
+     */
+    public function subtotal(): int
+    {
+        return $this->subtotal_amount > 0 ? $this->subtotal_amount : (int) $this->amount;
+    }
+
+    /**
+     * Potongan dalam rupiah.
+     */
+    public function discount(): int
+    {
+        return (int) $this->discount_amount;
+    }
+
+    /**
+     * Apakah pesanan ini memakai voucher.
+     */
+    public function hasDiscount(): bool
+    {
+        return $this->discount() > 0;
     }
 
     /**
@@ -181,5 +228,36 @@ class Transaction extends Model
     public function isPayable(): bool
     {
         return $this->status === TransactionStatus::Pending && ! $this->hasExpired();
+    }
+
+    /**
+     * Sisa waktu pembayaran dalam bentuk yang mudah dibaca, mis. "5 jam 12 menit".
+     *
+     * Mengembalikan null bila batas waktu belum ditetapkan atau sudah lewat.
+     * Dipakai untuk menampilkan hitung mundur pada kartu pesanan.
+     */
+    public function remainingPaymentTime(): ?string
+    {
+        if ($this->expires_at === null || $this->hasExpired()) {
+            return null;
+        }
+
+        return $this->expires_at->diffForHumans(now(), [
+            'syntax' => \Carbon\CarbonInterface::DIFF_ABSOLUTE,
+            'parts' => 2,
+            'short' => false,
+        ]);
+    }
+
+    /**
+     * Sisa waktu pembayaran dalam jam, dibulatkan ke bawah.
+     */
+    public function remainingPaymentHours(): ?int
+    {
+        if ($this->expires_at === null || $this->hasExpired()) {
+            return null;
+        }
+
+        return (int) floor(now()->diffInHours($this->expires_at));
     }
 }

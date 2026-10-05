@@ -17,6 +17,7 @@
         ['route' => 'admin.users.index', 'label' => 'Pengguna', 'icon' => 'users', 'active' => ['admin.users.*']],
         ['route' => 'admin.services.index', 'label' => 'Produk', 'icon' => 'cube', 'active' => ['admin.services.*', 'admin.plans.*']],
         ['route' => 'admin.payments.index', 'label' => 'Pembayaran', 'icon' => 'credit-card', 'active' => ['admin.payments.*']],
+        ['route' => 'admin.vouchers.index', 'label' => 'Voucher', 'icon' => 'ticket', 'active' => ['admin.vouchers.*']],
         ['route' => 'admin.reports.index', 'label' => 'Laporan', 'icon' => 'document-chart-bar', 'active' => ['admin.reports.*']],
     ];
 @endphp

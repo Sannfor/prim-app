@@ -10,6 +10,7 @@ use App\Models\Transaction;
 use App\Models\User;
 use App\Services\Payment\PaymentGateway;
 use App\Services\Payment\PaymentResult;
+use App\Services\VoucherService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -21,23 +22,77 @@ use Illuminate\Support\Facades\DB;
  */
 class TransactionService
 {
-    public function __construct(private readonly PaymentGateway $gateway) {}
+    public function __construct(
+        private readonly PaymentGateway $gateway,
+        private readonly VoucherService $vouchers,
+    ) {}
 
     /**
      * Buat transaksi baru berstatus menunggu pembayaran.
      *
+     * Bila kode voucher diberikan dan memenuhi syarat, potongannya langsung
+     * disimpan pada transaksi dan pemakaiannya dicatat agar kuota berkurang.
+     * Kode yang tidak valid diabaikan, bukan menggagalkan pemesanan.
+     *
      * @param  string|null  $paymentMethod  Metode bayar yang dipilih, bila sudah ditentukan.
+     * @param  string|null  $voucherCode  Kode voucher yang ingin dipakai pembeli.
      */
-    public function checkout(User $user, Plan $plan, ?string $paymentMethod = null): Transaction
+    public function checkout(User $user, Plan $plan, ?string $paymentMethod = null, ?string $voucherCode = null): Transaction
     {
-        return Transaction::create([
+        $subtotal = (int) $plan->price;
+        $potongan = 0;
+        $voucher = null;
+
+        if (filled($voucherCode)) {
+            $hasil = $this->vouchers->periksa($voucherCode, $user, $plan);
+
+            if ($hasil['valid']) {
+                $voucher = $hasil['voucher'];
+                $potongan = $hasil['discount'];
+            }
+        }
+
+        $transaksi = Transaction::create([
             'user_id' => $user->id,
             'plan_id' => $plan->id,
-            'amount' => $plan->price,
+            'voucher_id' => $voucher?->id,
+            'subtotal_amount' => $subtotal,
+            'discount_amount' => $potongan,
+            'amount' => $subtotal - $potongan,
             'status' => TransactionStatus::Pending,
             'payment_method' => $paymentMethod,
             'expires_at' => now()->addHours(Transaction::PAYMENT_WINDOW_HOURS),
         ]);
+
+        if ($voucher !== null && $potongan > 0) {
+            $this->vouchers->catatPemakaian($voucher, $user, $transaksi->id, $potongan);
+        }
+
+        return $transaksi;
+    }
+
+    /**
+     * Batalkan pesanan yang belum dibayar dan lepas pemakaian vouchernya.
+     *
+     * Hanya transaksi yang masih menunggu pembayaran yang dapat dibatalkan,
+     * sehingga pesanan yang sudah lunas tidak hilang begitu saja.
+     */
+    public function batalkan(Transaction $transaction): bool
+    {
+        if (! $transaction->isPayable()) {
+            return false;
+        }
+
+        $transaction->forceFill([
+            'status' => TransactionStatus::Cancelled,
+            'notes' => 'Pesanan dibatalkan oleh pembeli sebelum dibayar.',
+            'payment_token' => null,
+            'payment_url' => null,
+        ])->save();
+
+        $this->vouchers->lepasPemakaian($transaction->id);
+
+        return true;
     }
 
     /**

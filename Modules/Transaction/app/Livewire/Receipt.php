@@ -29,7 +29,7 @@ class Receipt extends Component
             'Struk ini bukan milik Anda.'
         );
 
-        $this->order = $order->load(['user', 'plan.service.provider', 'subscription']);
+        $this->order = $order->load(['user', 'plan.service.provider', 'subscription', 'voucher']);
     }
 
     public function render(): View

@@ -2,6 +2,8 @@
 
 use App\Enums\TransactionStatus;
 use App\Models\Transaction;
+use App\Services\TransactionService;
+use Flux\Flux;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
@@ -53,6 +55,27 @@ new #[Layout('layouts::account')] #[Title('Pesanan Saya')] class extends Compone
         }
 
         return $counts;
+    }
+
+    /**
+     * Batalkan pesanan yang belum dibayar.
+     *
+     * Pemakaian voucher yang menempel pada pesanan ini dilepas kembali, sehingga
+     * kuotanya tidak terbuang karena pesanan yang batal.
+     */
+    public function batalkan(int $transactionId, TransactionService $transactions): void
+    {
+        $transaction = Transaction::query()->whereKey($transactionId)->firstOrFail();
+
+        $this->authorize('view', $transaction);
+
+        if ($transactions->batalkan($transaction)) {
+            Flux::toast(variant: 'success', text: 'Pesanan '.$transaction->order_code.' dibatalkan.');
+        } else {
+            Flux::toast(variant: 'danger', text: 'Pesanan ini tidak dapat dibatalkan lagi.');
+        }
+
+        $this->resetPage();
     }
 
     public function render(): \Illuminate\Contracts\View\View
@@ -183,6 +206,15 @@ new #[Layout('layouts::account')] #[Title('Pesanan Saya')] class extends Compone
                     </div>
                 </dl>
 
+                @if ($transaction->hasDiscount())
+                    <p class="mt-3 flex items-center gap-1.5 text-xs text-status-done-fg">
+                        <flux:icon.ticket class="size-4" />
+                        Voucher {{ $transaction->voucher?->code ?? 'diskon' }} memotong
+                        Rp{{ number_format($transaction->discount(), 0, ',', '.') }}
+                        dari Rp{{ number_format($transaction->subtotal(), 0, ',', '.') }}
+                    </p>
+                @endif
+
                 <div class="mt-4 flex flex-wrap items-center gap-2">
                     @if ($transaction->isPayable())
                         <a
@@ -203,15 +235,61 @@ new #[Layout('layouts::account')] #[Title('Pesanan Saya')] class extends Compone
                         Lihat Rincian
                     </a>
 
+                    @if ($transaction->status->isSuccessful())
+                        <a
+                            href="{{ route('transaction.receipt', $transaction->order_code) }}"
+                            class="prim-btn-ghost h-9 text-sm"
+                            wire:navigate
+                        >
+                            <flux:icon.printer class="size-4" />
+                            Cetak Struk
+                        </a>
+                    @endif
+
                     @if ($credential)
                         <a href="{{ route('profile.login-code') }}" class="text-sm font-medium text-brand hover:underline" wire:navigate>
                             Kode Login Tersedia
                         </a>
                     @endif
 
+                    {{-- Pesan ulang untuk pesanan yang gagal, batal, atau kedaluwarsa --}}
+                    @if ($transaction->status->isFinal() && ! $transaction->status->isSuccessful())
+                        <a
+                            href="{{ route('transaction.checkout', $transaction->plan_id) }}"
+                            class="prim-btn-ghost h-9 text-sm"
+                            wire:navigate
+                        >
+                            <flux:icon.arrow-path class="size-4" />
+                            Pesan Ulang
+                        </a>
+                    @endif
+
                     @if ($transaction->isPayable())
-                        <span class="text-xs text-status-wait-fg">
-                            Bayar sebelum {{ $transaction->expires_at?->translatedFormat('d M Y, H:i') }}
+                        <button
+                            type="button"
+                            wire:click="batalkan({{ $transaction->id }})"
+                            wire:confirm="Batalkan pesanan {{ $transaction->order_code }}? Voucher yang dipakai akan dikembalikan."
+                            class="ml-auto inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-sm text-status-cancel-fg transition hover:bg-status-cancel-bg"
+                        >
+                            <flux:icon.x-circle class="size-4" />
+                            Batalkan
+                        </button>
+                    @endif
+
+                    @if ($transaction->isPayable())
+                        <span @class([
+                            'text-xs',
+                            'text-status-wait-fg' => ($transaction->remainingPaymentHours() ?? 0) > 3,
+                            'font-medium text-status-cancel-fg' => ($transaction->remainingPaymentHours() ?? 0) <= 3,
+                        ])>
+                            <flux:icon.clock class="mr-0.5 inline size-3.5" />
+                            Bayar dalam {{ $transaction->remainingPaymentTime() }}
+                        </span>
+                    @endif
+
+                    @if ($transaction->hasExpired() && $transaction->status === \App\Enums\TransactionStatus::Pending)
+                        <span class="text-xs font-medium text-status-cancel-fg">
+                            Batas pembayaran sudah lewat — pesanan akan ditandai kedaluwarsa
                         </span>
                     @endif
                 </div>

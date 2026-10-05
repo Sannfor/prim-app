@@ -167,6 +167,95 @@
         @enderror
     </section>
 
+    {{-- Voucher --}}
+    <section class="rounded-xl bg-white p-6 shadow-brand-xs">
+        <h2 class="font-display text-base font-semibold text-ink-strong">Kode Voucher</h2>
+        <p class="mt-1 text-xs text-muted">Punya kode promo? Masukkan di sini untuk mendapat potongan.</p>
+
+        @if ($appliedVoucher)
+            {{-- Voucher sudah diterapkan --}}
+            <div class="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-status-done-bg p-4">
+                <div class="flex items-start gap-3">
+                    <flux:icon.ticket class="mt-0.5 size-5 shrink-0 text-status-done-fg" />
+
+                    <div>
+                        <p class="font-mono text-sm font-semibold text-status-done-fg">{{ $appliedVoucher }}</p>
+                        <p class="mt-0.5 text-xs text-ink">
+                            Kamu hemat <strong>Rp{{ number_format($appliedDiscount, 0, ',', '.') }}</strong>
+                            dari harga paket.
+                        </p>
+                    </div>
+                </div>
+
+                <button type="button" wire:click="hapusVoucher" class="prim-btn-ghost h-9 text-sm">
+                    <flux:icon.x-mark class="size-4" />
+                    Hapus
+                </button>
+            </div>
+        @else
+            {{-- Formulir kode voucher --}}
+            <div class="mt-4 flex flex-col gap-2 sm:flex-row">
+                <input
+                    type="text"
+                    wire:model="voucherCode"
+                    wire:keydown.enter="terapkanVoucher"
+                    placeholder="Contoh: HEMAT20"
+                    class="prim-input font-mono uppercase sm:flex-1"
+                    autocomplete="off"
+                >
+
+                <button type="button" wire:click="terapkanVoucher" class="prim-btn h-11 sm:w-auto" wire:loading.attr="disabled">
+                    <flux:icon.check class="size-4" wire:loading.remove />
+                    <span wire:loading.remove>Pakai Voucher</span>
+                    <span wire:loading>Memeriksa…</span>
+                </button>
+            </div>
+        @endif
+
+        @if ($voucherMessage !== '')
+            <p @class([
+                'mt-3 flex items-start gap-2 text-sm',
+                'text-status-done-fg' => $voucherValid,
+                'text-status-cancel-fg' => ! $voucherValid,
+            ])>
+                <flux:icon :name="$voucherValid ? 'check-circle' : 'exclamation-circle'" class="mt-0.5 size-4 shrink-0" />
+                {{ $voucherMessage }}
+            </p>
+        @endif
+
+        {{-- Daftar voucher yang sedang berlaku, sebagai bantuan demonstrasi --}}
+        @if ($voucherTersedia->isNotEmpty())
+            <div class="mt-4 border-t border-line-soft pt-4">
+                <p class="text-xs tracking-wide text-muted uppercase">Voucher yang berlaku</p>
+
+                <div class="mt-2 space-y-2">
+                    @foreach ($voucherTersedia as $promo)
+                        <div class="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-canvas px-3 py-2">
+                            <div class="min-w-0">
+                                <p class="font-mono text-xs font-semibold text-ink-strong">{{ $promo->code }}</p>
+                                <p class="truncate text-[11px] text-muted">{{ $promo->description }}</p>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <span class="prim-badge bg-brand-soft text-brand">{{ $promo->valueLabel() }}</span>
+
+                                @if (! $appliedVoucher)
+                                    <button
+                                        type="button"
+                                        wire:click="$set('voucherCode', '{{ $promo->code }}')"
+                                        class="text-xs font-medium text-brand hover:underline"
+                                    >
+                                        Isi
+                                    </button>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+    </section>
+
     {{-- Ringkasan biaya --}}
     <section class="rounded-xl bg-white p-6 shadow-brand-xs">
         <h2 class="font-display text-base font-semibold text-ink-strong">Ringkasan Biaya</h2>
@@ -179,9 +268,9 @@
 
             @if ($plan->discount_percent > 0)
                 <div class="flex justify-between gap-4">
-                    <dt class="text-muted">Diskon {{ $plan->discount_percent }}%</dt>
+                    <dt class="text-muted">Diskon paket {{ $plan->discount_percent }}%</dt>
                     <dd class="text-status-done-fg">
-                        − {{ $plan->compare_at_price ? 'Rp'.number_format($plan->compare_at_price - $plan->price, 0, ',', '.') : $plan->discount_percent.'%' }}
+                        sudah termasuk pada harga
                     </dd>
                 </div>
             @endif
@@ -191,9 +280,23 @@
                 <dd class="text-ink">Rp0</dd>
             </div>
 
+            @if ($appliedDiscount > 0)
+                <div class="flex justify-between gap-4">
+                    <dt class="flex items-center gap-1.5 text-muted">
+                        <flux:icon.ticket class="size-4 text-status-done-fg" />
+                        Voucher {{ $appliedVoucher }}
+                    </dt>
+                    <dd class="font-medium text-status-done-fg">
+                        − Rp{{ number_format($appliedDiscount, 0, ',', '.') }}
+                    </dd>
+                </div>
+            @endif
+
             <div class="flex items-center justify-between gap-4 border-t border-line-soft pt-3">
                 <dt class="font-display text-base font-bold text-ink-strong">Total Pembayaran</dt>
-                <dd class="font-display text-lg font-bold text-brand">{{ $plan->formattedPrice() }}</dd>
+                <dd class="font-display text-lg font-bold text-brand">
+                    Rp{{ number_format(max(0, $plan->price - $appliedDiscount), 0, ',', '.') }}
+                </dd>
             </div>
         </dl>
 

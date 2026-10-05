@@ -26,11 +26,25 @@
     {{-- Bagian pembayaran --}}
     @if ($isPayable)
         <section class="rounded-xl bg-brand-soft p-5">
-            <h2 class="font-display text-base font-semibold text-brand">Selesaikan Pembayaran</h2>
-            <p class="mt-1 text-sm text-ink">
-                Bayar sebesar <strong>{{ $transaction->formattedAmount() }}</strong> sebelum
-                {{ $transaction->expires_at?->translatedFormat('d F Y, H:i') }} WITA.
-            </p>
+            <div class="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                    <h2 class="font-display text-base font-semibold text-brand">Selesaikan Pembayaran</h2>
+                    <p class="mt-1 text-sm text-ink">
+                        Bayar sebesar <strong>{{ $transaction->formattedAmount() }}</strong>
+                        sebelum {{ $transaction->expires_at?->translatedFormat('d F Y, H:i') }} WITA.
+                    </p>
+                </div>
+
+                {{-- Hitung mundur: ditegaskan bila waktunya tinggal sedikit --}}
+                <span @class([
+                    'prim-badge',
+                    'bg-status-wait-bg text-status-wait-fg' => ($transaction->remainingPaymentHours() ?? 0) > 3,
+                    'bg-status-cancel-bg text-status-cancel-fg font-medium' => ($transaction->remainingPaymentHours() ?? 0) <= 3,
+                ])>
+                    <flux:icon.clock class="mr-1 size-3.5" />
+                    Sisa {{ $transaction->remainingPaymentTime() }}
+                </span>
+            </div>
 
             {{-- Pemilih metode pembayaran --}}
             <div class="mt-5">
@@ -124,13 +138,22 @@
         </section>
     @elseif ($hasExpired)
         <section class="rounded-xl bg-white p-5 shadow-brand-xs">
-            <h2 class="font-display text-base font-semibold text-status-cancel-fg">Pesanan Sudah Kedaluwarsa</h2>
+            <h2 class="font-display text-base font-semibold text-status-cancel-fg">Batas Pembayaran Sudah Lewat</h2>
             <p class="mt-1 text-sm text-muted">
-                Batas waktu pembayaran telah terlewat. Silakan buat pesanan baru untuk paket ini.
+                Pesanan ini melewati batas waktu pembayaran
+                {{ $transaction->expires_at?->translatedFormat('d F Y, H:i') }} WITA,
+                sehingga tidak dapat dilanjutkan lagi. Silakan buat pesanan baru untuk paket ini.
             </p>
-            <a href="{{ route('transaction.checkout', $transaction->plan_id) }}" class="prim-btn mt-4" wire:navigate>
-                Pesan Ulang
-            </a>
+
+            <div class="mt-4 flex flex-wrap gap-2">
+                <a href="{{ route('transaction.checkout', $transaction->plan_id) }}" class="prim-btn" wire:navigate>
+                    <flux:icon.arrow-path class="size-4" />
+                    Pesan Ulang
+                </a>
+                <a href="{{ route('catalog.index') }}" class="prim-btn-ghost h-10" wire:navigate>
+                    Jelajahi Katalog
+                </a>
+            </div>
         </section>
     @elseif ($transaction->status->isSuccessful())
         <section class="rounded-xl bg-status-done-bg p-5">
@@ -200,6 +223,22 @@
                     <dd class="text-right font-mono text-xs text-ink">{{ $transaction->payment_reference }}</dd>
                 </div>
             @endif
+            @if ($transaction->hasDiscount())
+                <div class="flex justify-between gap-4">
+                    <dt class="text-muted">Harga paket</dt>
+                    <dd class="text-right text-ink">Rp{{ number_format($transaction->subtotal(), 0, ',', '.') }}</dd>
+                </div>
+                <div class="flex justify-between gap-4">
+                    <dt class="flex items-center gap-1.5 text-muted">
+                        <flux:icon.ticket class="size-4 text-status-done-fg" />
+                        Voucher {{ $transaction->voucher?->code ?? 'diskon' }}
+                    </dt>
+                    <dd class="text-right font-medium text-status-done-fg">
+                        − Rp{{ number_format($transaction->discount(), 0, ',', '.') }}
+                    </dd>
+                </div>
+            @endif
+
             <div class="flex justify-between gap-4">
                 <dt class="text-muted">Dibuat pada</dt>
                 <dd class="text-right text-ink">{{ $transaction->created_at->translatedFormat('d F Y, H:i') }} WITA</dd>

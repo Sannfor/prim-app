@@ -104,12 +104,24 @@
                 <tfoot>
                     <tr>
                         <td class="pt-3 text-xs text-muted">Subtotal</td>
-                        <td class="pt-3 text-right text-ink">{{ $order->formattedAmount() }}</td>
+                        <td class="pt-3 text-right text-ink">Rp{{ number_format($order->subtotal(), 0, ',', '.') }}</td>
                     </tr>
                     <tr>
                         <td class="pt-1 text-xs text-muted">Biaya layanan</td>
                         <td class="pt-1 text-right text-ink">Rp0</td>
                     </tr>
+
+                    @if ($order->hasDiscount())
+                        <tr>
+                            <td class="pt-1 text-xs text-muted">
+                                Voucher {{ $order->voucher?->code ?? 'diskon' }}
+                            </td>
+                            <td class="pt-1 text-right text-status-done-fg">
+                                − Rp{{ number_format($order->discount(), 0, ',', '.') }}
+                            </td>
+                        </tr>
+                    @endif
+
                     <tr class="border-t border-line-soft">
                         <td class="pt-3 font-display text-sm font-bold text-ink-strong">Total Dibayar</td>
                         <td class="pt-3 text-right font-display text-base font-bold text-brand">

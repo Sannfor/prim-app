@@ -3,7 +3,9 @@
 namespace Modules\Transaction\Livewire;
 
 use App\Models\Plan;
+use App\Models\Voucher;
 use App\Services\TransactionService;
+use App\Services\VoucherService;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -26,6 +28,32 @@ class Checkout extends Component
      * Kode metode pembayaran yang dipilih.
      */
     public string $paymentMethod = '';
+
+    /**
+     * Kode voucher yang sedang diketik pengguna.
+     */
+    public string $voucherCode = '';
+
+    /**
+     * Kode voucher yang sudah diterapkan. Disimpan sebagai kode, bukan sebagai
+     * model, agar keadaan komponen tetap dapat dipulihkan pada setiap permintaan.
+     */
+    public ?string $appliedVoucher = null;
+
+    /**
+     * Potongan yang dihasilkan voucher terpilih, dalam rupiah.
+     */
+    public int $appliedDiscount = 0;
+
+    /**
+     * Pesan hasil pemeriksaan voucher.
+     */
+    public string $voucherMessage = '';
+
+    /**
+     * Apakah pesan voucher menunjukkan keberhasilan.
+     */
+    public bool $voucherValid = false;
 
     /**
      * Muat paket dari segmen URL dan sediakan metode pembayaran bawaan.
@@ -83,6 +111,40 @@ class Checkout extends Component
     }
 
     /**
+     * Periksa dan terapkan kode voucher yang diketik pengguna.
+     */
+    public function terapkanVoucher(VoucherService $vouchers): void
+    {
+        $this->resetErrorBag('voucherCode');
+
+        $hasil = $vouchers->periksa($this->voucherCode, auth()->user(), $this->plan());
+
+        $this->voucherValid = $hasil['valid'];
+        $this->voucherMessage = $hasil['message'];
+
+        if ($hasil['valid']) {
+            $this->appliedVoucher = $hasil['voucher']->code;
+            $this->appliedDiscount = $hasil['discount'];
+            $this->voucherCode = $hasil['voucher']->code;
+        } else {
+            $this->appliedVoucher = null;
+            $this->appliedDiscount = 0;
+        }
+    }
+
+    /**
+     * Batalkan voucher yang sudah diterapkan.
+     */
+    public function hapusVoucher(): void
+    {
+        $this->appliedVoucher = null;
+        $this->appliedDiscount = 0;
+        $this->voucherCode = '';
+        $this->voucherMessage = '';
+        $this->voucherValid = false;
+    }
+
+    /**
      * Buat transaksi dan arahkan pengguna ke halaman pembayaran.
      */
     public function checkout(TransactionService $transactions)
@@ -98,7 +160,8 @@ class Checkout extends Component
         $transaction = $transactions->checkout(
             auth()->user(),
             $plan,
-            $this->paymentMethod
+            $this->paymentMethod,
+            $this->appliedVoucher,
         );
 
         return redirect()->route('transaction.show', $transaction->order_code);
@@ -134,6 +197,12 @@ class Checkout extends Component
             'methods' => $transactions->gateway()->methods(),
             'gatewayName' => $transactions->gateway()->name(),
             'activeSubscription' => $activeSubscription,
+            'voucherTersedia' => Voucher::query()
+                ->where('is_active', true)
+                ->where(fn ($q) => $q->whereNull('expires_at')->orWhere('expires_at', '>', now()))
+                ->orderBy('code')
+                ->take(4)
+                ->get(),
         ]);
     }
 }

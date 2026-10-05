@@ -63,7 +63,7 @@ class TransactionDetail extends Component
     {
         $transaction = Transaction::query()
             ->where('order_code', $this->orderCode)
-            ->with(['plan.service.provider', 'plan.service.category', 'subscription'])
+            ->with(['plan.service.provider', 'plan.service.category', 'subscription', 'voucher'])
             ->firstOrFail();
 
         $this->authorize('view', $transaction);

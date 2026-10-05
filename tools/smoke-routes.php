@@ -36,7 +36,7 @@ $kelompok = [
         '/admin', '/admin/pesanan', '/admin/pembayaran', '/admin/pengguna',
         '/admin/produk', '/admin/laporan',
         '/admin/pengaturan/profil', '/admin/pengaturan/notifikasi',
-        '/admin/kategori', '/admin/penyedia',
+        '/admin/kategori', '/admin/penyedia', '/admin/voucher',
     ]],
 ];
 

@@ -36,6 +36,9 @@ Route::middleware(['auth', 'verified', 'role:admin'])
         Route::livewire('kategori', 'admin::category-manager')->name('categories.index');
         Route::livewire('penyedia', 'admin::provider-manager')->name('providers.index');
 
+        // Kode promo.
+        Route::livewire('voucher', 'admin::voucher-manager')->name('vouchers.index');
+
         // Laporan & pengaturan.
         Route::livewire('laporan', 'admin::report')->name('reports.index');
         Route::livewire('pengaturan/profil', 'admin::settings-profile')->name('settings.profile');
