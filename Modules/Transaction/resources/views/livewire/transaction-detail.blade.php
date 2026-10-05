@@ -166,6 +166,21 @@
                 @endif
             </p>
 
+            @if ($transaction->isRefunded())
+                <div class="mt-4 rounded-lg bg-white p-4">
+                    <p class="flex items-center gap-2 text-sm font-medium text-status-cancel-fg">
+                        <flux:icon.banknotes class="size-4" />
+                        Dana sudah dikembalikan {{ $transaction->formattedRefund() }}
+                    </p>
+                    <p class="mt-1 text-xs leading-relaxed text-muted">
+                        Dikembalikan pada {{ $transaction->refunded_at->translatedFormat('d F Y, H:i') }} WITA.
+                        @if ($transaction->refund_reason)
+                            Alasan: {{ $transaction->refund_reason }}
+                        @endif
+                    </p>
+                </div>
+            @endif
+
             <div class="mt-4 flex flex-wrap gap-2">
                 <a href="{{ route('transaction.receipt', $transaction->order_code) }}" class="prim-btn" wire:navigate>
                     <flux:icon.printer class="size-4" />

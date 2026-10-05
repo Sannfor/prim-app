@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Enums\SubscriptionStatus;
 use App\Models\Subscription;
+use App\Services\BuyerNotificationService;
 use App\Services\TransactionService;
 use Illuminate\Console\Command;
 
@@ -19,7 +20,7 @@ class ExpireTransactions extends Command
 
     protected $description = 'Tandai transaksi kedaluwarsa dan akhiri langganan yang sudah lewat masa aktifnya';
 
-    public function handle(TransactionService $transactions): int
+    public function handle(TransactionService $transactions, BuyerNotificationService $notifications): int
     {
         $expiredTransactions = $transactions->expireOverdueTransactions();
 
@@ -31,8 +32,12 @@ class ExpireTransactions extends Command
                 'updated_at' => now(),
             ]);
 
+        // Notifikasi lama yang sudah dibaca dibersihkan agar daftar tetap ringkas.
+        $dibersihkan = $notifications->bersihkan(hari: 30);
+
         $this->info("Transaksi ditandai kedaluwarsa: {$expiredTransactions}");
         $this->info("Langganan ditandai berakhir: {$expiredSubscriptions}");
+        $this->info("Notifikasi lama dibersihkan: {$dibersihkan}");
 
         return self::SUCCESS;
     }

@@ -144,6 +144,23 @@
             </section>
         @endif
 
+        {{-- Penanda pengembalian dana --}}
+        @if ($order->isRefunded())
+            <section class="mt-5 rounded-lg bg-status-cancel-bg px-4 py-3">
+                <p class="flex items-center gap-2 text-sm font-semibold text-status-cancel-fg">
+                    <flux:icon.banknotes class="size-4" />
+                    DANA SUDAH DIKEMBALIKAN
+                </p>
+                <p class="mt-1 text-xs leading-relaxed text-ink">
+                    Sebesar <strong>{{ $order->formattedRefund() }}</strong> pada
+                    {{ $order->refunded_at->translatedFormat('d F Y, H:i') }} WITA.
+                    @if ($order->refund_reason)
+                        Alasan: {{ $order->refund_reason }}
+                    @endif
+                </p>
+            </section>
+        @endif
+
         {{-- Catatan --}}
         @if ($order->notes)
             <section class="mt-5 border-t border-line-soft pt-5">

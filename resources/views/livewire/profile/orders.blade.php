@@ -194,7 +194,9 @@ new #[Layout('layouts::account')] #[Title('Pesanan Saya')] class extends Compone
                 <dl class="mt-4 grid gap-3 border-t border-line-soft pt-4 text-xs sm:grid-cols-3">
                     <div>
                         <dt class="text-muted">Metode pembayaran</dt>
-                        <dd class="mt-0.5 text-ink">{{ $transaction->paymentLabel() }}</dd>
+                        <dd class="mt-0.5 text-ink">
+                            {{ $transaction->payment_method ? $transaction->paymentLabel() : 'Belum dipilih' }}
+                        </dd>
                     </div>
                     <div>
                         <dt class="text-muted">Masa aktif</dt>

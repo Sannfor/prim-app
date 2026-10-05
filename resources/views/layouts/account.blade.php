@@ -70,6 +70,9 @@
                     </a>
                 @endif
 
+                {{-- Lonceng notifikasi pembeli --}}
+                <livewire:buyer-notification-bell />
+
                 <flux:dropdown position="bottom" align="end">
                     <button type="button" class="flex items-center gap-2 rounded-full py-1 pr-2 pl-1 transition hover:bg-canvas">
                         <span class="flex size-8 items-center justify-center rounded-full bg-brand text-xs font-medium text-white">

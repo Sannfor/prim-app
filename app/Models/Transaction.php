@@ -48,6 +48,10 @@ class Transaction extends Model
         'paid_confirmed_at',
         'expires_at',
         'notes',
+        'refunded_at',
+        'refund_amount',
+        'refund_reason',
+        'refunded_by',
     ];
 
     protected function casts(): array
@@ -60,6 +64,8 @@ class Transaction extends Model
             'paid_at' => 'datetime',
             'paid_confirmed_at' => 'datetime',
             'expires_at' => 'datetime',
+            'refunded_at' => 'datetime',
+            'refund_amount' => 'integer',
         ];
     }
 
@@ -151,6 +157,22 @@ class Transaction extends Model
     public function hasDiscount(): bool
     {
         return $this->discount() > 0;
+    }
+
+    /**
+     * Apakah dana pesanan ini sudah dikembalikan.
+     */
+    public function isRefunded(): bool
+    {
+        return $this->refunded_at !== null;
+    }
+
+    /**
+     * Nominal yang dikembalikan dalam format rupiah.
+     */
+    public function formattedRefund(): string
+    {
+        return 'Rp'.Number::format((int) $this->refund_amount, locale: 'id');
     }
 
     /**

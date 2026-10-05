@@ -8,6 +8,7 @@ use App\Models\Plan;
 use App\Models\Subscription;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Services\BuyerNotificationService;
 use App\Services\Payment\PaymentGateway;
 use App\Services\Payment\PaymentResult;
 use App\Services\VoucherService;
@@ -25,6 +26,7 @@ class TransactionService
     public function __construct(
         private readonly PaymentGateway $gateway,
         private readonly VoucherService $vouchers,
+        private readonly BuyerNotificationService $notifications,
     ) {}
 
     /**
@@ -92,6 +94,8 @@ class TransactionService
 
         $this->vouchers->lepasPemakaian($transaction->id);
 
+        $this->notifications->pesananDibatalkan($transaction->fresh());
+
         return true;
     }
 
@@ -143,6 +147,12 @@ class TransactionService
             }
         });
 
+        // Notifikasi dikirim setelah transaksi tersimpan, agar pembeli tidak
+        // menerima pemberitahuan untuk transaksi yang gagal disimpan.
+        if ($result->successful) {
+            $this->notifications->pesananLunas($transaction->fresh());
+        }
+
         return $result;
     }
 
@@ -168,25 +178,41 @@ class TransactionService
             return $this->activateSubscription($transaction->fresh());
         });
 
+        $this->notifications->pesananLunas($transaction->fresh());
+
         return $subscription;
     }
 
     /**
      * Tandai transaksi pending yang sudah lewat batas waktu sebagai kedaluwarsa.
      *
+     * Pemakaian voucher pada pesanan yang kedaluwarsa juga dilepas agar kuotanya
+     * tidak terbuang, dan pembeli menerima notifikasi.
+     *
      * @return int jumlah transaksi yang diperbarui
      */
     public function expireOverdueTransactions(): int
     {
-        return Transaction::query()
+        $kedaluwarsa = Transaction::query()
             ->where('status', TransactionStatus::Pending->value)
             ->whereNotNull('expires_at')
             ->where('expires_at', '<=', now())
-            ->update([
-                'status' => TransactionStatus::Expired->value,
+            ->get();
+
+        foreach ($kedaluwarsa as $transaksi) {
+            $transaksi->forceFill([
+                'status' => TransactionStatus::Expired,
                 'notes' => 'Pesanan kedaluwarsa karena melewati batas waktu pembayaran.',
-                'updated_at' => now(),
-            ]);
+                'payment_token' => null,
+                'payment_url' => null,
+            ])->save();
+
+            $this->vouchers->lepasPemakaian($transaksi->id);
+
+            $this->notifications->pesananKedaluwarsa($transaksi->fresh());
+        }
+
+        return $kedaluwarsa->count();
     }
 
     /**
