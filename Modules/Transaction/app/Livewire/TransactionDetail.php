@@ -15,7 +15,7 @@ use Livewire\Component;
  * Karena PRIM memakai simulasi gateway internal, pengguna (atau penguji) dapat
  * memilih untuk mensimulasikan pembayaran yang berhasil maupun yang ditolak.
  */
-#[Layout('layouts::app')]
+#[Layout('layouts::account')]
 class TransactionDetail extends Component
 {
     /**

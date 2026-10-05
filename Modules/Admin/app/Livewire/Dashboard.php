@@ -32,13 +32,22 @@ class Dashboard extends Component
         $monthStart = now()->startOfMonth();
         $lastMonthStart = $monthStart->copy()->subMonth();
 
+        // Pendapatan dihitung dari pesanan yang sudah berhasil, yaitu status
+        // Selesai (paid) dan Pesanan Diterima (accepted). Dasar waktu memakai
+        // kolom paid_at, sama seperti halaman Laporan, agar kedua halaman
+        // menampilkan angka yang identik.
+        $statusBerhasil = [
+            TransactionStatus::Paid->value,
+            TransactionStatus::Accepted->value,
+        ];
+
         $revenueThisMonth = Transaction::query()
-            ->where('status', TransactionStatus::Paid->value)
+            ->whereIn('status', $statusBerhasil)
             ->where('paid_at', '>=', $monthStart)
             ->sum('amount');
 
         $revenueLastMonth = Transaction::query()
-            ->where('status', TransactionStatus::Paid->value)
+            ->whereIn('status', $statusBerhasil)
             ->whereBetween('paid_at', [$lastMonthStart, $monthStart])
             ->sum('amount');
 

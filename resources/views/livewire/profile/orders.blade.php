@@ -11,11 +11,10 @@ use Livewire\WithPagination;
 /**
  * Pusat pesanan pengguna.
  *
- * Mengikuti frame "Profil - pesanan" pada desain: judul "Pesanan", daftar tab
- * status yang dapat diperluas, kolom pencarian pesanan, dan daftar pesanan
- * milik pengguna yang sedang masuk.
+ * Menampilkan pesanan milik pengguna yang sedang masuk beserta status, rincian
+ * paket, tombol pembayaran, dan penanda ketersediaan kode login.
  */
-new #[Layout('layouts::app')] #[Title('Pesanan Saya')] class extends Component {
+new #[Layout('layouts::account')] #[Title('Pesanan Saya')] class extends Component {
     use WithPagination;
 
     #[Url(as: 'status', history: true)]
@@ -89,196 +88,145 @@ new #[Layout('layouts::app')] #[Title('Pesanan Saya')] class extends Component {
 }; ?>
 
 @php
-    $user = auth()->user();
-
     $tabs = [
         ['key' => '', 'label' => 'Semua'],
         ['key' => 'aktif', 'label' => 'Aktif'],
+        ['key' => 'pending', 'label' => 'Menunggu Pembayaran'],
+        ['key' => 'processed', 'label' => 'Diproses'],
         ['key' => 'follow_up', 'label' => 'Ditindak Lanjuti'],
         ['key' => 'proof_renewal', 'label' => 'Pembaharuan Bukti'],
-        ['key' => 'pending', 'label' => 'Menunggu Pembayaran'],
-        ['key' => 'dibatalkan', 'label' => 'Dibatalkan'],
-        ['key' => 'processed', 'label' => 'Sedang Proses'],
-        ['key' => 'grace', 'label' => 'Masa Tenggang'],
         ['key' => 'proof_revision', 'label' => 'Revisi Bukti'],
+        ['key' => 'grace', 'label' => 'Masa Tenggang'],
+        ['key' => 'dibatalkan', 'label' => 'Dibatalkan'],
     ];
 @endphp
 
-<div class="mx-auto w-full max-w-[1728px] px-6 py-10 lg:px-12">
-    <div class="grid gap-8 lg:grid-cols-[300px_minmax(0,1fr)]">
-        {{-- Panel akun --}}
-        <aside class="lg:sticky lg:top-8 lg:self-start">
-            <div class="prim-card p-6">
-                <div class="flex items-center gap-3">
-                    <span class="flex size-12 shrink-0 items-center justify-center rounded-full bg-brand text-sm font-medium text-white">
-                        {{ $user->initials() }}
-                    </span>
-                    <div class="min-w-0">
-                        <p class="truncate font-display text-base font-semibold text-ink-strong">{{ $user->name }}</p>
-                        <p class="truncate text-xs text-muted">{{ $user->email }}</p>
+<div class="min-w-0">
+    {{-- Kepala halaman --}}
+    <div class="flex flex-wrap items-end justify-between gap-4">
+        <div>
+            <h1 class="font-display text-2xl font-bold text-ink-strong">Pesanan Saya</h1>
+            <p class="mt-1 text-sm text-muted">
+                Seluruh pesananmu beserta status, rincian paket, dan kredensial akunnya.
+            </p>
+        </div>
+
+        <div class="w-full max-w-xs">
+            <input
+                type="search"
+                wire:model.live.debounce.400ms="search"
+                placeholder="Cari pesanan atau layanan…"
+                class="prim-input h-10 text-sm"
+            >
+        </div>
+    </div>
+
+    {{-- Tab status --}}
+    <div class="mt-5 flex flex-wrap gap-1.5">
+        @foreach ($tabs as $tab)
+            <button
+                type="button"
+                wire:key="tab-{{ $tab['key'] ?: 'semua' }}"
+                wire:click="$set('status', '{{ $tab['key'] }}')"
+                @class([
+                    'rounded-full px-3.5 py-1.5 text-sm transition',
+                    'bg-brand text-white' => $status === $tab['key'],
+                    'bg-white text-ink hover:bg-brand-soft' => $status !== $tab['key'],
+                ])
+            >
+                {{ $tab['label'] }} ({{ $counts[$tab['key']] ?? $counts[$tab['key'] === '' ? 'semua' : $tab['key']] ?? 0 }})
+            </button>
+        @endforeach
+    </div>
+
+    {{-- Daftar pesanan --}}
+    <div class="mt-5 space-y-4">
+        @forelse ($transactions as $transaction)
+            @php $credential = $transaction->serviceCredentials->first(); @endphp
+
+            <article wire:key="order-{{ $transaction->id }}" class="rounded-xl bg-white p-5 shadow-brand-xs">
+                <div class="flex flex-wrap items-start justify-between gap-4">
+                    <div class="flex items-center gap-4">
+                        <x-service-logo :service="$transaction->plan->service" class="h-12 w-20 shrink-0" />
+
+                        <div class="min-w-0">
+                            <p class="font-display text-base font-semibold text-ink-strong">
+                                {{ $transaction->plan->service->name }}
+                            </p>
+                            <p class="text-xs text-muted">
+                                {{ $transaction->plan->groupLabel() }} &middot;
+                                <span class="font-mono">{{ $transaction->order_code }}</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="text-right">
+                        <x-status-badge :status="$transaction->status" />
+                        <p class="mt-2 text-sm font-medium text-ink-strong">{{ $transaction->formattedAmount() }}</p>
+                        <p class="text-xs text-muted">{{ $transaction->created_at->translatedFormat('d M Y, H:i') }}</p>
                     </div>
                 </div>
 
-                <dl class="mt-5 space-y-2 text-sm">
-                    <div class="flex items-center justify-between gap-3">
-                        <dt class="text-muted">No. HP</dt>
-                        <dd class="truncate text-ink">{{ $user->phone ?: '—' }}</dd>
+                {{-- Rincian singkat pesanan --}}
+                <dl class="mt-4 grid gap-3 border-t border-line-soft pt-4 text-xs sm:grid-cols-3">
+                    <div>
+                        <dt class="text-muted">Metode pembayaran</dt>
+                        <dd class="mt-0.5 text-ink">{{ $transaction->paymentLabel() }}</dd>
                     </div>
-                    <div class="flex items-center justify-between gap-3">
-                        <dt class="text-muted">Kode Login</dt>
-                        <dd class="text-ink">{{ $credentialCount }} akun</dd>
+                    <div>
+                        <dt class="text-muted">Masa aktif</dt>
+                        <dd class="mt-0.5 text-ink">{{ $transaction->plan->durationLabel() }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-muted">Perangkat</dt>
+                        <dd class="mt-0.5 text-ink">{{ $transaction->plan->max_devices }} perangkat</dd>
                     </div>
                 </dl>
 
-                <nav class="mt-6 space-y-1 border-t border-line-soft pt-4">
-                    <a
-                        href="{{ route('profile.orders') }}"
-                        @class([
-                            'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition',
-                            'bg-brand-soft text-brand' => request()->routeIs('profile.orders'),
-                            'text-ink hover:bg-canvas' => ! request()->routeIs('profile.orders'),
-                        ])
-                        wire:navigate
-                    >
-                        <flux:icon.receipt-percent class="size-5" />
-                        Pesanan
-                    </a>
+                <div class="mt-4 flex flex-wrap items-center gap-2">
+                    @if ($transaction->isPayable())
+                        <a
+                            href="{{ route('transaction.show', $transaction->order_code) }}"
+                            class="prim-btn h-9 text-sm"
+                            wire:navigate
+                        >
+                            <flux:icon.credit-card class="size-4" />
+                            Bayar Sekarang
+                        </a>
+                    @endif
 
                     <a
-                        href="{{ route('profile.login-code') }}"
-                        @class([
-                            'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition',
-                            'bg-brand-soft text-brand' => request()->routeIs('profile.login-code'),
-                            'text-ink hover:bg-canvas' => ! request()->routeIs('profile.login-code'),
-                        ])
+                        href="{{ route('transaction.show', $transaction->order_code) }}"
+                        class="prim-btn-ghost h-9 text-sm"
                         wire:navigate
                     >
-                        <flux:icon.key class="size-5" />
-                        Kode Login
+                        Lihat Rincian
                     </a>
 
-                    <a
-                        href="{{ route('subscription.index') }}"
-                        class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-ink transition hover:bg-canvas"
-                        wire:navigate
-                    >
-                        <flux:icon.arrow-path-rounded-square class="size-5" />
-                        Langganan
-                    </a>
+                    @if ($credential)
+                        <a href="{{ route('profile.login-code') }}" class="text-sm font-medium text-brand hover:underline" wire:navigate>
+                            Kode Login Tersedia
+                        </a>
+                    @endif
 
-                    <a
-                        href="{{ route('settings.profile') }}"
-                        class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-ink transition hover:bg-canvas"
-                        wire:navigate
-                    >
-                        <flux:icon.cog-6-tooth class="size-5" />
-                        Pengaturan
-                    </a>
-
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-status-cancel-fg transition hover:bg-status-cancel-bg">
-                            <flux:icon.arrow-right-start-on-rectangle class="size-5" />
-                            Keluar
-                        </button>
-                    </form>
-                </nav>
-            </div>
-        </aside>
-
-        {{-- Daftar pesanan --}}
-        <section class="min-w-0">
-            <div class="flex flex-wrap items-end justify-between gap-4">
-                <h1 class="font-display text-[28px] font-bold text-ink-strong sm:text-[35px]">Pesanan</h1>
-
-                <div class="w-full max-w-xs">
-                    <input
-                        type="search"
-                        wire:model.live.debounce.400ms="search"
-                        placeholder="Cari Pesanan"
-                        class="prim-input h-10 text-sm"
-                    >
+                    @if ($transaction->isPayable())
+                        <span class="text-xs text-status-wait-fg">
+                            Bayar sebelum {{ $transaction->expires_at?->translatedFormat('d M Y, H:i') }}
+                        </span>
+                    @endif
                 </div>
+            </article>
+        @empty
+            <div class="rounded-xl bg-white p-12 text-center shadow-brand-xs">
+                <flux:icon.receipt-percent class="mx-auto size-9 text-muted-2" />
+                <p class="mt-3 font-medium text-ink-strong">Belum ada pesanan</p>
+                <p class="mt-1 text-sm text-muted">
+                    Pesanan yang kamu buat akan muncul di sini beserta statusnya.
+                </p>
+                <a href="{{ route('catalog.index') }}" class="prim-btn mt-5" wire:navigate>Jelajahi Katalog</a>
             </div>
-
-            {{-- Tab status --}}
-            <div class="mt-6 flex flex-wrap gap-1.5">
-                @foreach ($tabs as $tab)
-                    <button
-                        type="button"
-                        wire:key="tab-{{ $tab['key'] ?: 'semua' }}"
-                        wire:click="$set('status', '{{ $tab['key'] }}')"
-                        @class([
-                            'rounded-full px-3.5 py-1.5 text-sm transition',
-                            'bg-brand text-white' => $status === $tab['key'],
-                            'bg-canvas text-ink hover:bg-brand-soft' => $status !== $tab['key'],
-                        ])
-                    >
-                        {{ $tab['label'] }}({{ $counts[$tab['key']] ?? 0 }})
-                    </button>
-                @endforeach
-            </div>
-
-            {{-- Daftar --}}
-            <div class="mt-6 space-y-4">
-                @forelse ($transactions as $transaction)
-                    <article wire:key="order-{{ $transaction->id }}" class="prim-card p-5">
-                        <div class="flex flex-wrap items-start justify-between gap-4">
-                            <div class="flex items-center gap-4">
-                                <x-service-logo :service="$transaction->plan->service" class="h-12 w-20 shrink-0" />
-
-                                <div>
-                                    <p class="font-display text-base font-semibold text-ink-strong">
-                                        {{ $transaction->plan->service->name }}
-                                    </p>
-                                    <p class="text-xs text-muted">
-                                        {{ $transaction->plan->groupLabel() }} ·
-                                        <span class="font-mono">{{ $transaction->order_code }}</span>
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="text-right">
-                                <x-status-badge :status="$transaction->status" />
-                                <p class="mt-2 text-sm font-medium text-ink-strong">{{ $transaction->formattedAmount() }}</p>
-                                <p class="text-xs text-muted">{{ $transaction->created_at->translatedFormat('d M Y') }}</p>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 flex flex-wrap items-center gap-3 border-t border-line-soft pt-4">
-                            <a
-                                href="{{ route('transaction.show', $transaction->order_code) }}"
-                                class="prim-btn-ghost h-9 text-sm"
-                                wire:navigate
-                            >
-                                Lihat Rincian
-                            </a>
-
-                            @if ($transaction->serviceCredentials->isNotEmpty())
-                                <a href="{{ route('profile.login-code') }}" class="prim-btn h-9 text-sm" wire:navigate>
-                                    Buka Kode Login
-                                </a>
-                            @elseif ($transaction->isPayable())
-                                <span class="text-xs text-status-wait-fg">
-                                    Selesaikan pembayaran sebelum
-                                    {{ $transaction->expires_at?->translatedFormat('d M Y, H:i') }}
-                                </span>
-                            @endif
-                        </div>
-                    </article>
-                @empty
-                    <div class="prim-card p-12 text-center">
-                        <flux:icon.receipt-percent class="mx-auto size-9 text-muted-2" />
-                        <p class="mt-3 font-medium text-ink-strong">Belum ada pesanan</p>
-                        <p class="mt-1 text-sm text-muted">
-                            Pesanan yang kamu buat akan muncul di sini beserta statusnya.
-                        </p>
-                        <a href="{{ route('catalog.index') }}" class="prim-btn mt-5" wire:navigate>Jelajahi Katalog</a>
-                    </div>
-                @endforelse
-            </div>
-
-            <div class="mt-8">{{ $transactions->links() }}</div>
-        </section>
+        @endforelse
     </div>
+
+    <div class="mt-8">{{ $transactions->links() }}</div>
 </div>

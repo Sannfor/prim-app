@@ -13,7 +13,7 @@ use Livewire\Component;
  * Halaman checkout: pengguna memilih paket dan metode pembayaran, lalu
  * transaksi dibuat dengan status menunggu pembayaran.
  */
-#[Layout('layouts::app')]
+#[Layout('layouts::account')]
 #[Title('Checkout')]
 class Checkout extends Component
 {

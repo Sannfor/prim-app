@@ -19,10 +19,6 @@
         ['route' => 'admin.payments.index', 'label' => 'Pembayaran', 'icon' => 'credit-card', 'active' => ['admin.payments.*']],
         ['route' => 'admin.reports.index', 'label' => 'Laporan', 'icon' => 'document-chart-bar', 'active' => ['admin.reports.*']],
     ];
-
-    $pendingCount = \App\Models\Transaction::query()
-        ->whereIn('status', ['pending', 'processed', 'waiting_process', 'follow_up'])
-        ->count();
 @endphp
 
 <!DOCTYPE html>
@@ -39,9 +35,17 @@
                 class="fixed inset-y-0 left-0 z-40 flex w-[280px] flex-col bg-brand text-white transition-transform lg:static lg:translate-x-0"
                 :class="menuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
             >
-                <div class="flex h-[74px] items-center px-6">
-                    <a href="{{ route('admin.dashboard') }}" wire:navigate>
-                        <x-brand-logo variant="light" />
+                <div class="flex h-[84px] items-center px-5">
+                    {{--
+                        Logo diletakkan pada alas putih. Logo PRIM berwarna gelap
+                        sehingga tenggelam bila langsung di atas latar ungu sidebar.
+                    --}}
+                    <a
+                        href="{{ route('admin.dashboard') }}"
+                        class="inline-flex items-center rounded-xl bg-white px-4 py-2.5 shadow-brand-xs transition hover:bg-white/90"
+                        wire:navigate
+                    >
+                        <x-brand-logo size="lg" />
                     </a>
 
                     <button
@@ -122,14 +126,7 @@
                         </p>
 
                         <div class="ml-auto flex items-center gap-4">
-                            <button type="button" class="relative flex size-9 items-center justify-center rounded-full hover:bg-canvas" aria-label="Notifikasi">
-                                <flux:icon.bell class="size-5 text-ink" />
-                                @if ($pendingCount > 0)
-                                    <span class="absolute -top-0.5 -right-0.5 flex min-w-4 items-center justify-center rounded-full bg-status-cancel-fg px-1 text-[10px] font-medium text-white">
-                                        {{ $pendingCount > 99 ? '99+' : $pendingCount }}
-                                    </span>
-                                @endif
-                            </button>
+                            <livewire:notification-bell />
 
                             <div class="flex items-center gap-3">
                                 <span class="flex size-9 items-center justify-center rounded-lg bg-brand text-xs font-medium text-white">

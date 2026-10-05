@@ -14,7 +14,7 @@ use Livewire\WithPagination;
 /**
  * Riwayat transaksi milik pengguna yang sedang masuk.
  */
-#[Layout('layouts::app')]
+#[Layout('layouts::account')]
 #[Title('Riwayat Transaksi')]
 class TransactionHistory extends Component
 {

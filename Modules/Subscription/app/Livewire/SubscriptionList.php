@@ -16,7 +16,7 @@ use Livewire\Component;
  * Daftar langganan milik pengguna: yang sedang aktif, yang akan segera
  * berakhir, dan riwayat langganan yang sudah selesai.
  */
-#[Layout('layouts::app')]
+#[Layout('layouts::account')]
 #[Title('Langganan Saya')]
 class SubscriptionList extends Component
 {

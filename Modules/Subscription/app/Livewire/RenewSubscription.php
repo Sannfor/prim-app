@@ -14,7 +14,7 @@ use Livewire\Component;
  * memperpanjang, termasuk beralih ke paket lain pada layanan tersebut.
  * Perpanjangan tetap melalui alur checkout agar tercatat sebagai transaksi.
  */
-#[Layout('layouts::app')]
+#[Layout('layouts::account')]
 class RenewSubscription extends Component
 {
     /**

@@ -9,11 +9,19 @@
     $resolvedLabel = $label;
     $resolvedTone = $tone;
 
-    if ($status instanceof \App\Enums\TransactionStatus || $status instanceof \App\Enums\UserStatus) {
+    $enumStatuses = [
+        \App\Enums\TransactionStatus::class,
+        \App\Enums\UserStatus::class,
+        \App\Enums\SubscriptionStatus::class,
+    ];
+
+    if ($status !== null && in_array($status::class, $enumStatuses, true)) {
         $resolvedLabel ??= $status->label();
         $resolvedTone ??= $status->tone();
     } elseif (is_string($status)) {
-        $enum = \App\Enums\TransactionStatus::tryFrom($status) ?? \App\Enums\UserStatus::tryFrom($status);
+        $enum = \App\Enums\TransactionStatus::tryFrom($status)
+            ?? \App\Enums\UserStatus::tryFrom($status)
+            ?? \App\Enums\SubscriptionStatus::tryFrom($status);
 
         if ($enum) {
             $resolvedLabel ??= $enum->label();

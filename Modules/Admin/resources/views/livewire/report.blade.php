@@ -27,7 +27,7 @@
                         'text-status-done-fg' => $insight['positive'],
                         'text-status-cancel-fg' => ! $insight['positive'],
                     ])>
-                        {{ $insight['value'] === null ? '—' : (($insight['value'] >= 0 ? '+' : '').$insight['value'].'%') }}
+                        {{ $insight['value'] === null ? $insight['text'] : (($insight['value'] >= 0 ? '+' : '').$insight['value'].'%') }}
                     </p>
                     <p class="mt-1 text-sm font-medium text-ink-strong">{{ $insight['text'] }}</p>
                     <p class="text-xs text-muted">Dibandingkan bulan lalu</p>
@@ -35,6 +35,79 @@
             @endforeach
         </div>
     </section>
+
+    {{-- Diagram lingkaran status pesanan --}}
+    <div class="grid gap-5 lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)]">
+        <section class="rounded-xl bg-white p-6 shadow-brand-xs">
+            <h2 class="font-display text-base font-semibold text-ink-strong">Diagram Lingkaran Status</h2>
+            <p class="mt-1 text-xs text-muted">Proporsi pesanan menurut status saat ini.</p>
+
+            @php
+                $warna = [
+                    'done' => '#3b6d11',
+                    'process' => '#0c447c',
+                    'wait' => '#854f0b',
+                    'cancel' => '#e24b4a',
+                    'new' => '#534ab7',
+                ];
+
+                $irisan = collect($pie)->map(
+                    fn ($row) => $warna[$row['tone']].' '.$row['dari'].'% '.$row['sampai'].'%'
+                )->implode(', ');
+            @endphp
+
+            <div class="mt-5 flex flex-col items-center gap-6 sm:flex-row sm:items-center">
+                {{-- Diagram donat: dibuat dari gradien kerucut agar tidak perlu pustaka grafik --}}
+                <div class="relative size-[164px] shrink-0">
+                    <div
+                        class="size-full rounded-full"
+                        style="background: conic-gradient({{ $irisan }});"
+                        role="img"
+                        aria-label="Komposisi status pesanan"
+                    ></div>
+                    <div class="absolute inset-[26%] flex flex-col items-center justify-center rounded-full bg-white">
+                        <span class="font-display text-xl font-bold text-ink-strong">{{ array_sum(array_column($composition, 'count')) }}</span>
+                        <span class="text-[11px] text-muted">pesanan</span>
+                    </div>
+                </div>
+
+                {{-- Keterangan --}}
+                <ul class="w-full space-y-2.5">
+                    @foreach ($composition as $row)
+                        @continue($row['count'] <= 0)
+
+                        <li class="flex items-center gap-3 text-sm">
+                            <span class="size-3 shrink-0 rounded-sm" style="background: {{ $warna[$row['tone']] ?? '#534ab7' }}"></span>
+                            <span class="flex-1 text-ink">{{ $row['label'] }}</span>
+                            <span class="text-muted">{{ $row['count'] }}</span>
+                            <span class="w-12 text-right font-medium text-ink-strong">{{ $row['percentage'] }}%</span>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+        </section>
+
+        {{-- Statistik bulan berjalan --}}
+        <section class="rounded-xl bg-white p-6 shadow-brand-xs">
+            <h2 class="font-display text-base font-semibold text-ink-strong">Statistik Bulan Ini</h2>
+            <p class="mt-1 text-xs text-muted">Angka dihitung dari pesanan pada bulan berjalan.</p>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-2">
+                @foreach ($statistics as $stat)
+                    <div class="rounded-xl bg-canvas p-4">
+                        <div class="flex items-start justify-between gap-3">
+                            <p class="text-xs text-muted">{{ $stat['label'] }}</p>
+                            <span class="flex size-8 items-center justify-center rounded-lg bg-white">
+                                <flux:icon :name="$stat['icon']" class="size-4 text-brand" />
+                            </span>
+                        </div>
+                        <p class="mt-2 font-display text-lg font-bold text-ink-strong">{{ $stat['value'] }}</p>
+                        <p class="mt-0.5 text-[11px] leading-relaxed text-muted">{{ $stat['hint'] }}</p>
+                    </div>
+                @endforeach
+            </div>
+        </section>
+    </div>
 
     {{-- Diagram pendapatan bulanan --}}
     <section class="rounded-xl bg-white p-6 shadow-brand-xs">
@@ -61,9 +134,10 @@
     </section>
 
     <div class="grid gap-5 lg:grid-cols-2">
-        {{-- Komposisi status --}}
+        {{-- Rincian status dalam bentuk bilah --}}
         <section class="rounded-xl bg-white p-6 shadow-brand-xs">
-            <h2 class="font-display text-base font-semibold text-ink-strong">Komposisi Status Pesanan</h2>
+            <h2 class="font-display text-base font-semibold text-ink-strong">Rincian Status Pesanan</h2>
+            <p class="mt-1 text-xs text-muted">Jumlah dan persentase tiap status pesanan.</p>
 
             @php
                 $tones = [

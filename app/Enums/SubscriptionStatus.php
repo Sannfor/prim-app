@@ -24,6 +24,20 @@ enum SubscriptionStatus: string
     }
 
     /**
+     * Nama kelompok warna lencana pada desain.
+     *
+     * Dipetakan ke kelas .prim-badge melalui komponen Blade x-status-badge.
+     */
+    public function tone(): string
+    {
+        return match ($this) {
+            self::Active => 'done',
+            self::Expired => 'cancel',
+            self::Cancelled => 'cancel',
+        };
+    }
+
+    /**
      * Warna lencana Flux yang sesuai untuk status ini.
      */
     public function badgeColor(): string

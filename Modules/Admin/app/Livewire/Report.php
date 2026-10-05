@@ -27,16 +27,22 @@ class Report extends Component
     {
         $successful = [TransactionStatus::Paid->value, TransactionStatus::Accepted->value];
 
-        $thisMonth = Transaction::query()
+        /*
+         | Pendapatan dihitung dari kolom paid_at, yaitu saat pembayaran benar-benar
+         | diterima. Dasar ini dipakai bersama oleh halaman Dashboard dan halaman
+         | Laporan agar kedua halaman menampilkan angka yang sama.
+         */
+        $awalBulanIni = now()->startOfMonth();
+        $awalBulanLalu = now()->subMonthNoOverflow()->startOfMonth();
+
+        $thisMonth = (int) Transaction::query()
             ->whereIn('status', $successful)
-            ->whereMonth('created_at', now()->month)
-            ->whereYear('created_at', now()->year)
+            ->where('paid_at', '>=', $awalBulanIni)
             ->sum('amount');
 
-        $lastMonth = Transaction::query()
+        $lastMonth = (int) Transaction::query()
             ->whereIn('status', $successful)
-            ->whereMonth('created_at', now()->subMonthNoOverflow()->month)
-            ->whereYear('created_at', now()->subMonthNoOverflow()->year)
+            ->whereBetween('paid_at', [$awalBulanLalu, $awalBulanIni])
             ->sum('amount');
 
         $revenueGrowth = $lastMonth > 0
@@ -113,6 +119,84 @@ class Report extends Component
             ];
         }
 
+        // Diagram lingkaran memakai nilai status utama saja agar mudah dibaca.
+        $pie = [];
+        $sudutAwal = 0.0;
+
+        foreach (array_slice($composition, 0, 4) as $row) {
+            if ($row['count'] <= 0) {
+                continue;
+            }
+
+            $bagian = $row['percentage'];
+
+            $pie[] = [
+                'label' => $row['label'],
+                'count' => $row['count'],
+                'percentage' => $bagian,
+                'dari' => $sudutAwal,
+                'sampai' => $sudutAwal + $bagian,
+                'tone' => $row['tone'],
+            ];
+
+            $sudutAwal += $bagian;
+        }
+
+        // Statistik bulan berjalan.
+        //
+        // Jumlah pesanan berhasil memakai dasar waktu yang sama dengan nilai
+        // pendapatan ($thisMonth), yaitu kolom paid_at, agar rata-rata nilai
+        // pesanan konsisten dengan nilai pendapatan yang ditampilkan.
+        $paidThisMonth = Transaction::query()
+            ->whereIn('status', $successful)
+            ->where('paid_at', '>=', $awalBulanIni)
+            ->count();
+
+        $averageOrderThisMonth = $paidThisMonth > 0 ? (int) round($thisMonth / $paidThisMonth) : 0;
+
+        $cancelledAll = Transaction::query()->where('status', TransactionStatus::Cancelled->value)->count();
+        $successRate = $totalForShare > 0
+            ? round((Transaction::query()->whereIn('status', $successful)->count() / $totalForShare) * 100, 1)
+            : 0.0;
+
+        // Hari tersibuk pada 30 hari terakhir.
+        $busiest = Transaction::query()
+            ->where('created_at', '>=', now()->subDays(30))
+            ->get(['created_at'])
+            ->groupBy(fn ($row) => $row->created_at->toDateString())
+            ->map->count()
+            ->sortDesc();
+
+        $busiestDay = $busiest->keys()->first();
+        $busiestCount = $busiest->first() ?? 0;
+
+        $statistics = [
+            [
+                'label' => 'Rata-rata Nilai Pesanan',
+                'value' => 'Rp'.Number::format($averageOrderThisMonth, locale: 'id'),
+                'hint' => 'Dari '.$paidThisMonth.' pesanan berhasil bulan ini',
+                'icon' => 'calculator',
+            ],
+            [
+                'label' => 'Tingkat Keberhasilan',
+                'value' => $successRate.'%',
+                'hint' => 'Perbandingan pesanan berhasil terhadap seluruh pesanan',
+                'icon' => 'check-badge',
+            ],
+            [
+                'label' => 'Total Pembatalan',
+                'value' => Number::format($cancelledAll, locale: 'id'),
+                'hint' => 'Sepanjang waktu, '.$cancelledThisMonth.' di antaranya bulan ini',
+                'icon' => 'x-circle',
+            ],
+            [
+                'label' => 'Hari Tersibuk',
+                'value' => $busiestDay ? Carbon::parse($busiestDay)->locale('id')->translatedFormat('d M') : '—',
+                'hint' => $busiestCount.' pesanan dalam 30 hari terakhir',
+                'icon' => 'calendar-days',
+            ],
+        ];
+
         $topServices = Service::query()
             ->withCount(['transactions as total_transactions'])
             ->withSum(['transactions as revenue' => fn ($q) => $q->whereIn('status', $successful)], 'amount')
@@ -152,13 +236,32 @@ class Report extends Component
                 ],
             ],
             'insights' => [
-                ['label' => 'Pendapatan', 'value' => $revenueGrowth, 'text' => 'Pendapatan naik', 'positive' => ($revenueGrowth ?? 0) >= 0],
-                ['label' => 'Pengguna baru', 'value' => $userGrowth, 'text' => 'Pengguna baru naik', 'positive' => ($userGrowth ?? 0) >= 0],
-                ['label' => 'Pembatalan', 'value' => $cancelDelta, 'text' => 'Pembatalan turun', 'positive' => ($cancelDelta ?? 0) <= 0],
+                [
+                    'label' => 'Pendapatan',
+                    'value' => $revenueGrowth,
+                    'text' => 'Pendapatan naik',
+                    'positive' => ($revenueGrowth ?? 0) >= 0,
+                ],
+                [
+                    'label' => 'Pengguna baru',
+                    'value' => $userGrowth,
+                    'text' => 'Pengguna baru naik',
+                    'positive' => ($userGrowth ?? 0) >= 0,
+                ],
+                [
+                    'label' => 'Pembatalan',
+                    'value' => $cancelDelta,
+                    'text' => $cancelDelta === null
+                        ? $cancelledThisMonth.' pembatalan bulan ini'
+                        : 'Pembatalan turun',
+                    'positive' => ($cancelDelta ?? 0) <= 0,
+                ],
             ],
             'monthly' => $monthly,
             'monthlyPeak' => $peak,
             'composition' => $composition,
+            'pie' => $pie,
+            'statistics' => $statistics,
             'topServices' => $topServices,
             'topServicePeak' => $topServicePeak,
             'recent' => Transaction::query()->with(['user', 'plan.service'])->latest()->take(8)->get(),
