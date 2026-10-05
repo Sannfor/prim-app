@@ -28,10 +28,41 @@
         <section class="rounded-xl bg-brand-soft p-5">
             <h2 class="font-display text-base font-semibold text-brand">Selesaikan Pembayaran</h2>
             <p class="mt-1 text-sm text-ink">
-                Bayar sebesar <strong>{{ $transaction->formattedAmount() }}</strong>
-                melalui {{ $paymentMethodLabel }} sebelum
+                Bayar sebesar <strong>{{ $transaction->formattedAmount() }}</strong> sebelum
                 {{ $transaction->expires_at?->translatedFormat('d F Y, H:i') }} WITA.
             </p>
+
+            {{-- Pemilih metode pembayaran --}}
+            <div class="mt-5">
+                <p class="text-xs tracking-wide text-muted uppercase">Metode Pembayaran</p>
+
+                <div class="mt-2 grid gap-2 sm:grid-cols-2">
+                    @foreach ($methods as $kode => $nama)
+                        <button
+                            type="button"
+                            wire:key="metode-{{ $kode }}"
+                            wire:click="pilihMetode('{{ $kode }}')"
+                            @class([
+                                'flex items-center gap-2.5 rounded-lg border p-3 text-left text-sm transition',
+                                'border-brand bg-white font-medium text-brand' => $paymentMethod === $kode,
+                                'border-line-soft bg-white/70 text-ink hover:border-brand/50' => $paymentMethod !== $kode,
+                            ])
+                        >
+                            <span @class([
+                                'flex size-4 shrink-0 items-center justify-center rounded-full border-2',
+                                'border-brand' => $paymentMethod === $kode,
+                                'border-line' => $paymentMethod !== $kode,
+                            ])>
+                                @if ($paymentMethod === $kode)
+                                    <span class="size-2 rounded-full bg-brand"></span>
+                                @endif
+                            </span>
+
+                            <span class="min-w-0">{{ $nama }}</span>
+                        </button>
+                    @endforeach
+                </div>
+            </div>
 
             @if ($transaction->payment_url)
                 {{-- Tautan pembayaran dari penyedia sudah tersedia --}}

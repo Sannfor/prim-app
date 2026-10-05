@@ -3,6 +3,7 @@
 namespace Modules\Transaction\Livewire;
 
 use App\Models\Transaction;
+use App\Services\Payment\PaymentGateway;
 use App\Services\TransactionService;
 use Flux\Flux;
 use Illuminate\Contracts\View\View;
@@ -23,9 +24,36 @@ class TransactionDetail extends Component
      */
     public string $orderCode = '';
 
+    /**
+     * Metode pembayaran yang dipilih pada halaman ini.
+     *
+     * Bisa berbeda dari metode yang dipilih saat checkout, karena pengguna
+     * sering baru memutuskan kanal pembayaran pada halaman pembayaran.
+     */
+    public string $paymentMethod = '';
+
     public function mount(string $order): void
     {
         $this->orderCode = $order;
+
+        $transaksi = $this->transaction();
+        $metode = array_keys(app(PaymentGateway::class)->methods());
+
+        // Pakai metode yang sudah tersimpan bila masih dikenal, jika tidak pakai
+        // kanal pertama yang tersedia.
+        $this->paymentMethod = in_array($transaksi->payment_method, $metode, true)
+            ? (string) $transaksi->payment_method
+            : (string) ($metode[0] ?? '');
+    }
+
+    /**
+     * Ganti metode pembayaran sebelum membayar.
+     */
+    public function pilihMetode(string $method): void
+    {
+        if (array_key_exists($method, app(PaymentGateway::class)->methods())) {
+            $this->paymentMethod = $method;
+        }
     }
 
     /**
@@ -56,10 +84,14 @@ class TransactionDetail extends Component
 
         $this->authorize('pay', $transaction);
 
+        // Metode yang dipilih pada halaman ini dipakai lebih dulu, karena
+        // pengguna sering baru memutuskan kanal pembayaran di sini.
+        $metode = $this->paymentMethod !== '' ? $this->paymentMethod : 'qris';
+
         $result = $transactions->pay(
             $transaction,
             auth()->user(),
-            $transaction->payment_method ?? 'qris',
+            $metode,
             $succeed
         );
 
@@ -87,13 +119,21 @@ class TransactionDetail extends Component
         $transaction = $this->transaction();
         $gateway = $transactions->gateway();
 
+        // Label metode yang ditampilkan mengikuti pilihan pada halaman ini, agar
+        // ringkasan rincian ikut berubah saat pengguna mengganti kanal pembayaran.
+        $label = $transaction->payment_method_label
+            ?? ($transaction->payment_method === null ? null : $gateway->label($transaction->payment_method));
+
+        if ($this->paymentMethod !== '' && $transaction->isPayable()) {
+            $label = $gateway->label($this->paymentMethod);
+        }
+
         return view('transaction::livewire.transaction-detail', [
             'transaction' => $transaction,
             'isPayable' => $transaction->isPayable(),
             'hasExpired' => $transaction->hasExpired(),
-            'paymentMethodLabel' => $transaction->payment_method === null
-                ? 'metode yang dipilih'
-                : $gateway->label($transaction->payment_method),
+            'paymentMethodLabel' => $label ?? 'metode yang dipilih',
+            'methods' => $gateway->methods(),
             'gatewayName' => $gateway->name(),
             'usesOnlineGateway' => $gateway->requiresRedirect(),
         ])->title('Pembayaran '.$transaction->order_code);
