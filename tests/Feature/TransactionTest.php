@@ -38,7 +38,6 @@ test('halaman checkout menampilkan ringkasan paket dan metode pembayaran', funct
         ->assertOk()
         ->assertSee($this->plan->service->name)
         ->assertSee($this->plan->name)
-        ->assertSee('Transfer Bank Virtual Account')
         ->assertSee('QRIS');
 });
 
@@ -222,7 +221,7 @@ test('pengguna dapat melihat transaksinya sendiri', function () {
         ->get(route('transaction.show', $transaction->order_code))
         ->assertOk()
         ->assertSee($transaction->order_code)
-        ->assertSee('Simulasikan Pembayaran Berhasil');
+        ->assertSee('Simulasikan Berhasil');
 });
 
 test('transaksi tidak dikenal menghasilkan 404', function () {
@@ -231,18 +230,18 @@ test('transaksi tidak dikenal menghasilkan 404', function () {
         ->assertNotFound();
 });
 
-test('tombol simulasi pembayaran berhasil mengaktifkan langganan dan mengarahkan ke daftar langganan', function () {
+test('tombol simulasi pembayaran berhasil mengaktifkan langganan dan mengarahkan ke struk', function () {
     $transaction = Transaction::factory()->pending()->create([
         'user_id' => $this->user->id,
         'plan_id' => $this->plan->id,
         'amount' => $this->plan->price,
-        'payment_method' => 'transfer',
+        'payment_method' => 'qris',
     ]);
 
     Livewire::actingAs($this->user)
         ->test(TransactionDetail::class, ['order' => $transaction->order_code])
         ->call('pay', true)
-        ->assertRedirect(route('subscription.index'));
+        ->assertRedirect(route('transaction.receipt', $transaction->order_code));
 
     expect($transaction->fresh()->status)->toBe(TransactionStatus::Paid);
 });
