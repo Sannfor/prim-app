@@ -78,24 +78,67 @@
                         </td>
                         <td class="px-4 py-3 text-xs text-ink whitespace-nowrap">{{ $user->phone ?: '—' }}</td>
                         <td class="px-4 py-3">
-                            <select
-                                wire:change="changeRole({{ $user->id }}, $event.target.value)"
-                                class="rounded-md border border-line-input px-2 py-1 text-xs text-ink"
-                            >
-                                @foreach ($roles as $value => $label)
-                                    <option value="{{ $value }}" @selected($user->role->value === $value)>{{ $label }}</option>
-                                @endforeach
-                            </select>
+                            {{--
+                                Pemilih peran memakai dropdown Flux, bukan select bawaan.
+                                Select bawaan dirender oleh sistem operasi sehingga
+                                daftar pilihannya terpotong oleh area gulir tabel dan
+                                sebagian pilihan tidak terlihat.
+                            --}}
+                            <flux:dropdown position="bottom" align="start">
+                                <button
+                                    type="button"
+                                    class="inline-flex items-center gap-2 rounded-lg border border-line-soft bg-white px-2.5 py-1.5 text-xs text-ink transition hover:border-brand hover:text-brand"
+                                >
+                                    {{ $user->role->label() }}
+                                    <flux:icon.chevron-down class="size-3.5 text-muted" />
+                                </button>
+
+                                <flux:menu>
+                                    @foreach ($roles as $value => $label)
+                                        <flux:menu.item
+                                            as="button"
+                                            type="button"
+                                            wire:key="role-{{ $user->id }}-{{ $value }}"
+                                            wire:click="changeRole({{ $user->id }}, '{{ $value }}')"
+                                            icon="{{ $user->role->value === $value ? 'check' : '' }}"
+                                        >
+                                            {{ $label }}
+                                        </flux:menu.item>
+                                    @endforeach
+                                </flux:menu>
+                            </flux:dropdown>
                         </td>
                         <td class="px-4 py-3">
-                            <select
-                                wire:change="changeStatus({{ $user->id }}, $event.target.value)"
-                                class="rounded-md border border-line-input px-2 py-1 text-xs text-ink"
-                            >
-                                @foreach ($statuses as $value => $label)
-                                    <option value="{{ $value }}" @selected($user->statusEnum()->value === $value)>{{ $label }}</option>
-                                @endforeach
-                            </select>
+                            {{-- Pemilih status, alasan yang sama seperti pemilih peran. --}}
+                            <flux:dropdown position="bottom" align="start">
+                                <button
+                                    type="button"
+                                    class="inline-flex items-center gap-2 rounded-lg border border-line-soft bg-white px-2.5 py-1.5 text-xs text-ink transition hover:border-brand hover:text-brand"
+                                >
+                                    <span @class([
+                                        'size-2 rounded-full',
+                                        'bg-status-done-fg' => $user->statusEnum()->value === 'aktif',
+                                        'bg-status-cancel-fg' => $user->statusEnum()->value === 'non_aktif',
+                                        'bg-status-wait-fg' => $user->statusEnum()->value === 'suspend',
+                                    ])></span>
+                                    {{ $user->statusEnum()->label() }}
+                                    <flux:icon.chevron-down class="size-3.5 text-muted" />
+                                </button>
+
+                                <flux:menu>
+                                    @foreach ($statuses as $value => $label)
+                                        <flux:menu.item
+                                            as="button"
+                                            type="button"
+                                            wire:key="status-{{ $user->id }}-{{ $value }}"
+                                            wire:click="changeStatus({{ $user->id }}, '{{ $value }}')"
+                                            icon="{{ $user->statusEnum()->value === $value ? 'check' : '' }}"
+                                        >
+                                            {{ $label }}
+                                        </flux:menu.item>
+                                    @endforeach
+                                </flux:menu>
+                            </flux:dropdown>
                         </td>
                         <td class="px-4 py-3 text-xs text-muted whitespace-nowrap">
                             {{ $user->created_at->translatedFormat('d M Y') }}
