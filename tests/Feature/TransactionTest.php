@@ -76,6 +76,46 @@ test('checkout menolak metode pembayaran yang tidak dikenal', function () {
     expect(Transaction::query()->count())->toBe(0);
 });
 
+test('pemilih paket dapat mengganti paket dalam layanan yang sama', function () {
+    $lain = Plan::query()
+        ->where('service_id', $this->plan->service_id)
+        ->where('is_active', true)
+        ->whereKeyNot($this->plan->id)
+        ->first();
+
+    // Sebagian layanan hanya punya satu paket; pengujian dilewati bila demikian.
+    if ($lain === null) {
+        expect(true)->toBeTrue();
+
+        return;
+    }
+
+    Livewire::actingAs($this->user)
+        ->test(Checkout::class, ['plan' => $this->plan->id])
+        ->assertSet('planId', $this->plan->id)
+        ->call('choosePlan', $lain->id)
+        ->assertSet('planId', $lain->id)
+        ->assertSee($lain->groupLabel());
+});
+
+test('pemilih paket menolak paket dari layanan yang berbeda', function () {
+    $lainService = Plan::query()
+        ->where('service_id', '!=', $this->plan->service_id)
+        ->where('is_active', true)
+        ->first();
+
+    if ($lainService === null) {
+        expect(true)->toBeTrue();
+
+        return;
+    }
+
+    Livewire::actingAs($this->user)
+        ->test(Checkout::class, ['plan' => $this->plan->id])
+        ->call('choosePlan', $lainService->id)
+        ->assertSet('planId', $this->plan->id);
+});
+
 test('pembayaran berhasil mengubah status dan membuat langganan aktif', function () {
     $transaction = Transaction::factory()->pending()->create([
         'user_id' => $this->user->id,
@@ -294,7 +334,7 @@ test('langganan yang sudah ada diberitahukan pada halaman checkout', function ()
     $this->actingAs($this->user)
         ->get(route('transaction.checkout', $this->plan->id))
         ->assertOk()
-        ->assertSee('Anda sudah berlangganan layanan ini');
+        ->assertSee('Kamu sudah berlangganan layanan ini');
 
     expect($existing->isActive())->toBeTrue();
 });

@@ -28,7 +28,7 @@
             'title' => ($title ?? $heading ?? 'Panel Pengelola').' — '.config('app.name'),
         ])
     </head>
-    <body class="min-h-screen bg-white text-ink antialiased" x-data="{ menuOpen: false }">
+    <body class="min-h-screen bg-canvas text-ink antialiased" x-data="{ menuOpen: false }">
         <div class="flex min-h-screen">
             {{-- Sidebar ungu --}}
             <aside

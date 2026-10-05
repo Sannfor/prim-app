@@ -102,8 +102,13 @@
             </div>
         </header>
 
-        <div class="mx-auto w-full max-w-[1440px] px-5 py-8 lg:px-8">
-            <div class="grid gap-8 lg:grid-cols-[248px_minmax(0,1fr)]">
+        {{--
+            Lebar area akun sengaja dibatasi 1120px. Pada layar lebar, kolom isi
+            yang terlalu panjang membuat kartu langganan dan pesanan terasa
+            kosong, sehingga teks sulit diikuti dan tampilan kurang nyaman.
+        --}}
+        <div class="mx-auto w-full max-w-[1120px] px-5 py-8 lg:px-8">
+            <div class="grid gap-6 lg:grid-cols-[240px_minmax(0,1fr)]">
                 {{-- Bilah samping akun --}}
                 <aside
                     class="fixed inset-y-0 left-0 z-40 w-[264px] overflow-y-auto border-r border-line-soft bg-white p-5 transition-transform lg:sticky lg:top-[80px] lg:z-0 lg:h-fit lg:translate-x-0 lg:rounded-xl lg:border lg:p-4 lg:shadow-brand-xs"

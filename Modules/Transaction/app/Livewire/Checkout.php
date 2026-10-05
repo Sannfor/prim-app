@@ -54,6 +54,35 @@ class Checkout extends Component
     }
 
     /**
+     * Pindah ke paket lain pada layanan yang sama.
+     *
+     * Dipakai oleh pemilih paket pada halaman konfirmasi, sehingga pengguna dapat
+     * mengubah durasi atau jumlah perangkat tanpa kembali ke katalog.
+     */
+    public function choosePlan(int $planId): void
+    {
+        $plan = $this->resolvePlan((string) $planId);
+
+        // Paket hanya boleh diganti dalam layanan yang sama.
+        if ($plan->service_id !== $this->plan()->service_id) {
+            return;
+        }
+
+        $this->planId = $plan->id;
+    }
+
+    /**
+     * Paket yang sedang dipilih, lengkap dengan relasinya.
+     */
+    private function plan(): Plan
+    {
+        return Plan::query()
+            ->with('service.provider', 'service.category')
+            ->whereKey($this->planId)
+            ->firstOrFail();
+    }
+
+    /**
      * Buat transaksi dan arahkan pengguna ke halaman pembayaran.
      */
     public function checkout(TransactionService $transactions)
@@ -77,10 +106,18 @@ class Checkout extends Component
 
     public function render(TransactionService $transactions): View
     {
-        $plan = Plan::query()
-            ->with('service.provider', 'service.category')
-            ->whereKey($this->planId)
-            ->firstOrFail();
+        $plan = $this->plan();
+
+        // Seluruh paket aktif dari layanan yang sama ditawarkan sebagai pilihan,
+        // agar pengguna tidak perlu kembali ke katalog hanya untuk mengganti paket.
+        $pilihanPaket = Plan::query()
+            ->where('service_id', $plan->service_id)
+            ->where('is_active', true)
+            ->orderByRaw('variant_group is null, variant_group')
+            ->orderBy('duration_days')
+            ->orderBy('max_devices')
+            ->orderBy('price')
+            ->get();
 
         // Pengguna yang sudah punya langganan aktif atas layanan yang sama
         // diberi tahu bahwa pembelian ini akan menyambung masa aktif.
@@ -93,6 +130,7 @@ class Checkout extends Component
 
         return view('transaction::livewire.checkout', [
             'plan' => $plan,
+            'pilihanPaket' => $pilihanPaket,
             'methods' => $transactions->gateway()->methods(),
             'gatewayName' => $transactions->gateway()->name(),
             'activeSubscription' => $activeSubscription,
