@@ -260,6 +260,34 @@
         color: #ffffff;
     }
 
+    /*
+     | Kontainer isi halaman.
+     |
+     | Lebarnya sengaja dibatasi 1280px, bukan memenuhi layar. Pada layar lebar,
+     | kontainer yang terlalu lebar membuat baris teks menjadi sangat panjang dan
+     | kartu terasa kosong sehingga tampilan kurang nyaman dibaca. Ukuran ini
+     | dipakai bersama oleh beranda, katalog, panduan, dan halaman bantuan agar
+     | tepi kiri konten tetap sejajar ketika pengguna berpindah halaman.
+     */
+    .prim-container {
+        margin-inline: auto;
+        width: 100%;
+        max-width: 1280px;
+        padding-inline: 1rem;
+    }
+
+    @media (min-width: 640px) {
+        .prim-container {
+            padding-inline: 1.5rem;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .prim-container {
+            padding-inline: 3rem;
+        }
+    }
+
     /* Kartu langkah "Cara Berlangganan" */
     .prim-step-card {
         border-radius: 117px 117px 12px 12px;

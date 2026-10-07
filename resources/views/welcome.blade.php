@@ -16,7 +16,7 @@
 <x-layouts::app title="Beranda">
     {{-- Hero: latar ungu penuh sesuai desain Figma --}}
     <section class="prim-hero-bg relative overflow-hidden">
-        <div class="mx-auto grid w-full max-w-[1728px] items-center gap-10 px-6 pt-12 pb-28 lg:grid-cols-[minmax(0,44fr)_minmax(0,56fr)] lg:gap-6 lg:px-12 lg:pt-16 lg:pb-32">
+        <div class="prim-container grid items-center gap-10 pt-12 pb-28 lg:grid-cols-[minmax(0,44fr)_minmax(0,56fr)] lg:gap-6 lg:pt-16 lg:pb-32">
             <div class="relative z-10">
                 <h1 class="font-display text-[34px] leading-[1.12] font-bold text-white sm:text-[44px] lg:text-[52px]">
                     Satu Platform, Semua Layanan Premium Favoritmu
@@ -54,7 +54,7 @@
     </section>
 
     {{-- Layanan populer --}}
-    <section class="mx-auto w-full max-w-[1728px] px-6 pt-20 lg:px-12">
+    <section class="prim-container pt-20">
         <div class="flex flex-wrap items-end justify-between gap-4">
             <div>
                 <h2 class="font-display text-2xl font-bold text-ink-strong sm:text-3xl">Layanan Populer</h2>
@@ -66,20 +66,20 @@
             </a>
         </div>
 
-        <div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             @foreach ($featured as $service)
                 <a
                     href="{{ route('catalog.show', $service->slug) }}"
-                    class="prim-service-card group p-5 transition hover:shadow-brand-sm"
+                    class="prim-service-card group p-4 transition hover:shadow-brand-sm"
                     wire:navigate
                 >
-                    <x-service-logo :service="$service" class="h-20" />
+                    <x-service-logo :service="$service" class="h-14" />
 
-                    <h3 class="mt-4 font-display text-lg font-semibold text-ink-strong">{{ $service->name }}</h3>
+                    <h3 class="mt-3.5 font-display text-base font-semibold text-ink-strong">{{ $service->name }}</h3>
 
-                    <p class="mt-1 text-xs text-muted">{{ $service->category?->name }}</p>
+                    <p class="mt-0.5 text-xs text-muted">{{ $service->category?->name }}</p>
 
-                    <p class="mt-4 text-sm text-muted">
+                    <p class="mt-3 text-sm text-muted">
                         @if ($service->lowest_price)
                             Mulai
                             <span class="font-semibold text-brand">Rp{{ Number::format($service->lowest_price, locale: 'id') }}</span>
@@ -94,7 +94,7 @@
     </section>
 
     {{-- Keunggulan --}}
-    <section class="mx-auto w-full max-w-[1728px] px-6 py-20 lg:px-12">
+    <section class="prim-container py-20">
         <h2 class="font-display text-2xl font-bold text-ink-strong sm:text-3xl">Kenapa memakai PRIM?</h2>
 
         <div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -116,7 +116,7 @@
     </section>
 
     {{-- Ajakan --}}
-    <section class="mx-auto w-full max-w-[1728px] px-6 pb-24 lg:px-12">
+    <section class="prim-container pb-24">
         <div class="prim-hero-bg flex flex-wrap items-center justify-between gap-6 rounded-2xl px-8 py-10 lg:px-12">
             <div>
                 <h2 class="font-display text-xl font-bold text-white sm:text-2xl">Siap berlangganan?</h2>

@@ -106,15 +106,15 @@
         </header>
 
         {{--
-            Lebar area akun sengaja dibatasi 1120px. Pada layar lebar, kolom isi
-            yang terlalu panjang membuat kartu langganan dan pesanan terasa
-            kosong, sehingga teks sulit diikuti dan tampilan kurang nyaman.
+            Lebar area akun dibatasi 1120px, dan lebar kolom bilah samping
+            disamakan dengan lebar bilahnya (264px). Bila kolom lebih sempit
+            daripada isinya, bilah samping akan meluber menutupi kolom isi.
         --}}
         <div class="mx-auto w-full max-w-[1120px] px-5 py-8 lg:px-8">
-            <div class="grid gap-6 lg:grid-cols-[240px_minmax(0,1fr)]">
+            <div class="grid gap-6 lg:grid-cols-[264px_minmax(0,1fr)]">
                 {{-- Bilah samping akun --}}
                 <aside
-                    class="fixed inset-y-0 left-0 z-40 w-[264px] overflow-y-auto border-r border-line-soft bg-white p-5 transition-transform lg:sticky lg:top-[80px] lg:z-0 lg:h-fit lg:translate-x-0 lg:rounded-xl lg:border lg:p-4 lg:shadow-brand-xs"
+                    class="fixed inset-y-0 left-0 z-40 w-[264px] min-w-0 overflow-y-auto border-r border-line-soft bg-white p-5 transition-transform lg:sticky lg:top-[80px] lg:z-0 lg:h-fit lg:translate-x-0 lg:rounded-xl lg:border lg:p-4 lg:shadow-brand-xs"
                     :class="menuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
                 >
                     <div class="flex items-center justify-between lg:hidden">

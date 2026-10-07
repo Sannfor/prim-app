@@ -26,7 +26,7 @@
     <body class="min-h-screen bg-white text-ink antialiased">
         {{-- Navbar publik: latar #D3CFFF sesuai desain Figma --}}
         <header class="relative z-30 bg-brand-surface" x-data="{ open: false }">
-            <div class="mx-auto flex h-[86px] w-full max-w-[1728px] items-center gap-6 px-6 lg:px-12">
+            <div class="prim-container flex h-[86px] items-center gap-6">
                 <a href="{{ route('home') }}" class="shrink-0" wire:navigate>
                     <x-brand-logo size="lg" />
                 </a>
@@ -158,7 +158,7 @@
 
         {{-- Footer --}}
         <footer class="mt-auto bg-brand-surface">
-            <div class="mx-auto w-full max-w-[1728px] px-6 py-12 lg:px-12">
+            <div class="prim-container py-12">
                 <div class="grid gap-10 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
                     <div>
                         <x-brand-logo size="lg" />

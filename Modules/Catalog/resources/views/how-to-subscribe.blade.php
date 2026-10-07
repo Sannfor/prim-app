@@ -30,7 +30,7 @@
 
 <x-layouts::app title="Cara Berlangganan">
     <section class="prim-hero-bg">
-        <div class="mx-auto w-full max-w-[1728px] px-6 pt-12 pb-20 lg:px-12">
+        <div class="prim-container pt-12 pb-20">
             <h1 class="text-center font-display text-[30px] font-bold text-white sm:text-[34px]">
                 Cara Berlangganan
             </h1>
@@ -66,7 +66,7 @@
     </section>
 
     <section class="bg-white py-16">
-        <div class="mx-auto w-full max-w-[1728px] px-6 lg:px-12">
+        <div class="prim-container">
             <h2 class="text-center font-display text-[26px] font-bold text-ink-strong sm:text-[30px]">
                 Metode Pembayaran
             </h2>
@@ -87,7 +87,7 @@
 
     {{-- Rincian tiap langkah --}}
     <section class="bg-canvas py-16">
-        <div class="mx-auto w-full max-w-[1728px] px-6 lg:px-12">
+        <div class="prim-container">
             <h2 class="font-display text-2xl font-bold text-ink-strong">Rincian tiap langkah</h2>
 
             <div class="mt-8 grid gap-5 lg:grid-cols-2">

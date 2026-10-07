@@ -1,7 +1,7 @@
 <div>
     {{-- Kepala halaman: latar ungu sesuai desain --}}
     <section class="prim-hero-bg">
-        <div class="mx-auto w-full max-w-[1728px] px-6 pt-10 pb-8 lg:px-12">
+        <div class="prim-container pt-10 pb-8">
             <h1 class="text-center font-display text-[30px] font-bold text-white sm:text-[36px] lg:text-[40px]">
                 Layanan
             </h1>
@@ -9,7 +9,7 @@
     </section>
 
     <section class="prim-hero-bg pb-16">
-        <div class="mx-auto w-full max-w-[1728px] px-6 lg:px-12">
+        <div class="prim-container">
             {{-- Baris pencarian & filter --}}
             <div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
                 <div class="relative">
@@ -76,7 +76,7 @@
                     @endif
                 </div>
             @else
-                <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                <div class="mt-6 grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     @foreach ($services as $service)
                         @php
                             $isCompared = in_array($service->id, $compareSelection, true);
@@ -96,14 +96,14 @@
                                 <span class="prim-ribbon bg-brand">{{ 'Preorder' }}</span>
                             @endif
 
-                            <div class="p-5 pb-4">
-                                <x-service-logo :service="$service" class="h-[74px]" />
+                            <div class="p-4 pb-3">
+                                <x-service-logo :service="$service" class="h-14" />
 
-                                <h2 class="mt-4 font-display text-xl font-semibold text-ink-strong">
+                                <h2 class="mt-3.5 font-display text-base font-semibold text-ink-strong">
                                     {{ $service->name }}
                                 </h2>
 
-                                <div class="mt-3 space-y-3">
+                                <div class="mt-2.5 space-y-2.5">
                                     @forelse ($activePlans as $plan)
                                         <div>
                                             <div class="flex items-start justify-between gap-2">
@@ -121,7 +121,7 @@
                                     @endforelse
                                 </div>
 
-                                <div class="mt-4 flex items-center justify-between gap-2">
+                                <div class="mt-3 flex items-center justify-between gap-2">
                                     <a
                                         href="{{ route('catalog.show', $service->slug) }}"
                                         class="text-[13px] text-muted underline-offset-2 hover:text-brand hover:underline"
@@ -141,7 +141,7 @@
                                 </div>
                             </div>
 
-                            <div class="mt-auto p-5 pt-0">
+                            <div class="mt-auto p-4 pt-0">
                                 @if ($firstPlan)
                                     <a
                                         href="{{ route('transaction.checkout', $firstPlan) }}"
@@ -166,7 +166,7 @@
     </section>
 
     {{-- Keterangan tambahan di luar area ungu --}}
-    <section class="mx-auto w-full max-w-[1728px] px-6 py-14 lg:px-12">
+    <section class="prim-container py-14">
         <div class="grid gap-5 sm:grid-cols-3">
             @foreach ([
                 ['icon' => 'shield-check', 'title' => 'Akun bergaransi', 'desc' => 'Setiap pembelian dilindungi garansi selama masa aktif langganan.'],

@@ -26,7 +26,7 @@
 
 <x-layouts::app title="Laporan Kendala">
     <section class="prim-hero-bg">
-        <div class="mx-auto w-full max-w-[1728px] px-6 py-14 lg:px-12">
+        <div class="prim-container py-14">
             <div class="grid items-center gap-12 lg:grid-cols-2">
                 <div>
                     <h1 class="font-display text-[30px] font-bold text-white sm:text-[36px]">
@@ -104,7 +104,7 @@
     </section>
 
     <section class="bg-white py-16">
-        <div class="mx-auto w-full max-w-[1728px] px-6 lg:px-12">
+        <div class="prim-container">
             <h2 class="font-display text-2xl font-bold text-ink-strong">Yang bisa kami bantu</h2>
 
             <div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
