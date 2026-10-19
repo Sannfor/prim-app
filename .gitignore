@@ -22,3 +22,9 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+# Dokumen SRS dan tangkapan layar tidak ikut repositori.
+# Sumbernya berada di akar proyek RPL (BAB-I..IV, docs/usecase-diagram,
+# docs/bab2). Berkas di folder ini tetap tersimpan di komputer dan tetap
+# dihasilkan ulang oleh tools/buat-gambar-bab4.ps1, hanya tidak dilacak git.
+/docs
