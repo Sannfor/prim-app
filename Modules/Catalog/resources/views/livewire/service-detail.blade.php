@@ -123,6 +123,50 @@
         @endif
     </section>
 
+    {{-- Formulir ulasan: hanya untuk pembeli layanan ini yang belum mengulas --}}
+    @if ($bolehMengulas)
+        <section class="rounded-2xl border border-zinc-200 bg-white p-6">
+            <h2 class="text-lg font-semibold tracking-tight">Tulis Ulasan</h2>
+            <p class="mt-1 text-sm text-muted">
+                Anda sudah berlangganan layanan ini, jadi Anda dapat memberi nilai dan ulasan.
+                Ulasan hanya dapat ditulis satu kali untuk setiap layanan.
+            </p>
+
+            <form wire:submit="simpanUlasan" class="mt-4 space-y-4">
+                <div class="max-w-xs">
+                    <label for="ratingUlasan" class="prim-label">Rating</label>
+                    <select id="ratingUlasan" wire:model="ratingUlasan" class="prim-input">
+                        @foreach ([5, 4, 3, 2, 1] as $nilai)
+                            <option value="{{ $nilai }}">{{ str_repeat('★', $nilai) }} ({{ $nilai }})</option>
+                        @endforeach
+                    </select>
+                    @error('ratingUlasan') <p class="mt-1 text-sm text-status-cancel-fg">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
+                    <label for="komentarUlasan" class="prim-label">Komentar (opsional)</label>
+                    <textarea
+                        id="komentarUlasan"
+                        wire:model="komentarUlasan"
+                        rows="3"
+                        class="prim-input"
+                        placeholder="Ceritakan pengalaman Anda memakai layanan ini"
+                    ></textarea>
+                    @error('komentarUlasan') <p class="mt-1 text-sm text-status-cancel-fg">{{ $message }}</p> @enderror
+                </div>
+
+                <button type="submit" class="prim-btn h-11 px-6" wire:loading.attr="disabled">
+                    <span wire:loading.remove>Kirim Ulasan</span>
+                    <span wire:loading>Menyimpan…</span>
+                </button>
+            </form>
+        </section>
+    @elseif ($sudahMengulas)
+        <p class="rounded-2xl bg-canvas px-5 py-4 text-sm text-muted">
+            Anda sudah menulis ulasan untuk layanan ini. Terima kasih.
+        </p>
+    @endif
+
     {{-- Ulasan pengguna --}}
     @if ($service->reviews->isNotEmpty())
         <section class="rounded-2xl border border-zinc-200 bg-white p-6 ">

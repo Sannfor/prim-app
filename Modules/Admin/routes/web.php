@@ -21,8 +21,9 @@ Route::middleware(['auth', 'verified', 'role:admin'])
     ->group(function () {
         Route::livewire('/', 'admin::dashboard')->name('dashboard');
 
-        // Pesanan & pembayaran.
+        // Pesanan, langganan, & pembayaran.
         Route::livewire('pesanan', 'admin::transaction-manager')->name('transactions.index');
+        Route::livewire('langganan', 'admin::subscription-manager')->name('subscriptions.index');
         Route::livewire('pembayaran', 'admin::payment-manager')->name('payments.index');
 
         // Pengguna.
@@ -48,4 +49,29 @@ Route::middleware(['auth', 'verified', 'role:admin'])
         Route::livewire('transaksi', 'admin::transaction-manager')->name('transactions.legacy');
         Route::livewire('layanan', 'admin::service-manager')->name('services.legacy');
         Route::livewire('layanan/{service}/paket', 'admin::plan-manager')->name('plans.legacy');
+    });
+
+/*
+|--------------------------------------------------------------------------
+| Provider Routes (ROLE: provider)
+|--------------------------------------------------------------------------
+|
+| Panel untuk akun berperan penyedia layanan. Cakupannya sengaja sempit:
+| penyedia hanya melihat dan menyunting layanan serta paket miliknya sendiri,
+| sesuai F-17. Kepemilikan ditentukan oleh providers.user_id, bukan oleh
+| masukan formulir, sehingga penyedia tidak dapat memindahkan layanan ke
+| penyedia lain atau menyunting layanan pihak lain.
+|
+| Verifikasi pembayaran, pengelolaan pengguna, dan laporan tetap menjadi
+| wewenang administrator pada panel di atas.
+|
+*/
+
+Route::middleware(['auth', 'verified', 'role:provider'])
+    ->prefix('penyedia')
+    ->name('provider.')
+    ->group(function () {
+        Route::livewire('/', 'admin::provider.dashboard')->name('dashboard');
+        Route::livewire('layanan', 'admin::provider.service-manager')->name('services.index');
+        Route::livewire('layanan/{service}/paket', 'admin::provider.plan-manager')->name('plans.index');
     });

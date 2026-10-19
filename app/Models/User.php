@@ -10,6 +10,7 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
@@ -110,6 +111,20 @@ class User extends Authenticatable // implements MustVerifyEmail
     public function isProvider(): bool
     {
         return $this->role === Role::Provider;
+    }
+
+    /**
+     * Data penyedia yang diwakili pengguna ini.
+     *
+     * Hanya terisi untuk akun berperan provider. Panel penyedia memakai relasi
+     * ini sebagai batas kepemilikan: akun hanya boleh menyunting layanan yang
+     * penyedianya adalah dirinya.
+     *
+     * @return HasOne<Provider, $this>
+     */
+    public function provider(): HasOne
+    {
+        return $this->hasOne(Provider::class);
     }
 
     /**

@@ -3,23 +3,44 @@
      | Tata letak panel pengelola PRIM: sidebar ungu (#534AB7) di kiri dan
      | area konten putih, sesuai desain Figma.
      |
-     | Dipakai lewat atribut #[Layout('layouts::admin')]. Berkas ini sengaja
-     | tidak memakai @props karena Livewire membutuhkannya sebagai view biasa.
+     | Dipakai lewat atribut #[Layout('layouts::admin')] oleh dua peran:
+     |   - administrator: panel pengelola penuh (menu di bawah)
+     |   - penyedia layanan: panel terbatas pada layanan miliknya (F-17)
+     |
+     | Menu disusun menurut peran pengguna yang sedang masuk, sehingga akun
+     | penyedia tidak melihat menu yang akan ditolak dengan 403.
+     |
+     | Berkas ini sengaja tidak memakai @props karena Livewire membutuhkannya
+     | sebagai view biasa.
      */
     $title = $title ?? null;
     $heading = $heading ?? null;
     $subheading = $subheading ?? null;
     $user = auth()->user();
+    $isPenyedia = $user?->isProvider() ?? false;
 
-    $menu = [
+    $menuPengelola = [
         ['route' => 'admin.dashboard', 'label' => 'Dashboard', 'icon' => 'squares-2x2', 'active' => ['admin.dashboard']],
         ['route' => 'admin.transactions.index', 'label' => 'Pesanan', 'icon' => 'shopping-cart', 'active' => ['admin.transactions.*']],
+        ['route' => 'admin.subscriptions.index', 'label' => 'Langganan', 'icon' => 'arrow-path', 'active' => ['admin.subscriptions.*']],
         ['route' => 'admin.users.index', 'label' => 'Pengguna', 'icon' => 'users', 'active' => ['admin.users.*']],
         ['route' => 'admin.services.index', 'label' => 'Produk', 'icon' => 'cube', 'active' => ['admin.services.*', 'admin.plans.*']],
         ['route' => 'admin.payments.index', 'label' => 'Pembayaran', 'icon' => 'credit-card', 'active' => ['admin.payments.*']],
         ['route' => 'admin.vouchers.index', 'label' => 'Voucher', 'icon' => 'ticket', 'active' => ['admin.vouchers.*']],
         ['route' => 'admin.reports.index', 'label' => 'Laporan', 'icon' => 'document-chart-bar', 'active' => ['admin.reports.*']],
     ];
+
+    $menuPenyedia = [
+        ['route' => 'provider.dashboard', 'label' => 'Dashboard', 'icon' => 'squares-2x2', 'active' => ['provider.dashboard']],
+        ['route' => 'provider.services.index', 'label' => 'Layanan Saya', 'icon' => 'cube', 'active' => ['provider.services.*', 'provider.plans.*']],
+    ];
+
+    $menu = $isPenyedia ? $menuPenyedia : $menuPengelola;
+
+    // Halaman beranda panel dan halaman pengaturan berbeda menurut peran.
+    $berandaPanel = $isPenyedia ? 'provider.dashboard' : 'admin.dashboard';
+    $rutePengaturan = $isPenyedia ? 'settings.profile' : 'admin.settings.profile';
+    $polaPengaturan = $isPenyedia ? 'settings.*' : 'admin.settings.*';
 @endphp
 
 <!DOCTYPE html>
@@ -42,7 +63,7 @@
                         sehingga tenggelam bila langsung di atas latar ungu sidebar.
                     --}}
                     <a
-                        href="{{ route('admin.dashboard') }}"
+                        href="{{ route($berandaPanel) }}"
                         class="inline-flex items-center rounded-xl bg-white px-4 py-2.5 shadow-brand-xs transition hover:bg-white/90"
                         wire:navigate
                     >
@@ -79,10 +100,10 @@
 
                 <div class="pb-6">
                     <a
-                        href="{{ route('admin.settings.profile') }}"
+                        href="{{ route($rutePengaturan) }}"
                         @class([
                             'prim-sidebar-item',
-                            'prim-sidebar-item-active font-medium' => request()->routeIs('admin.settings.*'),
+                            'prim-sidebar-item-active font-medium' => request()->routeIs($polaPengaturan),
                         ])
                         wire:navigate
                     >
@@ -127,7 +148,14 @@
                         </p>
 
                         <div class="ml-auto flex items-center gap-4">
-                            <livewire:notification-bell />
+                            {{--
+                                Lonceng notifikasi panel berisi pemberitahuan
+                                pesanan seluruh platform, jadi hanya ditampilkan
+                                untuk administrator.
+                            --}}
+                            @unless ($isPenyedia)
+                                <livewire:notification-bell />
+                            @endunless
 
                             <div class="flex items-center gap-3">
                                 <span class="flex size-9 items-center justify-center rounded-lg bg-brand text-xs font-medium text-white">

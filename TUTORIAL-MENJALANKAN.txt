@@ -8,6 +8,10 @@ Dokumen ini menjelaskan cara menjalankan aplikasi PRIM dari nol sampai bisa
 dibuka di peramban. Ikuti berurutan. Perkiraan waktu: 10-20 menit (tergantung
 kecepatan internet saat memasang dependensi).
 
+Diperbarui 18 Oktober 2026: menambahkan panel penyedia, ulasan dan rating,
+pemantauan langganan, tabel dan kolom basis data yang baru, serta alur demo
+yang disarankan (bagian 7B).
+
 
 ================================================================================
 1. APA YANG AKAN ANDA JALANKAN
@@ -16,10 +20,19 @@ kecepatan internet saat memasang dependensi).
 PRIM adalah aplikasi web katalog layanan digital premium. Fitur utamanya:
 
   - Katalog 27 layanan dengan varian paket, harga, dan pita diskon
-  - Pemesanan, pembayaran (simulasi), dan riwayat transaksi
-  - Pengelolaan langganan beserta masa aktifnya
-  - Panel pengelola: dashboard, pesanan, pengguna, produk, pembayaran, laporan
+  - Pencarian, filter kategori, dan perbandingan sampai empat layanan
+  - Pemesanan, pembayaran (simulasi), struk digital, dan riwayat transaksi
+  - Kode voucher, notifikasi pembeli, dan pengembalian dana
+  - Pengelolaan langganan beserta masa aktif, perpanjangan, dan otomatis
+  - Ulasan dan rating dari pelanggan yang benar-benar sudah membeli
+  - Panel pengelola: dashboard, pesanan, langganan, pengguna, produk,
+    pembayaran, voucher, dan laporan
+  - Panel penyedia: penyedia hanya dapat mengelola layanan dan paket miliknya
   - Autentikasi: masuk, daftar, lupa kata sandi, dan verifikasi perangkat (OTP)
+
+Aplikasi ini memiliki TIGA PERAN: Pelanggan (user), Administrator (admin), dan
+Penyedia Layanan (provider). Ketiganya memakai satu halaman masuk yang sama;
+peran akunlah yang menentukan panel mana yang terbuka.
 
 Teknologi: Laravel 12, Livewire 3, Flux UI 2, Tailwind CSS 4, SQLite.
 
@@ -140,8 +153,9 @@ macOS / Linux:
 
   php artisan migrate:fresh --seed
 
-Perintah ini membuat seluruh tabel lalu mengisinya dengan 27 layanan, 18 akun,
-20 transaksi, kredensial kode login, dan 4 kode voucher.
+Perintah ini membuat seluruh tabel lalu mengisinya dengan 27 layanan, 19 akun
+(satu administrator, satu penyedia, sisanya pelanggan), transaksi contoh,
+kredensial kode login, dan 4 kode voucher.
 
 PERINGATAN: "migrate:fresh" menghapus seluruh isi basis data. Pada pemasangan
 pertama ini tidak masalah karena basis datanya masih kosong. Jangan dijalankan
@@ -202,7 +216,9 @@ Seluruh akun memakai kata sandi yang sama:  password
 
 --- Pelanggan ----------------------------------------------------------------
 
-  Email : andi@prim.test      <- paling lengkap (2 transaksi, 2 kode login)
+  Email : andi@prim.test      <- paling lengkap: transaksi lunas, langganan
+                                  aktif, kode login, dan memenuhi syarat menulis
+                                  ulasan Netflix
   Email : rina@prim.test
   Email : budi@prim.test
   Email : dewi@prim.test
@@ -217,9 +233,26 @@ pengelola:
   maya@prim.test   -> Suspend
   mega@prim.test   -> Non-aktif
 
+--- Penyedia Layanan ---------------------------------------------------------
+
+  Email : provider@prim.test
+  Sandi : password
+  Peran : Penyedia Layanan
+  Mewakili penyedia: Netflix (1 layanan, 3 paket)
+
+Akun ini hanya dapat membuka panel penyedia dan hanya melihat layanan milik
+Netflix. Bila akun tersebut belum ada pada basis data lama (dibuat sebelum
+panel penyedia ditambahkan), jalankan dari dalam folder prim:
+
+  php artisan migrate
+  php artisan db:seed --class=ProviderUserSeeder
+
+Seeder itu idempoten: dijalankan berulang tetap menghasilkan satu akun yang
+tertaut ke satu penyedia.
+
 
 ================================================================================
-7. CARA MASUK SEBAGAI ADMIN DAN SEBAGAI USER
+7. CARA MASUK SEBAGAI ADMIN, PENYEDIA, DAN PELANGGAN
 ================================================================================
 
 --- 7.1 Masuk sebagai Administrator -------------------------------------------
@@ -230,10 +263,28 @@ pengelola:
   4. Setelah masuk, klik avatar di kanan atas, lalu pilih "Panel Pengelola"
      ATAU langsung buka http://127.0.0.1:8000/admin
 
-  Di panel pengelola tersedia menu: Dashboard, Pesanan, Pengguna, Produk,
-  Pembayaran, Voucher, Laporan, dan Pengaturan.
+  Di panel pengelola tersedia menu: Dashboard, Pesanan, Langganan, Pengguna,
+  Produk, Pembayaran, Voucher, Laporan, dan Pengaturan.
 
---- 7.2 Masuk sebagai Pelanggan ----------------------------------------------
+--- 7.2 Masuk sebagai Penyedia Layanan ---------------------------------------
+
+  1. Buka http://127.0.0.1:8000/login
+  2. Isi Email: provider@prim.test   dan   Password: password
+  3. Klik tombol "Masuk"
+  4. Klik avatar di kanan atas, lalu pilih "Panel Penyedia"
+     ATAU langsung buka http://127.0.0.1:8000/penyedia
+
+  Menu panel penyedia hanya dua: Dashboard dan Layanan Saya. Lonceng notifikasi
+  pengelola sengaja tidak ditampilkan di panel ini agar pemberitahuan pesanan
+  seluruh platform tidak terbaca oleh penyedia.
+
+  Yang dapat dilakukan penyedia: menyunting layanan miliknya, menambah atau
+  mengubah paket pada layanan itu, serta memantau pesanan dan pendapatan atas
+  layanannya. Penyedia tidak dapat memindahkan layanan ke penyedia lain, dan
+  seluruh alamat halaman milik penyedia lain ditolak dengan pesan data tidak
+  ditemukan. Akun ini juga ditolak (403) bila membuka /admin.
+
+--- 7.3 Masuk sebagai Pelanggan ----------------------------------------------
 
   1. Buka http://127.0.0.1:8000/login
   2. Isi Email: andi@prim.test   dan   Password: password
@@ -241,7 +292,7 @@ pengelola:
 
   Menu pelanggan: Pesanan (9 tab status), Kode Login, Langganan, Pengaturan.
 
---- 7.3 Masuk memakai kode OTP (verifikasi perangkat) -------------------------
+--- 7.4 Masuk memakai kode OTP (verifikasi perangkat) -------------------------
 
   1. Buka http://127.0.0.1:8000/kode-login
   2. Masukkan email terdaftar, misalnya admin@prim.com
@@ -250,14 +301,15 @@ pengelola:
      sebagai sarana demonstrasi)
   4. Masukkan kode tersebut, lalu klik "Verifikasi & Masuk"
 
---- 7.4 Mendaftar akun baru ---------------------------------------------------
+--- 7.5 Mendaftar akun baru ---------------------------------------------------
 
   1. Buka http://127.0.0.1:8000/register
   2. Isi nama lengkap, email, nomor WhatsApp, kata sandi, dan konfirmasi
   3. Centang persetujuan syarat, lalu klik "Daftar"
 
-Tidak ada halaman login terpisah untuk admin. Peran akun yang menentukan akses;
-akun dengan peran Administrator otomatis melihat menu "Panel Pengelola".
+Tidak ada halaman login terpisah untuk admin maupun penyedia. Peran akun yang
+menentukan akses: akun Administrator melihat menu "Panel Pengelola" dan akun
+Penyedia Layanan melihat menu "Panel Penyedia".
 
 
 ================================================================================
@@ -314,6 +366,60 @@ yang bisa langsung dicoba pada halaman konfirmasi pemesanan.
 
 
 ================================================================================
+7B. ALUR DEMO YANG DISARANKAN
+================================================================================
+
+Urutan berikut memperlihatkan seluruh fitur dalam waktu singkat, termasuk dua
+fitur yang baru ditambahkan (ulasan dan pemantauan langganan) serta panel
+penyedia.
+
+--- 1. Pelanggan: menulis ulasan ---------------------------------------------
+
+  1. Masuk sebagai andi@prim.test (akun ini sudah punya transaksi Netflix
+     yang lunas)
+  2. Buka http://127.0.0.1:8000/katalog/netflix
+  3. Gulir ke bawah: ada bagian "Tulis Ulasan" berisi pilihan Rating dan
+     kolom Komentar
+  4. Pilih bintang, isi komentar, lalu klik "Kirim Ulasan"
+  5. Ulasan langsung muncul pada daftar "Ulasan pengguna" dan nilai rata-rata
+     pada lencana rating ikut berubah
+
+  Syaratnya: akun harus punya transaksi berhasil atas layanan itu dan belum
+  pernah mengulasnya. Ulasan hanya dapat ditulis satu kali per layanan, jadi
+  formulir ini hilang setelah dipakai. Bila daftar ulasan ingin diisi contoh
+  lebih dahulu, jalankan dari folder prim:
+
+      php tools/buat-ulasan-contoh.php
+
+--- 2. Pelanggan: melihat struk dan notifikasi --------------------------------
+
+  1. Masuk sebagai andi@prim.test, buka menu "Pesanan"
+  2. Pada pesanan berstatus "Selesai", klik "Cetak Struk"
+  3. Struk digital tampil dan dapat dicetak atau disimpan sebagai PDF
+  4. Kembali ke Pesanan, klik ikon lonceng di kanan atas: daftar notifikasi
+     pembeli terbuka (pembayaran diterima, kode login siap dipakai)
+
+--- 3. Pengelola: memantau langganan ------------------------------------------
+
+  1. Masuk sebagai admin@prim.com, buka menu "Langganan"
+  2. Empat kartu ringkasan: Langganan Aktif, Akan Berakhir (7 hari),
+     Sudah Berakhir, dan Perpanjangan Otomatis
+  3. Coba penyaring "Akan berakhir" dan kolom pencarian nama pelanggan
+  4. Kolom "Sisa" menampilkan jumlah hari; yang tinggal 7 hari atau kurang
+     diberi warna peringatan
+
+--- 4. Penyedia: mengelola layanan miliknya ----------------------------------
+
+  1. Masuk sebagai provider@prim.test, buka http://127.0.0.1:8000/penyedia
+  2. Dashboard hanya menampilkan ringkasan layanan Netflix, bukan layanan
+     penyedia lain
+  3. Buka "Layanan Saya" lalu tekan tombol pensil: kolom Penyedia tampil
+     terkunci berisi "Netflix"
+  4. Buka "Kelola Paket" untuk menambah atau mengubah paket layanan tersebut
+  5. Coba buka http://127.0.0.1:8000/admin — akses ditolak (403)
+
+
+================================================================================
 8. DENAH HALAMAN
 ================================================================================
 
@@ -335,19 +441,38 @@ yang bisa langsung dicoba pada halaman konfirmasi pemesanan.
   /profil/pesanan         Pusat pesanan
   /profil/kode-login      Kredensial akun layanan
   /langganan              Langganan saya
+  /langganan/{id}/perpanjang   Perpanjangan langganan
   /transaksi              Riwayat transaksi
+  /transaksi/{kode}       Detail pesanan + pilih metode pembayaran
+  /transaksi/{kode}/struk Struk digital
   /checkout/{id}          Konfirmasi pemesanan
   /settings/profile       Pengaturan akun
+  /settings/password      Ubah kata sandi
+
+  Ulasan ditulis langsung pada halaman detail layanan (/katalog/{slug}), bukan
+  pada alamat tersendiri. Formulirnya hanya muncul bagi pembeli layanan itu.
 
 --- Halaman pengelola (peran admin) ------------------------------------------
 
   /admin                          Dashboard
   /admin/pesanan                  Manajemen pesanan
+  /admin/langganan                Manajemen langganan
   /admin/pembayaran               Manajemen pembayaran
   /admin/pengguna                 Manajemen pengguna
   /admin/produk                   Manajemen produk
+  /admin/produk/{slug}/paket      Manajemen paket per layanan
+  /admin/kategori                 Manajemen kategori
+  /admin/penyedia                 Manajemen data penyedia
+  /admin/voucher                  Manajemen kode voucher
   /admin/laporan                  Laporan
   /admin/pengaturan/profil        Pengaturan profil admin
+  /admin/pengaturan/notifikasi    Pengaturan notifikasi admin
+
+--- Halaman penyedia (peran provider) ----------------------------------------
+
+  /penyedia                       Dashboard penyedia
+  /penyedia/layanan               Layanan saya
+  /penyedia/layanan/{slug}/paket  Paket layanan miliknya
 
 
 ================================================================================
@@ -395,10 +520,38 @@ yang bisa langsung dicoba pada halaman konfirmasi pemesanan.
   Solusi  : php artisan serve --port=8001
             lalu buka http://127.0.0.1:8001
 
+--- Akun penyedia belum ada / "Akun penyedia ini belum dihubungkan ke data
+    penyedia" ------------------------------------------------------------------
+
+  Penyebab: basis data dibuat sebelum panel penyedia ditambahkan, sehingga
+            kolom providers.user_id belum ada atau akunnya belum tertaut.
+  Solusi  : dari dalam folder prim, jalankan berurutan:
+              php artisan migrate
+              php artisan db:seed --class=ProviderUserSeeder
+            lalu masuk dengan provider@prim.test / password.
+
+--- Menu "Panel Penyedia" tidak muncul, atau /penyedia ditolak (403) ----------
+
+  Penyebab: akun yang dipakai bukan berperan provider, atau belum tertaut ke
+            satu baris data penyedia.
+  Solusi  : periksa peran akun; bila perlu tetapkan ulang dengan seeder di atas.
+            Administrator memang ditolak di /penyedia, dan penyedia ditolak di
+            /admin. Itu disengaja.
+
+--- Bagian "Tulis Ulasan" tidak muncul pada halaman detail layanan -----------
+
+  Penyebab: salah satu syarat belum terpenuhi. Formulir hanya tampil bila akun
+            sudah masuk, punya transaksi BERHASIL atas layanan itu, dan belum
+            pernah mengulasnya.
+  Solusi  : pakai andi@prim.test (punya transaksi Netflix lunas) dan pastikan
+            akun itu belum mengirim ulasan untuk layanan tersebut. Ulasan hanya
+            dapat ditulis sekali per layanan.
+
 --- Ingin mengembalikan data ke kondisi awal --------------------------------
 
   Solusi  : php artisan migrate:fresh --seed
-            (menghapus seluruh data dan mengisi ulang data contoh)
+            (menghapus seluruh data dan mengisi ulang data contoh, termasuk
+            akun penyedia)
 
 
 ================================================================================
@@ -409,9 +562,22 @@ yang bisa langsung dicoba pada halaman konfirmasi pemesanan.
   npm run build                  Bangun aset tampilan (wajib setelah ubah CSS)
   npm run dev                    Pantau perubahan tampilan secara otomatis
   php artisan migrate:fresh --seed   Setel ulang basis data + data contoh
+  php artisan db:seed --class=ProviderUserSeeder
+                                 Buat atau tautkan akun penyedia contoh
   php artisan test               Jalankan seluruh pengujian otomatis
   php artisan optimize:clear     Bersihkan cache
   php artisan route:list         Lihat daftar seluruh rute
+  php artisan route:list --path=penyedia
+                                 Lihat rute panel penyedia saja
+
+Perintah berikut dijalankan dari AKAR proyek RPL (bukan dari dalam prim):
+
+  powershell -ExecutionPolicy Bypass -File tools\buat-gambar-bab4.ps1
+                                 Ambil ulang seluruh gambar Bab 4 SRS
+  python tools\generate_usecase_diagrams.py
+                                 Buat ulang diagram dan deskripsi use case Bab 3
+  python tools\generate_gambar_2_1.py
+                                 Buat ulang Gambar 2-1 (tinjauan sistem)
 
 
 ================================================================================
@@ -430,10 +596,22 @@ Email       : belum dikonfigurasi (MAIL_MAILER=log). Karena itu kode OTP
 Struktur    : arsitektur modular (HMVC). Setiap modul berada pada folder
               Modules/ dengan folder app, resources, routes, dan database
               tersendiri. Modul yang ada: Admin, Catalog, Subscription,
-              Transaction.
+              Transaction. Panel penyedia berada di dalam modul Admin, karena
+              keduanya memakai satu kerangka tata letak dan satu diagram use
+              case (Modul 4).
 
-Dokumentasi : prim/docs/DESAIN-FIGMA.md    Catatan penyesuaian tampilan ke Figma
-              prim/docs/SRS-SINKRONISASI.md Sinkronisasi SRS dengan implementasi
+Peran       : Pelanggan (user), Administrator (admin), Penyedia Layanan
+              (provider). Pembatasan akses memakai middleware role dan diuji
+              otomatis, termasuk penolakan penyedia membuka /admin.
+
+Tabel baru  : reviews (ulasan dan rating) dan kolom providers.user_id yang
+              menautkan satu akun penyedia ke satu baris data penyedia.
+
+Dokumentasi : docs/BAB-IV-Rancangan-Antarmuka-PRIM.md  Bab 4 SRS + daftar gambar
+              docs/BAB-II-Deskripsi-Umum-Revisi.md     Perbaikan Bab 2 SRS
+              docs/usecase-diagram/                      Diagram + deskripsi use case
+              prim/docs/DESAIN-FIGMA.md                  Penyesuaian tampilan ke Figma
+              prim/docs/SRS-SINKRONISASI.md              Sinkronisasi SRS dengan kode
 
 Kalau ada kendala yang belum tercantum di dokumen ini, kirimkan pesan galat
 lengkapnya beserta langkah yang sedang dijalankan.

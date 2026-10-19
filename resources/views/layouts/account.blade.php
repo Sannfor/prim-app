@@ -68,6 +68,15 @@
                         <flux:icon.chart-bar-square class="size-4" />
                         Panel Pengelola
                     </a>
+                @elseif ($user?->isProvider())
+                    <a
+                        href="{{ route('provider.dashboard') }}"
+                        class="hidden items-center gap-2 text-sm font-medium text-ink transition hover:text-brand sm:flex"
+                        wire:navigate
+                    >
+                        <flux:icon.cube class="size-4" />
+                        Panel Penyedia
+                    </a>
                 @endif
 
                 {{-- Lonceng notifikasi pembeli --}}
