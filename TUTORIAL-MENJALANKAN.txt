@@ -204,15 +204,33 @@ Bila port 8000 sudah dipakai program lain, jalankan dengan port berbeda:
 
 Seluruh akun memakai kata sandi yang sama:  password
 
---- Administrator ------------------------------------------------------------
+--- Administrator (dua tingkat) ----------------------------------------------
 
   Email : admin@prim.com
   Sandi : password
-  Peran : Administrator (Super Admin)
+  Peran : Administrator, tingkat SUPER ADMIN
+  Boleh : mengangkat pengguna menjadi administrator, mengubah peran dan
+          status administrator lain
 
   Email : admin@prim.test
   Sandi : password
-  Peran : Administrator
+  Peran : Administrator biasa
+  Boleh : mengelola layanan, paket, transaksi, voucher, refund, laporan,
+          serta peran dan status pelanggan/penyedia
+  Tidak : mengangkat administrator atau menyentuh akun administrator lain.
+          Pilihan "Administrator" tidak muncul pada daftar perannya, dan
+          baris administrator lain ditampilkan terkunci.
+
+  Cara memperlihatkan bedanya saat demo:
+    1. Masuk sebagai admin@prim.test, buka /admin/pengguna.
+    2. Buka daftar peran pada salah satu pelanggan: hanya ada Pelanggan dan
+       Penyedia Layanan. Baris administrator lain terkunci.
+    3. Keluar, masuk sebagai admin@prim.com, buka halaman yang sama.
+    4. Daftar peran kini memuat Administrator, dan baris administrator lain
+       dapat diubah.
+
+  Catatan: akun administrator tidak dapat mengubah peran maupun status
+  akunnya sendiri, agar akses panel tidak hilang.
 
 --- Pelanggan ----------------------------------------------------------------
 

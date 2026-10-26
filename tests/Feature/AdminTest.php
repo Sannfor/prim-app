@@ -2,6 +2,7 @@
 
 use App\Enums\Role;
 use App\Enums\TransactionStatus;
+use App\Enums\UserStatus;
 use App\Models\Category;
 use App\Models\Plan;
 use App\Models\Provider;
@@ -29,7 +30,12 @@ use Modules\Admin\Livewire\UserManager;
 beforeEach(function () {
     $this->seed(CatalogSeeder::class);
 
+    // Administrator biasa: boleh mengelola data platform, tetapi tidak boleh
+    // mengangkat administrator lain.
     $this->admin = User::factory()->admin()->create();
+
+    // Super Admin: administrator tingkat tertinggi.
+    $this->superAdmin = User::factory()->superAdmin()->create();
 });
 
 /*
@@ -414,20 +420,95 @@ test('admin tidak dapat menurunkan perannya sendiri', function () {
     expect($this->admin->fresh()->role)->toBe(Role::Admin);
 });
 
-test('admin dapat menaikkan pengguna lain menjadi admin', function () {
+test('super admin dapat menaikkan pengguna lain menjadi admin', function () {
     $user = User::factory()->create();
 
-    Livewire::actingAs($this->admin)
+    Livewire::actingAs($this->superAdmin)
         ->test(UserManager::class)
         ->call('changeRole', $user->id, Role::Admin->value);
 
     expect($user->fresh()->role)->toBe(Role::Admin);
 });
 
-test('peran yang tidak dikenal ditolak', function () {
+test('admin biasa tidak dapat menaikkan pengguna menjadi admin', function () {
     $user = User::factory()->create();
 
     Livewire::actingAs($this->admin)
+        ->test(UserManager::class)
+        ->call('changeRole', $user->id, Role::Admin->value);
+
+    expect($user->fresh()->role)->toBe(Role::User);
+});
+
+test('admin biasa tidak dapat mengubah peran administrator lain', function () {
+    $lain = User::factory()->admin()->create();
+
+    Livewire::actingAs($this->admin)
+        ->test(UserManager::class)
+        ->call('changeRole', $lain->id, Role::User->value);
+
+    expect($lain->fresh()->role)->toBe(Role::Admin);
+});
+
+test('super admin dapat mengubah peran administrator lain', function () {
+    $lain = User::factory()->admin()->create();
+
+    Livewire::actingAs($this->superAdmin)
+        ->test(UserManager::class)
+        ->call('changeRole', $lain->id, Role::User->value);
+
+    expect($lain->fresh()->role)->toBe(Role::User);
+});
+
+test('super admin tetap dapat menurunkan super admin lain', function () {
+    $kedua = User::factory()->superAdmin()->create();
+
+    Livewire::actingAs($this->superAdmin)
+        ->test(UserManager::class)
+        ->call('changeRole', $kedua->id, Role::User->value);
+
+    expect($kedua->fresh()->role)->toBe(Role::User);
+});
+
+test('admin biasa tidak dapat mengubah status administrator lain', function () {
+    $lain = User::factory()->admin()->create(['status' => UserStatus::Aktif]);
+
+    Livewire::actingAs($this->admin)
+        ->test(UserManager::class)
+        ->call('changeStatus', $lain->id, UserStatus::Suspend->value);
+
+    expect($lain->fresh()->status)->toBe(UserStatus::Aktif);
+});
+
+test('super admin dapat mengubah status administrator lain', function () {
+    $lain = User::factory()->admin()->create(['status' => UserStatus::Aktif]);
+
+    Livewire::actingAs($this->superAdmin)
+        ->test(UserManager::class)
+        ->call('changeStatus', $lain->id, UserStatus::Suspend->value);
+
+    expect($lain->fresh()->status)->toBe(UserStatus::Suspend);
+});
+
+test('pilihan peran admin biasa tidak memuat administrator', function () {
+    Livewire::actingAs($this->admin)
+        ->test(UserManager::class)
+        ->assertViewHas('roleOptions', fn (array $opsi) => array_keys($opsi) === [
+            Role::User->value,
+            Role::Provider->value,
+        ])
+        ->assertViewHas('isSuperAdmin', false);
+
+    Livewire::actingAs($this->superAdmin)
+        ->test(UserManager::class)
+        ->assertViewHas('roleOptions', fn (array $opsi) => array_key_exists(Role::Admin->value, $opsi))
+        ->assertViewHas('isSuperAdmin', true);
+});
+
+test('peran yang tidak dikenal ditolak', function () {
+    $user = User::factory()->create();
+
+    Livewire::actingAs($this->superAdmin)
         ->test(UserManager::class)
         ->call('changeRole', $user->id, 'superadmin');
 

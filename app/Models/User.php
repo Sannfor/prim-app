@@ -30,6 +30,7 @@ class User extends Authenticatable // implements MustVerifyEmail
         'email',
         'password',
         'role',
+        'is_super_admin',
         'status',
         'last_login_at',
         'phone',
@@ -59,6 +60,7 @@ class User extends Authenticatable // implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'role' => RoleCast::class,
+            'is_super_admin' => 'boolean',
             'status' => UserStatus::class,
             'last_login_at' => 'datetime',
             'settings' => 'array',
@@ -103,6 +105,27 @@ class User extends Authenticatable // implements MustVerifyEmail
     public function isAdmin(): bool
     {
         return $this->role === Role::Admin;
+    }
+
+    /**
+     * Apakah pengguna ini Super Admin.
+     *
+     * Super Admin adalah tingkat tertinggi di dalam peran admin. Hanya tingkat
+     * ini yang boleh mengangkat pengguna menjadi administrator dan mengubah
+     * peran administrator lain. Akun administrator biasa tetap dapat mengelola
+     * layanan, transaksi, voucher, serta status pembeli dan penyedia.
+     */
+    public function isSuperAdmin(): bool
+    {
+        return $this->isAdmin() && (bool) $this->is_super_admin;
+    }
+
+    /**
+     * Apakah pengguna ini administrator biasa (bukan Super Admin).
+     */
+    public function isAdminBiasa(): bool
+    {
+        return $this->isAdmin() && ! (bool) $this->is_super_admin;
     }
 
     /**

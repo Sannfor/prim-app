@@ -92,6 +92,7 @@ class DemoDataSeeder extends Seeder
                 'name' => 'Super Admin',
                 'password' => Hash::make('password'),
                 'role' => Role::Admin,
+                'is_super_admin' => true,
                 'status' => UserStatus::Aktif,
                 'phone' => '+62 858 2812 0489',
                 'address' => 'Banjarbaru, Kalimantan Selatan',
@@ -101,13 +102,15 @@ class DemoDataSeeder extends Seeder
         );
 
         // Akun admin lama tetap dipertahankan agar tautan dokumentasi lama
-        // dan pengujian yang memakai alamat ini tidak putus.
+        // dan pengujian yang memakai alamat ini tidak putus. Akun ini sengaja
+        // administrator biasa, sebagai pembanding Super Admin di atas.
         User::updateOrCreate(
             ['email' => 'admin@prim.test'],
             [
                 'name' => 'Admin PRIM',
                 'password' => Hash::make('password'),
                 'role' => Role::Admin,
+                'is_super_admin' => false,
                 'status' => UserStatus::Aktif,
                 'phone' => '081100000001',
                 'last_login_at' => now()->subHours(2),

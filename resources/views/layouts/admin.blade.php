@@ -163,7 +163,7 @@
                                 </span>
                                 <div class="leading-tight">
                                     <p class="text-sm font-medium text-ink-strong">{{ $user?->name }}</p>
-                                    <p class="text-xs text-muted">{{ $user?->role->label() }}</p>
+                                    <p class="text-xs text-muted">{{ $user?->isSuperAdmin() ? 'Super Admin' : $user?->role->label() }}</p>
                                 </div>
                             </div>
                         </div>

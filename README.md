@@ -171,10 +171,17 @@ Seluruh akun hasil seeder memakai kata sandi **`password`**.
 
 ### Administrator
 
-| Email | Peran | Akses |
+Peran `admin` memiliki dua tingkat. Pembedaannya disimpan pada kolom
+`users.is_super_admin`.
+
+| Email | Tingkat | Akses |
 |---|---|---|
-| `admin@prim.com` | Administrator (Super Admin) | Seluruh panel `/admin` |
-| `admin@prim.test` | Administrator | Seluruh panel `/admin` |
+| `admin@prim.com` | Super Admin | Seluruh panel `/admin`, termasuk mengangkat administrator dan mengubah peran/status administrator lain |
+| `admin@prim.test` | Administrator biasa | Seluruh panel `/admin`, kecuali mengangkat administrator dan menyentuh akun administrator lain |
+
+Pilihan "Administrator" pada daftar peran di `/admin/pengguna` hanya muncul untuk Super
+Admin; administrator biasa melihat baris administrator lain dalam keadaan terkunci.
+Akun administrator tidak dapat mengubah peran maupun status akunnya sendiri.
 
 Cara masuk sebagai admin: buka `/login` → masukkan kredensial di atas → setelah
 masuk, klik avatar di kanan atas lalu pilih **Panel Pengelola**, atau langsung

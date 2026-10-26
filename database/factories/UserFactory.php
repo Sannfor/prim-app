@@ -52,11 +52,26 @@ class UserFactory extends Factory
 
     /**
      * Buat pengguna dengan peran administrator platform.
+     *
+     * Administrator biasa: tidak dapat mengangkat administrator lain.
      */
     public function admin(): static
     {
         return $this->state(fn (array $attributes) => [
             'role' => Role::Admin,
+            'is_super_admin' => false,
+        ]);
+    }
+
+    /**
+     * Buat pengguna Super Admin: administrator yang boleh mengangkat
+     * administrator lain dan mengubah peran administrator.
+     */
+    public function superAdmin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => Role::Admin,
+            'is_super_admin' => true,
         ]);
     }
 

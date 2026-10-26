@@ -83,7 +83,18 @@
                                 Select bawaan dirender oleh sistem operasi sehingga
                                 daftar pilihannya terpotong oleh area gulir tabel dan
                                 sebagian pilihan tidak terlihat.
+
+                                Pilihan peran berasal dari $roleOptions, yang untuk
+                                administrator biasa tidak memuat Administrator. Baris
+                                berisi administrator lain dikunci agar tidak dapat
+                                diubah oleh administrator biasa.
                             --}}
+                            @if ($user->isAdmin() && ! $isSuperAdmin)
+                                <span class="inline-flex items-center gap-1.5 rounded-lg border border-line-soft bg-surface-muted px-2.5 py-1.5 text-xs text-muted">
+                                    <flux:icon.lock-closed class="size-3.5" />
+                                    {{ $user->role->label() }}
+                                </span>
+                            @else
                             <flux:dropdown position="bottom" align="start">
                                 <button
                                     type="button"
@@ -94,7 +105,7 @@
                                 </button>
 
                                 <flux:menu>
-                                    @foreach ($roles as $value => $label)
+                                    @foreach ($roleOptions as $value => $label)
                                         <flux:menu.item
                                             as="button"
                                             type="button"
@@ -107,6 +118,7 @@
                                     @endforeach
                                 </flux:menu>
                             </flux:dropdown>
+                            @endif
                         </td>
                         <td class="px-4 py-3">
                             {{-- Pemilih status, alasan yang sama seperti pemilih peran. --}}

@@ -41,6 +41,9 @@ class UserManager extends Component
 
     /**
      * Ubah status akun seorang pengguna.
+     *
+     * Status administrator hanya boleh diubah oleh Super Admin, agar
+     * administrator biasa tidak dapat menyuspend rekannya sendiri.
      */
     public function changeStatus(int $userId, string $status): void
     {
@@ -58,6 +61,12 @@ class UserManager extends Component
             return;
         }
 
+        if ($target->isAdmin() && ! auth()->user()->isSuperAdmin()) {
+            Flux::toast(variant: 'danger', text: 'Hanya Super Admin yang dapat mengubah status administrator lain.');
+
+            return;
+        }
+
         $target->update(['status' => $status]);
 
         Flux::toast(variant: 'success', text: 'Status pengguna berhasil diperbarui.');
@@ -65,12 +74,19 @@ class UserManager extends Component
 
     /**
      * Ubah peran seorang pengguna.
+     *
+     * Aturan tingkat administrator:
+     *   - mengangkat pengguna menjadi admin hanya oleh Super Admin;
+     *   - mengubah peran administrator lain hanya oleh Super Admin;
+     *   - Super Admin terakhir tidak boleh diturunkan agar tidak ada akun yang
+     *     dapat mengangkat administrator lagi.
      */
     public function changeRole(int $userId, string $role): void
     {
         $target = User::query()->findOrFail($userId);
+        $pelaku = auth()->user();
 
-        if ($target->id === auth()->id() && $role !== Role::Admin->value) {
+        if ($target->id === $pelaku->id && $role !== Role::Admin->value) {
             Flux::toast(
                 variant: 'danger',
                 text: 'Anda tidak dapat menurunkan peran akun Anda sendiri.'
@@ -85,9 +101,51 @@ class UserManager extends Component
             return;
         }
 
+        $menjadiAdmin = $role === Role::Admin->value;
+        $targetAdmin = $target->isAdmin();
+
+        if (! $pelaku->isSuperAdmin() && $menjadiAdmin && ! $targetAdmin) {
+            Flux::toast(
+                variant: 'danger',
+                text: 'Hanya Super Admin yang dapat mengangkat pengguna menjadi administrator.'
+            );
+
+            return;
+        }
+
+        if (! $pelaku->isSuperAdmin() && $targetAdmin && ! $menjadiAdmin) {
+            Flux::toast(
+                variant: 'danger',
+                text: 'Hanya Super Admin yang dapat mengubah peran administrator lain.'
+            );
+
+            return;
+        }
+
         $target->update(['role' => $role]);
 
         Flux::toast(variant: 'success', text: 'Peran pengguna berhasil diperbarui.');
+    }
+
+    /**
+     * Pilihan peran yang boleh diberikan oleh pengguna yang sedang masuk.
+     *
+     * Administrator biasa hanya dapat memilih Pelanggan dan Penyedia Layanan;
+     * pilihan Administrator hanya muncul untuk Super Admin.
+     *
+     * @return array<string, string>
+     */
+    private function pilihanPeran(): array
+    {
+        $semua = Role::options();
+
+        if (auth()->user()?->isSuperAdmin()) {
+            return $semua;
+        }
+
+        unset($semua[Role::Admin->value]);
+
+        return $semua;
     }
 
     public function render(): View
@@ -119,6 +177,8 @@ class UserManager extends Component
         return view('admin::livewire.user-manager', [
             'users' => $users,
             'roles' => Role::options(),
+            'roleOptions' => $this->pilihanPeran(),
+            'isSuperAdmin' => (bool) auth()->user()?->isSuperAdmin(),
             'statuses' => UserStatus::options(),
             'cards' => [
                 ['label' => 'Total Pengguna', 'value' => Number::format($total, locale: 'id'), 'hint' => 'Seluruh akun terdaftar'],
